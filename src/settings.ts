@@ -1,5 +1,5 @@
-import { App, PluginSettingTab, Setting } from 'obsidian'
-import TimelinesPlugin from './main'
+import { App, PluginSettingTab, Setting } from 'obsidian';
+import TimelinesPlugin from './main';
 
 export class TimelinesSettingTab extends PluginSettingTab {
 	plugin: TimelinesPlugin;
@@ -17,14 +17,17 @@ export class TimelinesSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Default timeline tag')
-			.setDesc("Tag to specify which notes to include in created timelines e.g. timeline for #timeline tag")
-			.addText(text => text
-				.setPlaceholder(this.plugin.settings.timelineTag)
-				.onChange(async (value) => {
-					this.plugin.settings.timelineTag = value;
-					await this.plugin.saveSettings();
-				}));
-
+			.setDesc(
+				'Tag to specify which notes to include in created timelines e.g. timeline for #timeline tag'
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder(this.plugin.settings.timelineTag)
+					.onChange(async (value) => {
+						this.plugin.settings.timelineTag = value;
+						await this.plugin.saveSettings();
+					})
+			);
 
 		new Setting(containerEl)
 			.setName('Chronological Direction')
@@ -35,6 +38,6 @@ export class TimelinesSettingTab extends PluginSettingTab {
 					this.plugin.settings.sortDirection = value;
 					await this.plugin.saveSettings();
 				});
-			})
+			});
 	}
 }

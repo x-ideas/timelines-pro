@@ -6,15 +6,18 @@ specifiers:
   '@rollup/plugin-typescript': ^6.0.0
   '@types/node': ^14.14.2
   obsidian: https://github.com/obsidianmd/obsidian-api/tarball/master
+  prettier: ^2.8.3
   rollup: ^2.32.1
   rollup-plugin-styles: ^3.14.1
   tslib: ^2.0.3
   typescript: ^4.0.3
+  vis-data: ^7.1.4
   vis-timeline: ^7.4.6
 
 dependencies:
   rollup-plugin-styles: 3.14.1_rollup@2.38.5
-  vis-timeline: 7.4.6
+  vis-data: 7.1.4
+  vis-timeline: 7.4.6_vis-data@7.1.4
 
 devDependencies:
   '@rollup/plugin-commonjs': 15.1.0_rollup@2.38.5
@@ -22,6 +25,7 @@ devDependencies:
   '@rollup/plugin-typescript': 6.1.0_1af113bc6caf2a8dd0b2fb47e45ab2f0
   '@types/node': 14.14.25
   obsidian: '@github.com/obsidianmd/obsidian-api/tarball/master'
+  prettier: 2.8.3
   rollup: 2.38.5
   tslib: 2.1.0
   typescript: 4.1.3
@@ -1359,6 +1363,12 @@ packages:
       source-map: 0.6.1
     dev: false
 
+  /prettier/2.8.3:
+    resolution: {integrity: sha512-tJ/oJ4amDihPoufT5sM0Z1SKEuKay8LfVAMlbbhnnkvt6BUserZylqo2PN+p9KeljLr0OHa2rXHU1T8reeoTrw==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
+    dev: true
+
   /q/1.5.1:
     resolution: {integrity: sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==}
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
@@ -1591,7 +1601,15 @@ packages:
     resolution: {integrity: sha512-/juG65kTL4Cy2su4P8HjtkTxk6VmJDiOPBufWniqQ6wknac6jNiXS9vU+hO3wgusiyqWlzTbVHi0dyJqRONg3w==}
     dev: false
 
-  /vis-timeline/7.4.6:
+  /vis-data/7.1.4:
+    resolution: {integrity: sha512-usy+ePX1XnArNvJ5BavQod7YRuGQE1pjFl+pu7IS6rCom2EBoG0o1ZzCqf3l5US6MW51kYkLR+efxRbnjxNl7w==}
+    requiresBuild: true
+    peerDependencies:
+      uuid: ^7.0.0 || ^8.0.0
+      vis-util: ^4.0.0 || ^5.0.0
+    dev: false
+
+  /vis-timeline/7.4.6_vis-data@7.1.4:
     resolution: {integrity: sha512-U4InXbpSaSH8Ag91RRnrjsC4Mf6SXNfdeCqVI3E2G1UrEM890otLS14/VpRYBYJkwSrFCVS2lPntEJHnU2XwTQ==}
     requiresBuild: true
     peerDependencies:
@@ -1604,6 +1622,8 @@ packages:
       vis-data: ^6.3.0 || ^7.0.0
       vis-util: ^3.0.0 || ^4.0.0 || ^5.0.0
       xss: ^1.0.0
+    dependencies:
+      vis-data: 7.1.4
     dev: false
 
   /which-boxed-primitive/1.0.2:

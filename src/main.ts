@@ -13,27 +13,55 @@ export default class TimelinesPlugin extends Plugin {
 		console.log('Loaded Timelines Plugin');
 
 		// Register timeline block renderer
-		this.registerMarkdownCodeBlockProcessor('timeline', async (source, el, ctx) => {
-			const proc = new TimelineProcessor();
-			await proc.run(source, el, this.settings, this.app.vault.getMarkdownFiles(), this.app.metadataCache, this.app.vault, false);
-		});
+		this.registerMarkdownCodeBlockProcessor(
+			'timeline-x',
+			async (source, el, ctx) => {
+				const proc = new TimelineProcessor();
+				await proc.run(
+					source,
+					el,
+					this.settings,
+					this.app.vault.getMarkdownFiles(),
+					this.app.metadataCache,
+					this.app.vault,
+					false
+				);
+			}
+		);
 
 		// Register vis-timeline block renderer
-		this.registerMarkdownCodeBlockProcessor('timeline-vis', async (source, el, ctx) => {
-			const proc = new TimelineProcessor();
-			await proc.run(source, el, this.settings, this.app.vault.getMarkdownFiles(), this.app.metadataCache, this.app.vault, true);
-		});
+		this.registerMarkdownCodeBlockProcessor(
+			'timeline-vis-x',
+			async (source, el, ctx) => {
+				const proc = new TimelineProcessor();
+				await proc.run(
+					source,
+					el,
+					this.settings,
+					this.app.vault.getMarkdownFiles(),
+					this.app.metadataCache,
+					this.app.vault,
+					true
+				);
+			}
+		);
 
 		this.addCommand({
-			id: "render-timeline",
-			name: "Render Timeline",
+			id: 'render-timeline',
+			name: 'Render Timeline',
 			callback: async () => {
 				const proc = new TimelineProcessor();
 				let view = this.app.workspace.getActiveViewOfType(MarkdownView);
 				if (view) {
-					await proc.insertTimelineIntoCurrentNote(view, this.settings, this.app.vault.getMarkdownFiles(), this.app.metadataCache, this.app.vault);
+					await proc.insertTimelineIntoCurrentNote(
+						view,
+						this.settings,
+						this.app.vault.getMarkdownFiles(),
+						this.app.metadataCache,
+						this.app.vault
+					);
 				}
-			}
+			},
 		});
 
 		this.addSettingTab(new TimelinesSettingTab(this.app, this));

@@ -4,7 +4,7 @@ export interface TimelinesSettings {
 }
 
 export interface TimelineArgs {
-	[key: string]: string
+	[key: string]: string;
 }
 
 export interface CardContainer {
