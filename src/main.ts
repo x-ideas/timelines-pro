@@ -5,6 +5,7 @@ import { TimelineProcessor } from './block';
 import { Plugin, MarkdownView } from 'obsidian';
 
 export default class TimelinesPlugin extends Plugin {
+	// @ts-ignore
 	settings: TimelinesSettings;
 
 	async onload() {
@@ -13,36 +14,38 @@ export default class TimelinesPlugin extends Plugin {
 		console.log('Loaded Timelines Plugin');
 
 		// Register timeline block renderer
+		// 垂直
 		this.registerMarkdownCodeBlockProcessor(
-			'timeline-x',
+			'timeline-pro',
 			async (source, el, ctx) => {
 				const proc = new TimelineProcessor();
-				await proc.run(
+				await proc.run({
 					source,
 					el,
-					this.settings,
-					this.app.vault.getMarkdownFiles(),
-					this.app.metadataCache,
-					this.app.vault,
-					false
-				);
+					settings: this.settings,
+					vaultFiles: this.app.vault.getMarkdownFiles(),
+					fileCache: this.app.metadataCache,
+					appVault: this.app.vault,
+					visTimeline: false,
+				});
 			}
 		);
 
 		// Register vis-timeline block renderer
+		// 水平
 		this.registerMarkdownCodeBlockProcessor(
-			'timeline-vis-x',
+			'timeline-vis-pro',
 			async (source, el, ctx) => {
 				const proc = new TimelineProcessor();
-				await proc.run(
+				await proc.run({
 					source,
 					el,
-					this.settings,
-					this.app.vault.getMarkdownFiles(),
-					this.app.metadataCache,
-					this.app.vault,
-					true
-				);
+					settings: this.settings,
+					vaultFiles: this.app.vault.getMarkdownFiles(),
+					fileCache: this.app.metadataCache,
+					appVault: this.app.vault,
+					visTimeline: true,
+				});
 			}
 		);
 
