@@ -25,27 +25,6 @@ export interface SourceArgs {
 	 * tag1;tag2;tag3
 	 */
 	tags?: string;
-
-	/**
-	 * 高度
-	 */
-	divHeight: number;
-	/**
-	 * 开始时间，YYYY-MM-DD
-	 */
-	startDate: string;
-	/**
-	 * 结束时间 YYYY-MM-DD
-	 */
-	endDate: string;
-	/**
-	 * 最小时间 YYYY-MM-DD
-	 */
-	minDate: string;
-	/**
-	 * 最大时间 YYYY-MM-DD
-	 */
-	maxDate: string;
 }
 
 /**
@@ -78,9 +57,9 @@ export type NoteData = CardContainer[];
 export type AllNotesData = NoteData[];
 
 /**
- * event中，支持的参数（存放在dataset中）
+ * event属性（存放在dataset中）
  */
-export interface IEventArgs {
+export interface IEventItem {
 	/** 类名 */
 	class?: string;
 	/**
@@ -123,7 +102,7 @@ export interface IEventArgs {
 }
 
 /** 绘制的Event的参数 */
-export interface IEventDrawArgs extends IEventArgs {
+export interface IEventDrawArgs extends IEventItem {
 	/** 事件所在的文件地址 */
 	path?: string;
 	/** 图片的地址 */

@@ -1,4 +1,4 @@
-import { groupBy, isNil } from 'lodash-es';
+import { groupBy, isNil, omit } from 'lodash-es';
 import {
 	DataGroup,
 	DataItem,
@@ -16,12 +16,12 @@ import {
 	getSortOrder,
 	parseTimeStr,
 } from './utils';
-import { IEventArgs } from './types';
+import { IEventItem, ParsedArgs } from './types';
 import { IEventDrawArgs } from './types';
 
 interface IDrawTimelineOptions {
 	events: IEventDrawArgs[];
-	options?: TimelineOptions;
+	options?: ParsedArgs;
 	/** 绘制的容器 */
 	container: HTMLElement;
 }
@@ -77,14 +77,8 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 			end: end ?? undefined,
 			group: event.groupName ?? '其他',
 		};
-		if (process.env.NODE_ENV === 'development') {
-			console.log('[timeline]: item opt', opt);
-		}
-		items.add(opt);
 
-		// items.add({
-		// 	id: getNoteId(event.dataset as IEventArgs),
-		// });
+		items.add(opt);
 	}
 
 	// 寻找group信息
@@ -119,12 +113,19 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 	const timelineOpt: TimelineOptions = {
 		showCurrentTime: false,
 		showTooltips: false,
-		template: function (item: any) {
+		// 删除一些不需要的字段
+		...omit(options, 'tags', 'eventTags'),
+		template: function (item: any, element: HTMLElement, data: any) {
 			let eventContainer = document.createElement('div');
 			eventContainer.setText(item.content);
 			let eventCard = eventContainer.createDiv();
 			eventCard.outerHTML = item.title;
 			eventContainer.addEventListener('click', (event) => {
+				if (process.env.NODE_ENV === 'development') {
+					console.log('[timeline]: click item', item, element, data);
+				}
+				// 计算位子
+
 				let el = eventContainer.getElementsByClassName(
 					'timeline-card'
 				)[0] as HTMLElement;
@@ -134,6 +135,10 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 			return eventContainer;
 		},
 	};
+
+	if (process.env.NODE_ENV === 'development') {
+		console.log('[timeline]: timelineOpt', timelineOpt);
+	}
 
 	container.setAttribute('class', 'timeline-vis');
 	if (groupInfos.length > 0) {
@@ -149,7 +154,7 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 
 	// 组合events
 	const groupEvents = groupBy(events, (event) => {
-		return getNoteId(event as IEventArgs);
+		return getNoteId(event as IEventItem);
 	});
 
 	// 排序

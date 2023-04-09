@@ -1,7 +1,7 @@
 import { DataSet } from 'vis-data';
 import { TFile, MetadataCache, DataAdapter, moment, Vault } from 'obsidian';
 import { getAllTags } from 'obsidian';
-import { IEventArgs, IEventDrawArgs, ParsedArgs, SourceArgs } from './types';
+import { IEventItem, IEventDrawArgs, ParsedArgs, SourceArgs } from './types';
 import { isNil } from 'lodash-es';
 
 export function parseTag(tag: string, tagList: string[]) {
@@ -82,7 +82,7 @@ export function getImgUrl(vaultAdaptor: DataAdapter, path: string): string {
 	return vaultAdaptor.getResourcePath(path);
 }
 
-export function getNoteId(dataset?: IEventArgs) {
+export function getNoteId(dataset?: IEventItem) {
 	if (dataset) {
 		if (dataset['date']) {
 			return parseTimeStr(dataset['date']) + '';
@@ -101,7 +101,7 @@ export function getNoteId(dataset?: IEventArgs) {
 /**
  * 从dataset中获取排序字段（做了一些解析工作）
  */
-export function getSortOrder(dataset?: IEventArgs) {
+export function getSortOrder(dataset?: IEventItem) {
 	if (dataset) {
 		return parseTimeStr(dataset['date']) || parseTimeStr(dataset['dateStart']);
 	}
@@ -115,11 +115,11 @@ export function parseMarkdownCode(source: string): ParsedArgs {
 	// 解析
 	const sourceArgs: SourceArgs = {
 		// 默认值
-		divHeight: 400,
-		startDate: moment().subtract(1000, 'year').format('YYYY-MM-DD'),
-		endDate: moment().add(3000, 'year').format('YYYY-MM-DD'),
-		minDate: moment().subtract(1000, 'year').format('YYYY-MM-DD'),
-		maxDate: moment().add(3000, 'year').format('YYYY-MM-DD'),
+		// divHeight: 400,
+		// startDate: moment().subtract(1000, 'year').format('YYYY-MM-DD'),
+		// endDate: moment().add(3000, 'year').format('YYYY-MM-DD'),
+		// minDate: moment().subtract(1000, 'year').format('YYYY-MM-DD'),
+		// maxDate: moment().add(3000, 'year').format('YYYY-MM-DD'),
 	};
 	source.split('\n').map((e) => {
 		e = e.trim();
@@ -149,11 +149,11 @@ export function parseMarkdownCode(source: string): ParsedArgs {
 
 	// 转换
 	const args: ParsedArgs = {
-		height: sourceArgs.divHeight,
-		start: sourceArgs.startDate,
-		end: sourceArgs.endDate,
-		min: sourceArgs.minDate,
-		max: sourceArgs.maxDate,
+		// height: sourceArgs.divHeight,
+		// start: sourceArgs.startDate,
+		// end: sourceArgs.endDate,
+		// min: sourceArgs.minDate,
+		// max: sourceArgs.maxDate,
 		tags: tagList,
 		eventTags: eventWhiteTags,
 	};
@@ -188,10 +188,6 @@ export async function getValidEvents(
 	}
 
 	const res: IEventDrawArgs[] = [];
-
-	// if (process.env.NODE_ENV === 'development') {
-	// 	console.log('[timeline]: fileList', fileList);
-	// }
 
 	// 过滤
 	const eventWhiteTags = new Set(opt.parsedArgs['eventTags']);
