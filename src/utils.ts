@@ -177,7 +177,7 @@ interface IGetEventsOptions {
  */
 export async function getValidEvents(
 	opt: IGetEventsOptions
-): Promise<HTMLElement[]> {
+): Promise<IEventDrawArgs[]> {
 	// 使用tags过滤文件
 	let fileList = opt.vaultFiles.filter((file) =>
 		FilterMDFiles(file, opt.parsedArgs.tags || [], opt.fileCache)
@@ -187,7 +187,7 @@ export async function getValidEvents(
 		return [];
 	}
 
-	const res: HTMLElement[] = [];
+	const res: IEventDrawArgs[] = [];
 
 	// if (process.env.NODE_ENV === 'development') {
 	// 	console.log('[timeline]: fileList', fileList);
@@ -224,11 +224,14 @@ export async function getValidEvents(
 					}, []);
 
 				// 如果没有交集，跳过
-				if (!eventTags.some((tag) => eventWhiteTags.has(tag))) {
+				if (
+					eventWhiteTags.size > 0 &&
+					!eventTags.some((tag) => eventWhiteTags.has(tag))
+				) {
 					continue;
 				}
 			} else {
-				if (!eventWhiteTags.has('none')) {
+				if (eventWhiteTags.size > 0 && !eventWhiteTags.has('none')) {
 					// 没有包含none的话，则表示不选中
 					continue;
 				}
@@ -244,9 +247,11 @@ export async function getValidEvents(
 					event.dataset.img
 				);
 			}
+			// 读取innerHTML
+			event.dataset.innerHTML = event.innerHTML;
 
 			// 添加到结果中
-			res.push(event);
+			res.push(event.dataset);
 		}
 	}
 
@@ -257,8 +262,8 @@ export async function getValidEvents(
  * 解析时间字符串
  * 中间使用/分割
  * @example
- * 	1940/9/9
- * -231/8/3
+ * 	1940/9/9 = 19400909
+ * -231/8/3 => -002310803
  */
 export function parseTimeStr(str?: string): number {
 	str = str?.trim();
@@ -308,4 +313,12 @@ export function getEventImagePath(dataset?: IEventDrawArgs) {
 
 export function getEventSourcePath(dataset?: IEventDrawArgs) {
 	return dataset?.path;
+}
+
+export function getEventStartTime(dataset?: IEventDrawArgs) {
+	return dataset?.date || dataset?.dateStart || undefined;
+}
+
+export function getEventEndTime(dataset?: IEventDrawArgs) {
+	return dataset?.dateEnd || undefined;
 }

@@ -128,4 +128,6 @@ export interface IEventDrawArgs extends IEventArgs {
 	path?: string;
 	/** 图片的地址 */
 	imgRealPath?: string;
+
+	innerHTML?: string;
 }

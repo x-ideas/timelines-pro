@@ -1,18 +1,9 @@
 //import Gallery from './svelte/Gallery.svelte'
-import type { TimelinesSettings, AllNotesData, SourceArgs } from './types';
+import type { TimelinesSettings } from './types';
 import { RENDER_TIMELINE } from './constants';
-import { TFile, MarkdownView, MetadataCache, Vault, moment } from 'obsidian';
-import { Timeline, TimelineOptions } from 'vis-timeline/esnext';
-import { DataSet } from 'vis-data';
+import { TFile, MarkdownView, MetadataCache, Vault } from 'obsidian';
 import 'vis-timeline/styles/vis-timeline-graph2d.css';
-import {
-	FilterMDFiles,
-	createDate,
-	getImgUrl,
-	getValidEvents,
-	parseMarkdownCode,
-	parseTag,
-} from './utils';
+import { getValidEvents, parseMarkdownCode } from './utils';
 import { drawTimeline, drawVisTimeline } from './draw-timeline';
 
 interface IRunOpt {
@@ -94,58 +85,6 @@ export class TimelineProcessor {
 		} else {
 			args.tags = [settings.timelineTag];
 		}
-
-		// let args: SourceArgs = {
-		// 	tags: '',
-		// 	divHeight: 400,
-		// 	startDate: moment().subtract(1000, 'year').format('YYYY-MM-DD'),
-		// 	endDate: moment().add(3000, 'year').format('YYYY-MM-DD'),
-		// 	minDate: moment().subtract(1000, 'year').format('YYYY-MM-DD'),
-		// 	maxDate: moment().add(3000, 'year').format('YYYY-MM-DD'),
-		// };
-
-		// // read arguments
-		// if (visTimeline) {
-		// 	source.split('\n').map((e) => {
-		// 		e = e.trim();
-		// 		if (e) {
-		// 			let param = e.split('=');
-		// 			if (param[1]) {
-		// 				// @ts-ignore
-		// 				args[param[0]] = param[1]?.trim();
-		// 			}
-		// 		}
-		// 	});
-		// } else {
-		// 	let lines = source.trim();
-		// 	// Parse the tags to search for the proper files
-		// 	args.tags = lines;
-		// }
-
-		// let tagList: string[] = [];
-		// args.tags.split(';').forEach((tag) => parseTag(tag, tagList));
-		// // 默认的timeline tag
-		// tagList.push(settings.timelineTag);
-
-		// // 收集白名单event-tags
-		// const eventWhiteTags = args['event-tags']
-		// 	?.split(';')
-		// 	.reduce<string[]>((accu, tag) => {
-		// 		const tagList: string[] = [];
-		// 		parseTag(tag, tagList);
-		// 		accu.push(...tagList);
-		// 		return accu;
-		// 	}, []);
-
-		// if (process.env.NODE_ENV === 'development') {
-		// 	console.log('[timeline]: args', args, 'tagList', tagList);
-		// }
-
-		// if (process.env.NODE_ENV === 'development') {
-		// 	console.log('[timeline]: eventWhiteTags', eventWhiteTags);
-		// }
-		// // 去重
-		// const eventWhiteTagsSet = new Set(eventWhiteTags);
 
 		const events = await getValidEvents({
 			vaultFiles,
