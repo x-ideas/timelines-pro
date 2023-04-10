@@ -141,9 +141,11 @@ export function parseMarkdownCode(source: string): ParsedArgs {
 	const eventWhiteTags = sourceArgs['eventTags']
 		?.split(';')
 		.reduce<string[]>((accu, tag) => {
-			const tagList: string[] = [];
-			parseTag(tag, tagList);
-			accu.push(...tagList);
+			// const tagList: string[] = [];
+			// parseTag(tag, tagList);
+			// accu.push(...tagList);
+			// NOTE: 不解析tag，直接全匹配
+			accu.push(tag);
 			return accu;
 		}, []);
 
@@ -213,13 +215,15 @@ export async function getValidEvents(
 				const eventTags = event.dataset['eventTags']
 					.split(';')
 					.reduce<string[]>((accu, tag) => {
-						const tagList: string[] = [];
-						parseTag(tag, tagList);
-						accu.push(...tagList);
+						// const tagList: string[] = [];
+						// parseTag(tag, tagList);
+						// accu.push(...tagList);
+						// NOTE: 不解析tag,直接全匹配
+						accu.push(tag);
 						return accu;
 					}, []);
 
-				// 如果没有交集，跳过
+				// 如果没有交集，跳过（或的关系)
 				if (
 					eventWhiteTags.size > 0 &&
 					!eventTags.some((tag) => eventWhiteTags.has(tag))
