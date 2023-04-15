@@ -7,12 +7,15 @@
     "dev": "NODE_ENV='development' VERBOSE=true node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
     "version": "node version-bump.mjs && git add manifest.json versions.json",
-    "build:old": "rollup --config rollup.config.js"
+    "build:old": "rollup --config rollup.config.js",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@commitlint/cli": "^17.6.1",
+    "@commitlint/config-conventional": "^17.6.1",
     "@rollup/plugin-commonjs": "^15.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-typescript": "^6.0.0",
@@ -21,6 +24,8 @@
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
     "eslint-config-prettier": "^8.8.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.2.1",
     "obsidian": "latest",
     "prettier": "^2.8.3",
     "rollup": "^2.32.1",
