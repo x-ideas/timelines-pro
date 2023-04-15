@@ -1,0 +1,13 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true // 启用它, 开启save时执行eslint --fix
+  },
+  "eslint.nodeEnv": "development",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "compile-hero.disable-compile-files-on-did-save-code": false
+}
