@@ -20,7 +20,7 @@ const context = await esbuild.context({
   plugins: [
     esbuildSvelte({
       compilerOptions: { css: true },
-      preprocess: sveltePreprocess(),
+      preprocess: [sveltePreprocess()],
     }),
   ],
   entryPoints: ['src/main.ts'],
