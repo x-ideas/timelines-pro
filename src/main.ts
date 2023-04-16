@@ -24,6 +24,10 @@ export default class TimelinesPlugin extends Plugin {
 		this.registerMarkdownCodeBlockProcessor(
 			'timeline-pro',
 			async (source, el, ctx) => {
+				const currentFile = this.app.metadataCache.getFirstLinkpathDest(
+					ctx.sourcePath,
+					''
+				);
 				const proc = new TimelineProcessor();
 				await proc.run({
 					source,
@@ -33,6 +37,7 @@ export default class TimelinesPlugin extends Plugin {
 					fileCache: this.app.metadataCache,
 					appVault: this.app.vault,
 					visTimeline: false,
+					currentFile: currentFile,
 				});
 			}
 		);
@@ -42,6 +47,12 @@ export default class TimelinesPlugin extends Plugin {
 		this.registerMarkdownCodeBlockProcessor(
 			'timeline-vis-pro',
 			async (source, el, ctx) => {
+				// 获取当前文件
+				const currentFile = this.app.metadataCache.getFirstLinkpathDest(
+					ctx.sourcePath,
+					''
+				);
+
 				const proc = new TimelineProcessor();
 				await proc.run({
 					source,
@@ -51,6 +62,7 @@ export default class TimelinesPlugin extends Plugin {
 					fileCache: this.app.metadataCache,
 					appVault: this.app.vault,
 					visTimeline: true,
+					currentFile,
 				});
 			}
 		);
@@ -61,13 +73,15 @@ export default class TimelinesPlugin extends Plugin {
 			callback: async () => {
 				const proc = new TimelineProcessor();
 				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+
 				if (view) {
 					await proc.insertTimelineIntoCurrentNote(
 						view,
 						this.settings,
 						this.app.vault.getMarkdownFiles(),
 						this.app.metadataCache,
-						this.app.vault
+						this.app.vault,
+						view.file
 					);
 				}
 			},

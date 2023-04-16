@@ -5,6 +5,7 @@ import type { TFile, MarkdownView, MetadataCache, Vault } from 'obsidian';
 import 'vis-timeline/styles/vis-timeline-graph2d.css';
 import { getValidEvents, parseMarkdownCode } from './utils';
 import { drawTimeline, drawVisTimeline } from './draw-timeline';
+import { insertFileLinkIfNeed } from './insert-file-link';
 
 interface IRunOpt {
 	/**
@@ -25,6 +26,8 @@ interface IRunOpt {
 	fileCache: MetadataCache;
 	appVault: Vault;
 	visTimeline: boolean;
+
+	currentFile: TFile | null;
 }
 
 export class TimelineProcessor {
@@ -33,7 +36,8 @@ export class TimelineProcessor {
 		settings: TimelinesSettings,
 		vaultFiles: TFile[],
 		fileCache: MetadataCache,
-		appVault: Vault
+		appVault: Vault,
+		currentFile: TFile | null
 	) {
 		const editor = sourceView.editor;
 		if (editor) {
@@ -58,6 +62,7 @@ export class TimelineProcessor {
 					fileCache,
 					appVault,
 					visTimeline: false,
+					currentFile,
 				});
 				div.appendChild(rendered);
 				div.appendChild(document.createComment('TIMELINE END'));
@@ -76,6 +81,7 @@ export class TimelineProcessor {
 			fileCache,
 			appVault,
 			visTimeline,
+			currentFile,
 		} = opt;
 
 		const args = parseMarkdownCode(source);
@@ -112,5 +118,11 @@ export class TimelineProcessor {
 		}
 
 		el.appendChild(timeline);
+
+		if (currentFile) {
+			insertFileLinkIfNeed(currentFile, app, events);
+		} else {
+			console.error('[timeline] currentFile is null');
+		}
 	}
 }

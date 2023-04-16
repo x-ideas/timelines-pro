@@ -25,7 +25,7 @@ export class EventTagsView extends ItemView {
 	// @ts-ignore
 	component: Component;
 
-	eventTagsMap: Map<string, IEventDrawArgs>;
+	eventTagsMap: Map<string, IEventDrawArgs[]>;
 
 	changeEventRef?: ReturnType<typeof this.app.metadataCache.on>;
 
@@ -108,8 +108,10 @@ export class EventTagsView extends ItemView {
 	/** 刷新view */
 	private refreshUI() {
 		const eventTagSet = new Set<string>();
-		for (const event of this.eventTagsMap.values()) {
-			event.eventTags?.forEach((tag) => eventTagSet.add(tag));
+		for (const timeline of this.eventTagsMap.values()) {
+			for (const event of timeline) {
+				event.eventTags?.forEach((tag) => eventTagSet.add(tag));
+			}
 		}
 
 		const tagArray = Array.from(eventTagSet);
@@ -124,10 +126,12 @@ export class EventTagsView extends ItemView {
 
 		// 找到需要修改的文件
 		const files: TFile[] = [];
-		for (const event of this.eventTagsMap.values()) {
-			if (includes(event.eventTags, oldTag)) {
-				if (event.path) {
-					files.push(event.file);
+		for (const timeline of this.eventTagsMap.values()) {
+			for (const event of timeline) {
+				if (includes(event.eventTags, oldTag)) {
+					if (event.path) {
+						files.push(event.file);
+					}
 				}
 			}
 		}

@@ -1,6 +1,5 @@
-import { DataSet } from 'vis-data';
 import type { TFile, MetadataCache, DataAdapter, Vault } from 'obsidian';
-import { moment } from 'obsidian';
+
 import { getAllTags } from 'obsidian';
 import type {
 	IEventItem,
@@ -187,9 +186,9 @@ interface IGetEventsOptions {
 export async function getTimelineEventInFile(
 	files: TFile[],
 	appVault: Vault
-): Promise<Map<string, IEventDrawArgs>> {
+): Promise<Map<string, IEventDrawArgs[]>> {
 	const domparser = new DOMParser();
-	const res = new Map<string, IEventDrawArgs>();
+	const res = new Map<string, IEventDrawArgs[]>();
 
 	for (const file of files) {
 		const doc = domparser.parseFromString(
@@ -199,6 +198,10 @@ export async function getTimelineEventInFile(
 		// timeline div
 		const timelineData = doc.getElementsByClassName('ob-timelines');
 
+		const timelines: IEventDrawArgs[] = [];
+		// NOTE: 额外dataset处理一些参数
+		const notePath = '/' + file.path;
+		const path = notePath;
 		for (const event of timelineData as any) {
 			if (!(event instanceof HTMLElement)) {
 				continue;
@@ -218,9 +221,6 @@ export async function getTimelineEventInFile(
 					}, []);
 			}
 
-			// NOTE: 额外dataset处理一些参数
-			const notePath = '/' + file.path;
-			const path = notePath;
 			// event.dataset.path = notePath;
 
 			let imgRealPath = '';
@@ -239,8 +239,10 @@ export async function getTimelineEventInFile(
 				eventTags,
 				file: file,
 			};
-			res.set(path, timelineEvent);
+
+			timelines.push(timelineEvent);
 		}
+		res.set(path, timelines);
 	}
 
 	return res;
@@ -264,70 +266,89 @@ export async function getValidEvents(
 	}
 
 	const res: IEventDrawArgs[] = [];
+	const timelineEvents = await getTimelineEventInFile(fileList, opt.appVault);
 
 	// 过滤
 	const eventWhiteTags = new Set(opt.parsedArgs['eventTags']);
+	// 过滤
+	for (const timeline of timelineEvents.values()) {
+		for (const event of timeline) {
+			if (eventWhiteTags.size > 0) {
+				// 指定要选择的event tag
+				if (event.eventTags?.some((tag) => eventWhiteTags.has(tag))) {
+					res.push(event);
+				}
 
-	for (const file of fileList) {
-		// Create a DOM Parser
-		const domparser = new DOMParser();
-		const doc = domparser.parseFromString(
-			await opt.appVault.read(file),
-			'text/html'
-		);
-		// timeline div
-		const timelineData = doc.getElementsByClassName('ob-timelines');
-
-		for (const event of timelineData as any) {
-			if (!(event instanceof HTMLElement)) {
-				continue;
-			}
-
-			/** event的tag属性 */
-			/** tags: ;分割 */
-			if (event.dataset['eventTags']) {
-				const eventTags = event.dataset['eventTags']
-					.split(';')
-					.reduce<string[]>((accu, tag) => {
-						// const tagList: string[] = [];
-						// parseTag(tag, tagList);
-						// accu.push(...tagList);
-						// NOTE: 不解析tag,直接全匹配
-						accu.push(tag);
-						return accu;
-					}, []);
-
-				// 如果没有交集，跳过（或的关系)
-				if (
-					eventWhiteTags.size > 0 &&
-					!eventTags.some((tag) => eventWhiteTags.has(tag))
-				) {
-					continue;
+				if (eventWhiteTags.has('none') && !event.eventTags) {
+					// 特殊情况（指定选中没有event tag的timeline)
+					res.push(event);
 				}
 			} else {
-				if (eventWhiteTags.size > 0 && !eventWhiteTags.has('none')) {
-					// 没有包含none的话，则表示不选中
-					continue;
-				}
+				res.push(event);
 			}
-
-			// NOTE: 额外dataset处理一些参数
-			const notePath = '/' + file.path;
-			event.dataset.path = notePath;
-
-			if (event.dataset.img) {
-				event.dataset.imgRealPath = getImgUrl(
-					opt.appVault.adapter,
-					event.dataset.img
-				);
-			}
-			// 读取innerHTML
-			event.dataset.innerHTML = event.innerHTML;
-
-			// 添加到结果中
-			res.push(event.dataset);
 		}
 	}
+
+	// for (const file of fileList) {
+	// 	// Create a DOM Parser
+	// 	const domparser = new DOMParser();
+	// 	const doc = domparser.parseFromString(
+	// 		await opt.appVault.read(file),
+	// 		'text/html'
+	// 	);
+	// 	// timeline div
+	// 	const timelineData = doc.getElementsByClassName('ob-timelines');
+
+	// 	for (const event of timelineData as any) {
+	// 		if (!(event instanceof HTMLElement)) {
+	// 			continue;
+	// 		}
+
+	// 		/** event的tag属性 */
+	// 		/** tags: ;分割 */
+	// 		if (event.dataset['eventTags']) {
+	// 			const eventTags = event.dataset['eventTags']
+	// 				.split(';')
+	// 				.reduce<string[]>((accu, tag) => {
+	// 					// const tagList: string[] = [];
+	// 					// parseTag(tag, tagList);
+	// 					// accu.push(...tagList);
+	// 					// NOTE: 不解析tag,直接全匹配
+	// 					accu.push(tag);
+	// 					return accu;
+	// 				}, []);
+
+	// 			// 如果没有交集，跳过（或的关系)
+	// 			if (
+	// 				eventWhiteTags.size > 0 &&
+	// 				!eventTags.some((tag) => eventWhiteTags.has(tag))
+	// 			) {
+	// 				continue;
+	// 			}
+	// 		} else {
+	// 			if (eventWhiteTags.size > 0 && !eventWhiteTags.has('none')) {
+	// 				// 没有包含none的话，则表示不选中
+	// 				continue;
+	// 			}
+	// 		}
+
+	// 		// NOTE: 额外dataset处理一些参数
+	// 		const notePath = '/' + file.path;
+	// 		event.dataset.path = notePath;
+
+	// 		if (event.dataset.img) {
+	// 			event.dataset.imgRealPath = getImgUrl(
+	// 				opt.appVault.adapter,
+	// 				event.dataset.img
+	// 			);
+	// 		}
+	// 		// 读取innerHTML
+	// 		event.dataset.innerHTML = event.innerHTML;
+
+	// 		// 添加到结果中
+	// 		res.push(event.dataset);
+	// 	}
+	// }
 
 	return res;
 }

@@ -10,7 +10,6 @@ import {
 	getEventStartTime,
 	getNoteId,
 	getSortOrder,
-	parseTimeStr,
 } from './utils';
 import type { IEventItem, ParsedArgs } from './types';
 import type { IEventDrawArgs } from './types';
