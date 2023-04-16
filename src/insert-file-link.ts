@@ -13,15 +13,13 @@ export async function insertFileLinkIfNeed(
 	const links = new Set();
 	// 判断是否需要插入文件链接
 	for (const event of events) {
-		const reg = new RegExp(`\\[\\[${event.file.name}\\]\\]`);
-		if (!reg.test(fileContent)) {
+		if (!fileContent.includes(`[[${event.file.name}]]`)) {
 			links.add(`[[${event.file.name}]]`);
 		}
 	}
 
 	if (links.size > 0) {
-		const newFileContent =
-			fileContent + '\n## 附录\n' + Array.from(links).join('\n');
+		const newFileContent = fileContent + '\n' + Array.from(links).join('\n');
 
 		app.vault.modify(currentFile, newFileContent);
 	}

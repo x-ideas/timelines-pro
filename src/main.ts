@@ -4,7 +4,7 @@ import { TimelinesSettingTab } from './settings';
 import { TimelineProcessor } from './block';
 import type { TFile } from 'obsidian';
 import { Plugin, MarkdownView } from 'obsidian';
-import { EVENT_TAGS_VIEW, EventTagsView } from './ui/event-tags';
+import { TIMELINE_PANEL, TimelinePanel } from './ui/timeline-manage';
 import './app.css';
 
 export default class TimelinesPlugin extends Plugin {
@@ -89,7 +89,7 @@ export default class TimelinesPlugin extends Plugin {
 
 		this.addSettingTab(new TimelinesSettingTab(this.app, this));
 
-		this.registerView(EVENT_TAGS_VIEW, (leaf) => new EventTagsView(leaf));
+		this.registerView(TIMELINE_PANEL, (leaf) => new TimelinePanel(leaf));
 
 		this.addRibbonIcon('tags', 'Timeline', () => {
 			this.activateView();
@@ -99,19 +99,19 @@ export default class TimelinesPlugin extends Plugin {
 	onunload() {
 		console.log('unloading plugin');
 
-		this.app.workspace.detachLeavesOfType(EVENT_TAGS_VIEW);
+		this.app.workspace.detachLeavesOfType(TIMELINE_PANEL);
 	}
 
 	async activateView() {
-		this.app.workspace.detachLeavesOfType(EVENT_TAGS_VIEW);
+		this.app.workspace.detachLeavesOfType(TIMELINE_PANEL);
 
 		await this.app.workspace.getRightLeaf(false).setViewState({
-			type: EVENT_TAGS_VIEW,
+			type: TIMELINE_PANEL,
 			active: true,
 		});
 
 		this.app.workspace.revealLeaf(
-			this.app.workspace.getLeavesOfType(EVENT_TAGS_VIEW)[0]
+			this.app.workspace.getLeavesOfType(TIMELINE_PANEL)[0]
 		);
 	}
 

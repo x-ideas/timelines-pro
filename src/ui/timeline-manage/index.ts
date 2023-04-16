@@ -4,12 +4,12 @@ import { Menu } from 'obsidian';
 import { ItemView } from 'obsidian';
 import { getTimelineEventInFile } from '../../utils';
 
-import Component from './event-tags-manage.svelte';
+import Component from './timeline-manage.svelte';
 import type { IEventDrawArgs } from 'src/types';
 import { RenameModal } from '../rename-modal';
 import { includes } from 'lodash-es';
 
-export const EVENT_TAGS_VIEW = 'timeline-event-tag-view';
+export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 
 /** 搜索全文用的 */
 function getSearchTagRegExp(tag: string) {
@@ -20,7 +20,7 @@ function getSearchTagRegExp2(tag: string) {
 	return `/data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]/`;
 }
 
-export class EventTagsView extends ItemView {
+export class TimelinePanel extends ItemView {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	component: Component;
@@ -28,19 +28,24 @@ export class EventTagsView extends ItemView {
 	eventTagsMap: Map<string, IEventDrawArgs[]>;
 
 	changeEventRef?: ReturnType<typeof this.app.metadataCache.on>;
+	deleteEventRef?: ReturnType<typeof this.app.metadataCache.on>;
 
 	constructor(leaf: WorkspaceLeaf) {
-		console.log('[timeine] EventTagsView constructor');
+		console.log('[timeine] TimelinePanel constructor');
 		super(leaf);
 
 		this.eventTagsMap = new Map();
 
 		this.changeEventRef = this.app.metadataCache.on(
 			'changed',
-			async (file, fileContent, cache) => {
+			(file, fileContent, cache) => {
 				this.onFileUpdated(file);
 			}
 		);
+
+		this.deleteEventRef = this.app.metadataCache.on('deleted', (file) => {
+			this.onFileDeleted(file);
+		});
 
 		// 注册菜单
 		document.on('contextmenu', '.timeline-event-tag-wrapper', this.onMenu, {
@@ -90,7 +95,7 @@ export class EventTagsView extends ItemView {
 	};
 
 	getViewType() {
-		return EVENT_TAGS_VIEW;
+		return TIMELINE_PANEL;
 	}
 
 	getDisplayText() {
@@ -170,7 +175,7 @@ export class EventTagsView extends ItemView {
 	}
 
 	/**
-	 * 交由外界调用更新event tags
+	 * 文件更新
 	 */
 	async onFileUpdated(file: TFile) {
 		const timelineEvents = await getTimelineEventInFile([file], this.app.vault);
@@ -180,6 +185,14 @@ export class EventTagsView extends ItemView {
 			this.eventTagsMap.set(path, events);
 		}
 
+		this.refreshUI();
+	}
+
+	/**
+	 * 文件删除
+	 */
+	async onFileDeleted(file: TFile) {
+		this.eventTagsMap.delete(file.path);
 		this.refreshUI();
 	}
 
@@ -205,6 +218,10 @@ export class EventTagsView extends ItemView {
 
 		if (this.changeEventRef) {
 			this.app.metadataCache.offref(this.changeEventRef);
+		}
+
+		if (this.deleteEventRef) {
+			this.app.metadataCache.offref(this.deleteEventRef);
 		}
 	}
 }

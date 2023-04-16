@@ -1,18 +1,22 @@
 <script lang="ts">
   import '../../uno.css'
+  // export let tabs: string[];
   export let tags: string[] | undefined;
   export let onClick: (tag: string) => void;
+
+  // let currentTab: string = tabs[0];
 </script>
 
 
-<div class="number">
+
+
   {#each (tags??[]) as tag}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="timeline-event-tag-wrapper" on:click={() => {
       onClick(tag)
     }}>{tag}</div>
   {/each}
-</div>
+
 
 
 <style lang='css'>

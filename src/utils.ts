@@ -200,7 +200,7 @@ export async function getTimelineEventInFile(
 
 		const timelines: IEventDrawArgs[] = [];
 		// NOTE: 额外dataset处理一些参数
-		const notePath = '/' + file.path;
+		const notePath = file.path;
 		const path = notePath;
 		for (const event of timelineData as any) {
 			if (!(event instanceof HTMLElement)) {
