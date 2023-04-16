@@ -63,7 +63,7 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 		}
 
 		const opt: DataItem = {
-			id: getNoteId(event) || '',
+			// id: getNoteId(event) || '',
 			content: event.title ?? '',
 			title: noteCard.outerHTML,
 			start: start,
