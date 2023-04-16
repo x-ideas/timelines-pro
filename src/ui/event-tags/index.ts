@@ -1,3 +1,4 @@
+import type { Plugin } from 'obsidian';
 import { Notice, type TFile, type WorkspaceLeaf } from 'obsidian';
 import { Menu } from 'obsidian';
 import { ItemView } from 'obsidian';
@@ -9,6 +10,15 @@ import { RenameModal } from '../rename-modal';
 import { includes } from 'lodash-es';
 
 export const EVENT_TAGS_VIEW = 'timeline-event-tag-view';
+
+/** 搜索全文用的 */
+function getSearchTagRegExp(tag: string) {
+	return new RegExp(`data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]`, 'g');
+}
+/** 给搜索组件用的 */
+function getSearchTagRegExp2(tag: string) {
+	return `/data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]/`;
+}
 
 export class EventTagsView extends ItemView {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -33,18 +43,18 @@ export class EventTagsView extends ItemView {
 		);
 
 		// 注册菜单
-		document.on('contextmenu', '.tag-wrapper', this.onMenu, {
+		document.on('contextmenu', '.timeline-event-tag-wrapper', this.onMenu, {
 			capture: true,
 		});
 		this.register(() => {
-			document.off('contextmenu', '.tag-wrapper', this.onMenu, {
+			document.off('contextmenu', '.timeline-event-tag-wrapper', this.onMenu, {
 				capture: true,
 			});
 		});
 	}
 
-	onMenu = (e: MouseEvent, deleteTarget: HTMLElement) => {
-		console.log('[timeline] onMenu', e, deleteTarget);
+	onMenu = (uiEvent: MouseEvent, deleteTarget: HTMLElement) => {
+		console.log('[timeline] onMenu', uiEvent, deleteTarget);
 
 		const menu = new Menu();
 		const eventTag = deleteTarget.innerText;
@@ -60,9 +70,22 @@ export class EventTagsView extends ItemView {
 			});
 		});
 
-		this.app.workspace.trigger('tag-wrapper:contextmenu', menu, eventTag);
+		menu.addItem((item) => {
+			// 搜索
+			item.setTitle(`搜索: "${eventTag}"`);
+			item.setIcon('search');
+			item.onClick(() => {
+				this.search(eventTag);
+			});
+		});
+
+		this.app.workspace.trigger(
+			'timeline-event-tag-wrapper:contextmenu',
+			menu,
+			eventTag
+		);
 		setTimeout(() => {
-			menu.showAtPosition({ x: e.pageX, y: e.pageY }, 0);
+			menu.showAtMouseEvent(uiEvent);
 		}, 0);
 	};
 
@@ -110,10 +133,7 @@ export class EventTagsView extends ItemView {
 		}
 
 		// 正则规则: eventTags: 'a;b'
-		const reg = new RegExp(
-			`data-event-tags\\W*=\\W*['"](.*;)?${oldTag}(;.*)?['"]`,
-			'g'
-		);
+		const reg = getSearchTagRegExp(oldTag);
 
 		// 修改文件
 		for (const file of files) {
@@ -126,6 +146,22 @@ export class EventTagsView extends ItemView {
 			);
 
 			this.app.vault.modify(file, newFileContent);
+		}
+	}
+
+	/** 搜索 */
+	private search(tag: string) {
+		const searchPlugin: Plugin =
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			this.app.internalPlugins.getPluginById('global-search');
+		console.log('[timeline] search', this.app);
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		if (searchPlugin && searchPlugin.instance) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			searchPlugin.instance.openGlobalSearch(getSearchTagRegExp2(tag));
 		}
 	}
 
@@ -148,8 +184,10 @@ export class EventTagsView extends ItemView {
 		this.component = new Component({
 			target: this.contentEl,
 			props: {
-				variable: 1,
 				tags: [],
+				onClick: (tag: string) => {
+					this.search(tag);
+				},
 			},
 		});
 		await this.initEventTags();
