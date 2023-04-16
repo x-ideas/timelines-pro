@@ -1,7 +1,13 @@
 import { DataSet } from 'vis-data';
-import { TFile, MetadataCache, DataAdapter, moment, Vault } from 'obsidian';
+import type { TFile, MetadataCache, DataAdapter, Vault } from 'obsidian';
+import { moment } from 'obsidian';
 import { getAllTags } from 'obsidian';
-import { IEventItem, IEventDrawArgs, ParsedArgs, SourceArgs } from './types';
+import type {
+	IEventItem,
+	IEventDrawArgs,
+	ParsedArgs,
+	SourceArgs,
+} from './types';
 import { isNil } from 'lodash-es';
 
 export function parseTag(tag: string, tagList: string[]) {
@@ -36,10 +42,10 @@ export function FilterMDFiles(
 	const cached = metadataCache.getFileCache(file);
 	if (cached) {
 		// 文件的tag
-		let tags = getAllTags(cached)?.map((e) => e.slice(1, e.length));
+		const tags = getAllTags(cached)?.map((e) => e.slice(1, e.length));
 
 		if (tags && tags.length > 0) {
-			let filetags: string[] = [];
+			const filetags: string[] = [];
 			tags.forEach((tag) => parseTag(tag, filetags));
 			return tagList.every((val) => {
 				return filetags.indexOf(val as string) >= 0;
@@ -55,7 +61,7 @@ export function FilterMDFiles(
  * @date - string date in the format YYYY-MM-DD-HH
  */
 export function createDate(date: string): Date {
-	let dateComp = date.split(',');
+	const dateComp = date.split(',');
 	// cannot simply replace '-' as need to support negative years
 	return new Date(
 		+(dateComp[0] ?? 0),
@@ -74,7 +80,7 @@ export function getImgUrl(vaultAdaptor: DataAdapter, path: string): string {
 		return '';
 	}
 
-	let regex = new RegExp('^https://');
+	const regex = new RegExp('^https://');
 	if (path.match(regex)) {
 		return path;
 	}
@@ -82,7 +88,9 @@ export function getImgUrl(vaultAdaptor: DataAdapter, path: string): string {
 	return vaultAdaptor.getResourcePath(path);
 }
 
-export function getNoteId(dataset?: IEventItem) {
+export function getNoteId(
+	dataset?: Pick<IEventItem, 'date' | 'dateStart' | 'dateEnd'>
+) {
 	if (dataset) {
 		if (dataset['date']) {
 			return parseTimeStr(dataset['date']) + '';
@@ -101,7 +109,7 @@ export function getNoteId(dataset?: IEventItem) {
 /**
  * 从dataset中获取排序字段（做了一些解析工作）
  */
-export function getSortOrder(dataset?: IEventItem) {
+export function getSortOrder(dataset?: Pick<IEventItem, 'date' | 'dateStart'>) {
 	if (dataset) {
 		return parseTimeStr(dataset['date']) || parseTimeStr(dataset['dateStart']);
 	}
@@ -124,8 +132,9 @@ export function parseMarkdownCode(source: string): ParsedArgs {
 	source.split('\n').map((e) => {
 		e = e.trim();
 		if (e) {
-			let param = e.split('=');
+			const param = e.split('=');
 			if (param[1]) {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
 				sourceArgs[param[0]] = param[1]?.trim();
 			}
@@ -134,7 +143,7 @@ export function parseMarkdownCode(source: string): ParsedArgs {
 
 	// 额外处理tags
 
-	let tagList: string[] = [];
+	const tagList: string[] = [];
 	sourceArgs.tags?.split(';').forEach((tag) => parseTag(tag, tagList));
 
 	// 收集白名单event-tags
@@ -173,6 +182,71 @@ interface IGetEventsOptions {
 }
 
 /**
+ * 从文件中解析出事件
+ */
+export async function getTimelineEventInFile(
+	files: TFile[],
+	appVault: Vault
+): Promise<Map<string, IEventDrawArgs>> {
+	const domparser = new DOMParser();
+	const res = new Map<string, IEventDrawArgs>();
+
+	for (const file of files) {
+		const doc = domparser.parseFromString(
+			await appVault.read(file),
+			'text/html'
+		);
+		// timeline div
+		const timelineData = doc.getElementsByClassName('ob-timelines');
+
+		for (const event of timelineData as any) {
+			if (!(event instanceof HTMLElement)) {
+				continue;
+			}
+
+			let eventTags: string[] = [];
+			if (event.dataset['eventTags']) {
+				eventTags = event.dataset['eventTags']
+					.split(';')
+					.reduce<string[]>((accu, tag) => {
+						// const tagList: string[] = [];
+						// parseTag(tag, tagList);
+						// accu.push(...tagList);
+						// NOTE: 不解析tag,直接全匹配
+						accu.push(tag);
+						return accu;
+					}, []);
+			}
+
+			// NOTE: 额外dataset处理一些参数
+			const notePath = '/' + file.path;
+			const path = notePath;
+			// event.dataset.path = notePath;
+
+			let imgRealPath = '';
+			if (event.dataset.img) {
+				imgRealPath = getImgUrl(appVault.adapter, event.dataset.img);
+			}
+			// 读取innerHTML
+			// event.dataset.innerHTML = event.innerHTML;
+
+			// 添加到结果中
+			const timelineEvent: IEventDrawArgs = {
+				...event.dataset,
+				innerHTML: event.innerHTML,
+				imgRealPath,
+				path,
+				eventTags,
+				file: file,
+			};
+			res.set(path, timelineEvent);
+		}
+	}
+
+	return res;
+}
+
+/**
  * 获取所有有效的的events对象
  * 1. 通过tags对文件过滤
  * 2. 通过event-tags对event过滤
@@ -181,7 +255,7 @@ export async function getValidEvents(
 	opt: IGetEventsOptions
 ): Promise<IEventDrawArgs[]> {
 	// 使用tags过滤文件
-	let fileList = opt.vaultFiles.filter((file) =>
+	const fileList = opt.vaultFiles.filter((file) =>
 		FilterMDFiles(file, opt.parsedArgs.tags || [], opt.fileCache)
 	);
 	if (!fileList) {
@@ -194,7 +268,7 @@ export async function getValidEvents(
 	// 过滤
 	const eventWhiteTags = new Set(opt.parsedArgs['eventTags']);
 
-	for (let file of fileList) {
+	for (const file of fileList) {
 		// Create a DOM Parser
 		const domparser = new DOMParser();
 		const doc = domparser.parseFromString(
@@ -202,9 +276,9 @@ export async function getValidEvents(
 			'text/html'
 		);
 		// timeline div
-		let timelineData = doc.getElementsByClassName('ob-timelines');
+		const timelineData = doc.getElementsByClassName('ob-timelines');
 
-		for (let event of timelineData as any) {
+		for (const event of timelineData as any) {
 			if (!(event instanceof HTMLElement)) {
 				continue;
 			}
@@ -238,7 +312,7 @@ export async function getValidEvents(
 			}
 
 			// NOTE: 额外dataset处理一些参数
-			let notePath = '/' + file.path;
+			const notePath = '/' + file.path;
 			event.dataset.path = notePath;
 
 			if (event.dataset.img) {

@@ -1,7 +1,7 @@
 //import Gallery from './svelte/Gallery.svelte'
 import type { TimelinesSettings } from './types';
 import { RENDER_TIMELINE } from './constants';
-import { TFile, MarkdownView, MetadataCache, Vault } from 'obsidian';
+import type { TFile, MarkdownView, MetadataCache, Vault } from 'obsidian';
 import 'vis-timeline/styles/vis-timeline-graph2d.css';
 import { getValidEvents, parseMarkdownCode } from './utils';
 import { drawTimeline, drawVisTimeline } from './draw-timeline';
@@ -35,15 +35,15 @@ export class TimelineProcessor {
 		fileCache: MetadataCache,
 		appVault: Vault
 	) {
-		let editor = sourceView.editor;
+		const editor = sourceView.editor;
 		if (editor) {
 			const source = editor.getValue();
-			let match = RENDER_TIMELINE.exec(source);
+			const match = RENDER_TIMELINE.exec(source);
 			if (match) {
-				let tagList = match[1];
+				const tagList = match[1];
 
-				let div = document.createElement('div');
-				let rendered = document.createElement('div');
+				const div = document.createElement('div');
+				const rendered = document.createElement('div');
 				rendered.addClass('timeline-rendered');
 				rendered.setText(new Date().toString());
 
@@ -94,7 +94,7 @@ export class TimelineProcessor {
 		});
 
 		// Keep only the files that have the time info
-		let timeline = document.createElement('div');
+		const timeline = document.createElement('div');
 		timeline.setAttribute('class', 'timeline');
 
 		if (visTimeline) {

@@ -4,10 +4,10 @@
   "description": "Create a timeline view of all notes with the specified combination of tags",
   "main": "main.js",
   "scripts": {
-    "dev": "pnpm run dev:js & pnpm run dev:css",
     "dev:js": "NODE_ENV='development' VERBOSE=true node esbuild.config.mjs",
-    "dev:css": "unocss --watch & pnpm run auto:css",
-    "auto:css": "nodemon -e css --ignore src/ --ignore styles.css scripts/update-style-css.cjs",
+    "dev:uno": "unocss",
+    "dev:css": "nodemon -e css --ignore src/ --ignore styles.css scripts/update-style-css.cjs",
+    "build:css": "node scripts/update-style-css.cjs",
     "build": "node esbuild.config.mjs production",
     "version": "node version-bump.mjs && git add manifest.json versions.json",
     "build:old": "rollup --config rollup.config.js",

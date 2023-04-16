@@ -2,11 +2,17 @@ import type { TimelinesSettings } from './types';
 import { DEFAULT_SETTINGS } from './constants';
 import { TimelinesSettingTab } from './settings';
 import { TimelineProcessor } from './block';
+import type { TFile } from 'obsidian';
 import { Plugin, MarkdownView } from 'obsidian';
+import { EVENT_TAGS_VIEW, EventTagsView } from './ui/event-tags';
+import './app.css';
 
 export default class TimelinesPlugin extends Plugin {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	settings: TimelinesSettings;
+
+	changeEventRef?: ReturnType<typeof this.app.metadataCache.on>;
 
 	async onload() {
 		// Load message
@@ -50,11 +56,11 @@ export default class TimelinesPlugin extends Plugin {
 		);
 
 		this.addCommand({
-			id: 'render-timeline',
-			name: 'Render Timeline',
+			id: 'render-timeline-pro',
+			name: 'Render Timeline ',
 			callback: async () => {
 				const proc = new TimelineProcessor();
-				let view = this.app.workspace.getActiveViewOfType(MarkdownView);
+				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 				if (view) {
 					await proc.insertTimelineIntoCurrentNote(
 						view,
@@ -68,10 +74,31 @@ export default class TimelinesPlugin extends Plugin {
 		});
 
 		this.addSettingTab(new TimelinesSettingTab(this.app, this));
+
+		this.registerView(EVENT_TAGS_VIEW, (leaf) => new EventTagsView(leaf));
+
+		this.addRibbonIcon('tags', 'Timeline', () => {
+			this.activateView();
+		});
 	}
 
 	onunload() {
 		console.log('unloading plugin');
+
+		this.app.workspace.detachLeavesOfType(EVENT_TAGS_VIEW);
+	}
+
+	async activateView() {
+		this.app.workspace.detachLeavesOfType(EVENT_TAGS_VIEW);
+
+		await this.app.workspace.getRightLeaf(false).setViewState({
+			type: EVENT_TAGS_VIEW,
+			active: true,
+		});
+
+		this.app.workspace.revealLeaf(
+			this.app.workspace.getLeavesOfType(EVENT_TAGS_VIEW)[0]
+		);
 	}
 
 	async loadSettings() {

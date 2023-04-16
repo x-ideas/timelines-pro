@@ -1,4 +1,5 @@
-import { TimelineOptions } from 'vis-timeline';
+import type { TFile } from 'obsidian';
+import type { TimelineOptions } from 'vis-timeline';
 
 export interface TimelinesSettings {
 	/** 标签 */
@@ -6,7 +7,7 @@ export interface TimelinesSettings {
 	/**  */
 	sortDirection: boolean;
 	/** 用来选中没有eventTags的tag，默认为none */
-	noTag: string;
+	noTag?: string;
 }
 
 /**
@@ -102,11 +103,17 @@ export interface IEventItem {
 }
 
 /** 绘制的Event的参数 */
-export interface IEventDrawArgs extends IEventItem {
+export interface IEventDrawArgs extends Omit<IEventItem, 'eventTags'> {
 	/** 事件所在的文件地址 */
 	path?: string;
 	/** 图片的地址 */
 	imgRealPath?: string;
 
 	innerHTML?: string;
+
+	/** 事件标签 */
+	eventTags?: string[];
+
+	/** 关联的文件 */
+	file: TFile;
 }

@@ -1,10 +1,6 @@
 import { groupBy, isNil, omit } from 'lodash-es';
-import {
-	DataGroup,
-	DataItem,
-	Timeline,
-	TimelineOptions,
-} from 'vis-timeline/esnext';
+import type { DataGroup, DataItem, TimelineOptions } from 'vis-timeline/esnext';
+import { Timeline } from 'vis-timeline/esnext';
 import * as vis from 'vis-data';
 import {
 	getEventDateDescription,
@@ -16,8 +12,8 @@ import {
 	getSortOrder,
 	parseTimeStr,
 } from './utils';
-import { IEventItem, ParsedArgs } from './types';
-import { IEventDrawArgs } from './types';
+import type { IEventItem, ParsedArgs } from './types';
+import type { IEventDrawArgs } from './types';
 
 interface IDrawTimelineOptions {
 	events: IEventDrawArgs[];
@@ -32,9 +28,9 @@ interface IDrawTimelineOptions {
 export function drawVisTimeline(opt: IDrawTimelineOptions) {
 	const { events, options, container } = opt;
 
-	var items = new vis.DataSet<DataItem>([]);
+	const items = new vis.DataSet<DataItem>([]);
 	for (const event of events) {
-		let noteCard = document.createElement('div');
+		const noteCard = document.createElement('div');
 		noteCard.className = 'timeline-card';
 
 		const imagePath = getEventImagePath(event);
@@ -116,9 +112,9 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 		// 删除一些不需要的字段
 		...omit(options, 'tags', 'eventTags'),
 		template: function (item: any, element: HTMLElement, data: any) {
-			let eventContainer = document.createElement('div');
+			const eventContainer = document.createElement('div');
 			eventContainer.setText(item.content);
-			let eventCard = eventContainer.createDiv();
+			const eventCard = eventContainer.createDiv();
 			eventCard.outerHTML = item.title;
 			eventContainer.addEventListener('click', (event) => {
 				if (process.env.NODE_ENV === 'development') {
@@ -126,7 +122,7 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 				}
 				// 计算位子
 
-				let el = eventContainer.getElementsByClassName(
+				const el = eventContainer.getElementsByClassName(
 					'timeline-card'
 				)[0] as HTMLElement;
 				el?.style.setProperty('display', 'block');
@@ -178,11 +174,11 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 			continue;
 		}
 
-		let noteContainer = container.createDiv({ cls: 'timeline-container' });
-		let noteHeader = noteContainer.createEl('h2', {
+		const noteContainer = container.createDiv({ cls: 'timeline-container' });
+		const noteHeader = noteContainer.createEl('h2', {
 			text: getEventDateDescription(first) || '--',
 		});
-		let eventContainer = noteContainer.createDiv({
+		const eventContainer = noteContainer.createDiv({
 			cls: 'timeline-event-list',
 			attr: { style: 'display: block' },
 		});
@@ -204,7 +200,7 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 
 		for (const event of events) {
 			// 绘制单个事件
-			let noteCard = eventContainer.createDiv({ cls: 'timeline-card' });
+			const noteCard = eventContainer.createDiv({ cls: 'timeline-card' });
 			// add an image only if available
 			const imagePath = getEventImagePath(event);
 			if (imagePath) {

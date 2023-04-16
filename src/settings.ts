@@ -1,5 +1,6 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
-import TimelinesPlugin from './main';
+import type { App } from 'obsidian';
+import { PluginSettingTab, Setting } from 'obsidian';
+import type TimelinesPlugin from './main';
 
 export class TimelinesSettingTab extends PluginSettingTab {
 	plugin: TimelinesPlugin;
@@ -10,7 +11,7 @@ export class TimelinesSettingTab extends PluginSettingTab {
 	}
 
 	display(): void {
-		let { containerEl } = this;
+		const { containerEl } = this;
 
 		containerEl.empty();
 		containerEl.createEl('h2', { text: 'Obsidian Timelines Settings' });
