@@ -1,10 +1,10 @@
 {
-  "id": "obsidian-timelines-pro",
-  "name": "Timelines-pro",
-  "version": "0.3.2",
-  "minAppVersion": "0.10.11",
-  "description": "Create a timeline view of all notes with the specified combination of tags",
-  "author": "xjiaxiang",
-  "authorUrl": "https://github.com/SaiRS",
-  "isDesktopOnly": false
+	"id": "obsidian-timelines-pro",
+	"name": "Timelines-pro",
+	"version": "1.0.0",
+	"minAppVersion": "0.10.11",
+	"description": "Create a timeline view of all notes with the specified combination of tags",
+	"author": "xjiaxiang",
+	"authorUrl": "https://github.com/SaiRS",
+	"isDesktopOnly": false
 }
