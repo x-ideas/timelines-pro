@@ -3,20 +3,20 @@ import type { DataGroup, DataItem, TimelineOptions } from 'vis-timeline/esnext';
 import { Timeline } from 'vis-timeline/esnext';
 import * as vis from 'vis-data';
 import {
-	getEventDateDescription,
-	getEventEndTime,
-	getEventImagePath,
-	getEventSourcePath,
-	getEventStartTime,
-	getNoteId,
-	getSortOrder,
-} from './utils';
-import type { IEventItem, ParsedArgs } from './types';
-import type { IEventDrawArgs } from './types';
+	type ITimelineEventItemExtend,
+	getTimelineEventImagePath,
+	getTimelineEventSourcePath,
+	getTimelineEventStartTime,
+	getTimelineEventEndTime,
+	getTimelineEventId,
+	type ITimelineEventItem,
+	getTimelineSortOrder,
+	getTimelineEventDateDescription,
+} from './type/timeline-event';
 
 interface IDrawTimelineOptions {
-	events: IEventDrawArgs[];
-	options?: ParsedArgs;
+	events: ITimelineEventItemExtend[];
+	options?: TimelineOptions;
 	/** 绘制的容器 */
 	container: HTMLElement;
 }
@@ -32,7 +32,7 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 		const noteCard = document.createElement('div');
 		noteCard.className = 'timeline-card';
 
-		const imagePath = getEventImagePath(event);
+		const imagePath = getTimelineEventImagePath(event);
 		if (imagePath) {
 			noteCard.createDiv({
 				cls: 'thumb',
@@ -48,14 +48,14 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 			.createEl('h3')
 			.createEl('a', {
 				cls: 'internal-link',
-				attr: { href: `${getEventSourcePath(event)}` },
+				attr: { href: `${getTimelineEventSourcePath(event)}` },
 				text: event.title,
 			});
 		noteCard.createEl('p', { text: event.innerHTML });
 
 		// 计算开始时间，结束时间
-		const start = getEventStartTime(event);
-		const end = getEventEndTime(event);
+		const start = getTimelineEventStartTime(event);
+		const end = getTimelineEventEndTime(event);
 
 		if (isNil(start)) {
 			console.warn('开始时间为空', event);
@@ -63,7 +63,7 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 		}
 
 		const opt: DataItem = {
-			// id: getNoteId(event) || '',
+			// id: getTimelineEventId(event) || '',
 			content: event.title ?? '',
 			title: noteCard.outerHTML,
 			start: start,
@@ -149,7 +149,7 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 
 	// 组合events
 	const groupEvents = groupBy(events, (event) => {
-		return getNoteId(event as IEventItem);
+		return getTimelineEventId(event as ITimelineEventItem);
 	});
 
 	// 排序
@@ -157,7 +157,7 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 		const item1 = a[0];
 		const item2 = b[0];
 
-		return getSortOrder(item1) - getSortOrder(item2);
+		return getTimelineSortOrder(item1) - getTimelineSortOrder(item2);
 	});
 
 	if (process.env.NODE_ENV === 'development') {
@@ -175,7 +175,7 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 
 		const noteContainer = container.createDiv({ cls: 'timeline-container' });
 		const noteHeader = noteContainer.createEl('h2', {
-			text: getEventDateDescription(first) || '--',
+			text: getTimelineEventDateDescription(first) || '--',
 		});
 		const eventContainer = noteContainer.createDiv({
 			cls: 'timeline-event-list',
@@ -201,7 +201,7 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 			// 绘制单个事件
 			const noteCard = eventContainer.createDiv({ cls: 'timeline-card' });
 			// add an image only if available
-			const imagePath = getEventImagePath(event);
+			const imagePath = getTimelineEventImagePath(event);
 			if (imagePath) {
 				noteCard.createDiv({
 					cls: 'thumb',
@@ -219,7 +219,7 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 				.createEl('h3')
 				.createEl('a', {
 					cls: 'internal-link',
-					attr: { href: `${getEventSourcePath(event)}` },
+					attr: { href: `${getTimelineEventSourcePath(event)}` },
 					text: event.title,
 				});
 			noteCard.createEl('p', { text: event.innerHTML });

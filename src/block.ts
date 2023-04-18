@@ -3,9 +3,10 @@ import type { TimelinesSettings } from './types';
 import { RENDER_TIMELINE } from './constants';
 import type { TFile, MarkdownView, MetadataCache, Vault } from 'obsidian';
 import 'vis-timeline/styles/vis-timeline-graph2d.css';
-import { getValidEvents, parseMarkdownCode } from './utils';
+import { parseMarkdownCode } from './utils';
 import { drawTimeline, drawVisTimeline } from './draw-timeline';
 import { insertFileLinkIfNeed } from './insert-file-link';
+import { searchTimelineEvents } from './apis/search-timeline';
 
 interface IRunOpt {
 	/**
@@ -86,17 +87,18 @@ export class TimelineProcessor {
 
 		const args = parseMarkdownCode(source);
 		// 添加默认的标签
-		if (args.tags) {
-			args.tags.push(settings.timelineTag);
-		} else {
-			args.tags = [settings.timelineTag];
-		}
+		// NOTE: 暂时注释
+		// if (args.tags) {
+		// 	args.tags.push(settings.timelineTag);
+		// } else {
+		// 	args.tags = [settings.timelineTag];
+		// }
 
-		const events = await getValidEvents({
+		const events = await searchTimelineEvents({
 			vaultFiles,
 			fileCache,
 			appVault,
-			parsedArgs: args,
+			params: args,
 		});
 
 		// Keep only the files that have the time info

@@ -2,12 +2,15 @@ import type { Plugin } from 'obsidian';
 import { Notice, type TFile, type WorkspaceLeaf } from 'obsidian';
 import { Menu } from 'obsidian';
 import { ItemView } from 'obsidian';
-import { getTimelineEventInFile } from '../../utils';
 
 import Component from './timeline-manage.svelte';
-import type { IEventDrawArgs } from 'src/types';
+
 import { RenameModal } from '../rename-modal';
 import { includes } from 'lodash-es';
+import {
+	type ITimelineEventItemExtend,
+	getTimelineEventInFile,
+} from 'src/type/timeline-event';
 
 export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 
@@ -25,7 +28,7 @@ export class TimelinePanel extends ItemView {
 	// @ts-ignore
 	component: Component;
 
-	eventTagsMap: Map<string, IEventDrawArgs[]>;
+	eventTagsMap: Map<string, ITimelineEventItemExtend[]>;
 
 	changeEventRef?: ReturnType<typeof this.app.metadataCache.on>;
 	deleteEventRef?: ReturnType<typeof this.app.metadataCache.on>;
@@ -134,7 +137,7 @@ export class TimelinePanel extends ItemView {
 		for (const timeline of this.eventTagsMap.values()) {
 			for (const event of timeline) {
 				if (includes(event.eventTags, oldTag)) {
-					if (event.path) {
+					if (event.file.path) {
 						files.push(event.file);
 					}
 				}
