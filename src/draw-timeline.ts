@@ -51,7 +51,9 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 				attr: { href: `${getTimelineEventSourcePath(event)}` },
 				text: event.title,
 			});
-		noteCard.createEl('p', { text: event.innerHTML });
+		noteCard.createEl('p', { text: event.innerHTML }, (el) => {
+			el.innerHTML = event.innerHTML || '';
+		});
 
 		// 计算开始时间，结束时间
 		const start = getTimelineEventStartTime(event);
@@ -222,7 +224,9 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 					attr: { href: `${getTimelineEventSourcePath(event)}` },
 					text: event.title,
 				});
-			noteCard.createEl('p', { text: event.innerHTML });
+			noteCard.createEl('p', { text: event.innerHTML }, (el) => {
+				el.innerHTML = event.innerHTML || '';
+			});
 		}
 
 		eventCount++;
