@@ -1,7 +1,6 @@
 import { isNil } from 'lodash-es';
 import {
 	hasTimeRangeIntersection,
-	parseTimelineDate,
 	type TimelineDateRange,
 } from 'src/type/time';
 import {
