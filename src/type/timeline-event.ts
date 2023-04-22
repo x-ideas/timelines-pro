@@ -234,6 +234,7 @@ export async function getTimelineEventInFile(
 			// 添加到结果中
 			const timelineEvent: ITimelineEventItemExtend = {
 				...event.dataset,
+				date: event.dataset.date ? event.dataset.date : event.dataset.dateStart,
 				innerHTML: event.innerHTML,
 				imgRealPath,
 				eventTags,

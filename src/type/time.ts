@@ -28,6 +28,7 @@ export function parseTimelineDate(str?: TimelineDate): number | undefined {
 	const yearStr = items[0];
 	const monthStr = items[1];
 	const dayStr = items[2];
+	const hour = items[3] ?? '0';
 
 	if (isNil(yearStr) || isNil(monthStr) || isNil(dayStr)) {
 		console.error('解析的时间中，年，月，日可能不存在', str);
@@ -40,8 +41,9 @@ export function parseTimelineDate(str?: TimelineDate): number | undefined {
 	const yy = yearStr.replace('-', '').padStart(4, '0');
 	const mm = monthStr.replace('-', '').padStart(2, '0');
 	const dd = dayStr.replace('-', '').padStart(2, '0');
+	const hh = hour.replace('-', '').padStart(2, '0');
 
-	const res = `${isNegative ? '-' : ''}${yy}${mm}${dd}`;
+	const res = `${isNegative ? '-' : ''}${yy}${mm}${dd}${hh}`;
 
 	const time = Number.parseInt(res);
 	if (Number.isNumber(time)) {

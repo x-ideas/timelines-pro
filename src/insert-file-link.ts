@@ -1,5 +1,5 @@
 import type { App, TFile } from 'obsidian';
-import type { ITimelineEventItemExtend } from './types';
+import type { ITimelineEventItemExtend } from './type';
 
 /** 插入文件链接 */
 export async function insertFileLinkIfNeed(
@@ -13,7 +13,11 @@ export async function insertFileLinkIfNeed(
 	const links = new Set();
 	// 判断是否需要插入文件链接
 	for (const event of events) {
-		if (!fileContent.includes(`[[${event.file.name}]]`)) {
+		if (
+			!fileContent.includes(`[[${event.file.name}]]`) &&
+			// 排除自身
+			event.file.path !== currentFile.path
+		) {
 			links.add(`[[${event.file.name}]]`);
 		}
 	}
