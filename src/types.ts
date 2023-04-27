@@ -1,22 +1,11 @@
+import type { TFile } from 'obsidian';
+import type { TimelineOptions } from 'vis-timeline';
+
 export interface TimelinesSettings {
+	/** 标签 */
 	timelineTag: string;
+	/**  */
 	sortDirection: boolean;
+	/** 用来选中没有eventTags的tag，默认为none */
+	noTag?: string;
 }
-
-export interface TimelineArgs {
-	[key: string]: string
-}
-
-export interface CardContainer {
-	date: string;
-	title: string;
-	img: string;
-	innerHTML: string;
-	path: string;
-	endDate: string;
-	type: string;
-	class: string;
-}
-
-export type NoteData = CardContainer[];
-export type AllNotesData = NoteData[];
