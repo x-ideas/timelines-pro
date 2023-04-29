@@ -52,6 +52,33 @@ export function parseTimelineDate(str?: TimelineDate): number | undefined {
 	return undefined;
 }
 
+export function parseTimelineDateElements(
+	str?: TimelineDate
+): { year: string; month: string; day: string; hour: string } | undefined {
+	str = str?.trim();
+	if (!str) {
+		return undefined;
+	}
+	const items = str.split('/');
+
+	const yearStr = items[0];
+	const monthStr = items[1];
+	const dayStr = items[2];
+	const hour = items[3] ?? '0';
+
+	if (isNil(yearStr) || isNil(monthStr) || isNil(dayStr)) {
+		console.error('解析的时间中，年，月，日可能不存在', str);
+		return undefined;
+	}
+
+	return {
+		year: yearStr,
+		month: monthStr.replace('-', '').padStart(2, '0'),
+		day: dayStr.replace('-', '').padStart(2, '0'),
+		hour: hour.replace('-', '').padStart(2, '0'),
+	};
+}
+
 /**
  * 两个时间范围是否有交集
  */

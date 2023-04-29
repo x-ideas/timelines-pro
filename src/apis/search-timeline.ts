@@ -40,10 +40,16 @@ interface ISearchTimelineEventsParams {
 export async function searchTimelineEvents(
 	opt: ISearchTimelineEventsParams
 ): Promise<ITimelineEventItemExtend[]> {
+	if (process.env.NODE_ENV !== 'production') {
+		console.log('[timeline] 文件过滤前', opt.vaultFiles);
+	}
 	// 使用tags过滤文件
 	const fileList = opt.vaultFiles.filter((file) =>
 		filterFileByTags(file, opt.fileCache, opt.params.tags)
 	);
+	if (process.env.NODE_ENV !== 'production') {
+		console.log('[timeline] 文件过滤后', fileList);
+	}
 	if (!fileList) {
 		// if no files valid for timeline
 		return [];

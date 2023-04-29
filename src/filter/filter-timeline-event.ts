@@ -1,13 +1,14 @@
-import { TagSelectExp } from 'src/expressions/tag-select-exp';
+import { TagSelectExp } from '../expressions/tag-select-exp';
 import {
 	hasTimeRangeIntersection,
+	parseTimelineDateElements,
 	type TimelineDateRange,
-} from 'src/type/time';
+} from '../type/time';
 import {
 	getTimelineEventEndTime,
 	getTimelineEventStartTime,
 	type ITimelineEventItemExtend,
-} from 'src/type/timeline-event';
+} from '../type/timeline-event';
 
 export interface ITimelineFilterParams {
 	/**
@@ -69,7 +70,17 @@ function filterByEventTag(
 	const tagSelect = new TagSelectExp(params.eventTags);
 
 	return events.filter((item) => {
-		const tags = item.eventTags ? item.eventTags : 'none';
+		let tags = item.eventTags ? item.eventTags : 'none';
+
+		// 增加时间相关的tag
+		const start = getTimelineEventStartTime(item);
+		const timeElements = parseTimelineDateElements(start);
+		if (timeElements) {
+			tags += `;year${timeElements.year}`;
+			tags += `;month${timeElements.month}`;
+			tags += `;day${timeElements.day}`;
+			tags += `;hour${timeElements.hour}`;
+		}
 
 		return tagSelect.test(tags);
 

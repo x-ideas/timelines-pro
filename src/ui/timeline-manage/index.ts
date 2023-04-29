@@ -118,7 +118,7 @@ export class TimelinePanel extends ItemView {
 		const eventTagSet = new Set<string>();
 		for (const timeline of this.eventTagsMap.values()) {
 			for (const event of timeline) {
-				event.eventTags?.forEach((tag) => eventTagSet.add(tag));
+				event.parsedEventTags?.forEach((tag) => eventTagSet.add(tag));
 			}
 		}
 

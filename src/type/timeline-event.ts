@@ -69,6 +69,8 @@ export interface ITimelineEventItemExtend extends ITimelineEventItem {
 
 	/** 事件标签 */
 	// eventTags?: string[];
+	/** 解析eventTags之后的数据(按照;分割了一下) */
+	parsedEventTags?: string[];
 
 	/** 关联的文件 */
 	file: TFile;
@@ -206,19 +208,15 @@ export async function getTimelineEventInFile(
 				continue;
 			}
 
-			// let eventTags: string[] = [];
-			// if (event.dataset['eventTags']) {
-			// 	eventTags = event.dataset['eventTags']
-			// 		.split(';')
-			// 		.reduce<string[]>((accu, tag) => {
-			// 			// const tagList: string[] = [];
-			// 			// parseTag(tag, tagList);
-			// 			// accu.push(...tagList);
-			// 			// NOTE: 不解析tag,直接全匹配
-			// 			accu.push(tag);
-			// 			return accu;
-			// 		}, []);
-			// }
+			let eventTags: string[] = [];
+			if (event.dataset['eventTags']) {
+				eventTags = event.dataset['eventTags']
+					.split(';')
+					.reduce<string[]>((accu, tag) => {
+						accu.push(tag);
+						return accu;
+					}, []);
+			}
 
 			// event.dataset.path = notePath;
 
@@ -235,7 +233,7 @@ export async function getTimelineEventInFile(
 				date: event.dataset.date ? event.dataset.date : event.dataset.dateStart,
 				innerHTML: event.innerHTML,
 				imgRealPath,
-				// eventTags,
+				parsedEventTags: eventTags,
 				file: file,
 			};
 

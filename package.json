@@ -12,7 +12,8 @@
     "version": "node version-bump.mjs && git add manifest.json versions.json",
     "build:old": "rollup --config rollup.config.js",
     "prepare": "husky install",
-    "test": "jest"
+    "test": "jest",
+    "tsc:check": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
