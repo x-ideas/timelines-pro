@@ -1,4 +1,4 @@
-import { isNil } from 'lodash-es';
+import { TagSelectExp } from 'src/expressions/tag-select-exp';
 import {
 	hasTimeRangeIntersection,
 	type TimelineDateRange,
@@ -64,19 +64,26 @@ function filterByEventTag(
 		return events;
 	}
 	// 过滤
-	const eventWhiteTags = new Set(tags);
+	// const eventWhiteTags = new Set(tags);
+
+	const tagSelect = new TagSelectExp(params.eventTags);
+
 	return events.filter((item) => {
+		const tags = item.eventTags ? item.eventTags : 'none';
+
+		return tagSelect.test(tags);
+
 		// 指定要选择的event tag
-		if (item.eventTags?.some((tag) => eventWhiteTags.has(tag))) {
-			return true;
-		}
+		// if (item.eventTags?.some((tag) => eventWhiteTags.has(tag))) {
+		// 	return true;
+		// }
 
-		if (eventWhiteTags.has('none') && !item.eventTags) {
-			// 特殊情况（指定选中没有event tag的timeline)
-			return true;
-		}
+		// if (eventWhiteTags.has('none') && !item.eventTags) {
+		// 	// 特殊情况（指定选中没有event tag的timeline)
+		// 	return true;
+		// }
 
-		return false;
+		// return false;
 	});
 }
 

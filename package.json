@@ -20,6 +20,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.21.4",
     "@babel/preset-typescript": "^7.21.4",
+    "@babel/types": "^7.21.4",
     "@commitlint/cli": "^17.6.1",
     "@commitlint/config-conventional": "^17.6.1",
     "@rollup/plugin-commonjs": "^15.1.0",
@@ -54,9 +55,9 @@
     "esbuild-svelte": "^0.7.3",
     "eslint": "^8.38.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "glob": "^10.2.2",
     "keycharm": "^0.4.0",
     "lodash-es": "^4.17.21",
+    "minimatch": "^9.0.0",
     "moment": "^2.29.4",
     "propagating-hammerjs": "^2.0.1",
     "rollup-plugin-styles": "^3.14.1",
