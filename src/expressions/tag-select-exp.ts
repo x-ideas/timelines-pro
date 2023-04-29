@@ -74,6 +74,14 @@ function transform(ast: _babel_types.Expression): Expression {
 		case 'Identifier':
 			return new Identifier(ast.name);
 
+		case 'BinaryExpression':
+			// 看成是identifier:
+			return new BinaryExpression(
+				ast.operator,
+				transform(ast.left),
+				transform(ast.right)
+			);
+
 		case 'NumericLiteral':
 			return new Identifier(ast.value.toString());
 
@@ -90,6 +98,8 @@ abstract class Expression {
 	}
 
 	abstract run(testStr: string): boolean;
+
+	abstract getPattern(): string;
 }
 
 class LogicalExpression extends Expression {
@@ -118,6 +128,10 @@ class LogicalExpression extends Expression {
 				throw new Error('不支持的运算符');
 		}
 	}
+
+	getPattern(): string {
+		return this.left.getPattern() + this.operator + this.right.getPattern();
+	}
 }
 
 class UnaryExpression extends Expression {
@@ -142,6 +156,10 @@ class UnaryExpression extends Expression {
 				throw new Error(`不支持的UnaryExpression运算符: ${this.operator}`);
 		}
 	}
+
+	getPattern(): string {
+		return this.operator + this.expression.getPattern();
+	}
 }
 
 class Identifier extends Expression {
@@ -155,5 +173,45 @@ class Identifier extends Expression {
 	run(testStr: string) {
 		const tags = testStr.split(';');
 		return tags.some((tag) => minimatch(tag, this.pattern));
+	}
+
+	getPattern(): string {
+		return this.pattern;
+	}
+}
+
+/**
+ * 因为一些标签有层级关系(a/b)
+ */
+class BinaryExpression extends Expression {
+	left: Expression;
+	right: Expression;
+	operator: _babel_types.BinaryExpression['operator'];
+
+	constructor(
+		operator: _babel_types.BinaryExpression['operator'],
+		left: Expression,
+		right: Expression
+	) {
+		super('');
+		this.operator = operator;
+		this.left = left;
+		this.right = right;
+	}
+
+	getPattern(): string {
+		return this.left.getPattern() + this.operator + this.right.getPattern();
+	}
+
+	run(testStr: string) {
+		switch (this.operator) {
+			case '/': {
+				const identifier = new Identifier(this.getPattern());
+				return identifier.run(testStr);
+			}
+
+			default:
+				throw new Error(`不支持的Binary运算符: ${this.operator}`);
+		}
 	}
 }
