@@ -76,10 +76,10 @@ function filterByEventTag(
 		const start = getTimelineEventStartTime(item);
 		const timeElements = parseTimelineDateElements(start);
 		if (timeElements) {
-			tags += `;year${timeElements.year}`;
-			tags += `;month${timeElements.month}`;
-			tags += `;day${timeElements.day}`;
-			tags += `;hour${timeElements.hour}`;
+			tags += `;year_${timeElements.year}`;
+			tags += `;month_${timeElements.month}`;
+			tags += `;day_${timeElements.day}`;
+			tags += `;hour_${timeElements.hour}`;
 		}
 
 		return tagSelect.test(tags);
