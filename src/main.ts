@@ -22,7 +22,7 @@ export default class TimelinesPlugin extends Plugin {
 		// Register timeline block renderer
 		// 垂直
 		this.registerMarkdownCodeBlockProcessor(
-			'timeline-pro',
+			'timelines-pro',
 			async (source, el, ctx) => {
 				const currentFile = this.app.metadataCache.getFirstLinkpathDest(
 					ctx.sourcePath,
@@ -68,7 +68,7 @@ export default class TimelinesPlugin extends Plugin {
 		);
 
 		this.addCommand({
-			id: 'render-timeline-pro',
+			id: 'render-timelines-pro',
 			name: 'Render Timeline ',
 			callback: async () => {
 				const proc = new TimelineProcessor();
