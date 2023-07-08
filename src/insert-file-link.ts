@@ -14,11 +14,11 @@ export async function insertFileLinkIfNeed(
 	// 判断是否需要插入文件链接
 	for (const event of events) {
 		if (
-			!fileContent.includes(`[[${event.file.name}]]`) &&
+			!fileContent.includes(`[[${event.file.basename}]]`) &&
 			// 排除自身
 			event.file.path !== currentFile.path
 		) {
-			links.add(`[[${event.file.name}]]`);
+			links.add(`[[${event.file.basename}]]`);
 		}
 	}
 

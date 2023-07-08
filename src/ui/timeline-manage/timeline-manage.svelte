@@ -12,9 +12,11 @@
 
   {#each (tags??[]) as tag}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="timeline-event-tag-wrapper" on:click={() => {
+    <div class="timeline-event-tag-wrapper text-gray-500" on:click={() => {
       onClick(tag)
-    }}>{tag}</div>
+    }}>{tag}
+    <div class='ml-auto'>0</div>
+  </div>
   {/each}
 
 
