@@ -1,63 +1,75 @@
-import type { TFile, MetadataCache, DataAdapter } from 'obsidian';
-import { getAllTags } from 'obsidian';
-
-export function parseTag(tag: string, tagList: string[]) {
-	tag = tag.trim();
-
-	// Skip empty tags
-	if (tag.length === 0) {
-		return;
-	}
-
-	// Parse all subtags out of the given tag.
-	// I.e., #hello/i/am would yield [#hello/i/am, #hello/i, #hello]. */
-	tagList.push(tag);
-	while (tag.contains("/")) {
-		tag = tag.substring(0, tag.lastIndexOf("/"));
-		tagList.push(tag);
-	}
-}
-
-export function FilterMDFiles(file: TFile, tagList: String[], metadataCache: MetadataCache) {
-	if (!tagList || tagList.length === 0) {
-		return true;
-	}
-
-	let tags = getAllTags(metadataCache.getFileCache(file)).map(e => e.slice(1, e.length));
-
-	if (tags && tags.length > 0) {
-		let filetags: string[] = [];
-		tags.forEach(tag => parseTag(tag, filetags));
-		return tagList.every(val => { return filetags.indexOf(val as string) >= 0; });
-	}
-
-	return false;
-}
+import type { ITimelineSearchParams } from './apis/search-timeline';
+import type { TimelineEventDrawParams } from './type/draw-params';
 
 /**
  * Create date of passed string
  * @date - string date in the format YYYY-MM-DD-HH
  */
-export function createDate(date: string): Date {
-	let dateComp = date.split(',');
-	// cannot simply replace '-' as need to support negative years
-	return new Date(+(dateComp[0] ?? 0), +(dateComp[1] ?? 0), +(dateComp[2] ?? 0), +(dateComp[3] ?? 0));
-}
+// export function createDate(date: string): Date {
+// 	const dateComp = date.split(',');
+// 	// cannot simply replace '-' as need to support negative years
+// 	return new Date(
+// 		+(dateComp[0] ?? 0),
+// 		+(dateComp[1] ?? 0),
+// 		+(dateComp[2] ?? 0),
+// 		+(dateComp[3] ?? 0)
+// 	);
+// }
 
 /**
- * Return URL for specified image path
- * @param path - image path
+ * 解析source中的markdown代码
  */
-export function getImgUrl(vaultAdaptor: DataAdapter, path: string): string {
+export function parseMarkdownCode(
+	source: string
+): ITimelineSearchParams & TimelineEventDrawParams {
+	// 解析
+	const sourceArgs: ITimelineSearchParams & TimelineEventDrawParams = {
+		// 默认值
+		// divHeight: 400,
+		// startDate: moment().subtract(1000, 'year').format('YYYY-MM-DD'),
+		// endDate: moment().add(3000, 'year').format('YYYY-MM-DD'),
+		// minDate: moment().subtract(1000, 'year').format('YYYY-MM-DD'),
+		// maxDate: moment().add(3000, 'year').format('YYYY-MM-DD'),
+	};
+	source.split('\n').map((e) => {
+		e = e.trim();
+		if (e) {
+			const param = e.split('=');
+			if (param[1]) {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				sourceArgs[param[0]] = param[1]?.trim();
+			}
+		}
+	});
 
-	if (!path) {
-		return null;
-	}
+	// 额外处理tags
 
-	let regex = new RegExp('^https:\/\/');
-	if (path.match(regex)) {
-		return path;
-	}
+	// const tagList: string[] = [];
+	// sourceArgs.tags?.split(';').forEach((tag) => parseTag(tag, tagList));
 
-	return vaultAdaptor.getResourcePath(path);
+	// // 收集白名单event-tags
+	// const eventWhiteTags = sourceArgs['eventTags']
+	// 	?.split(';')
+	// 	.reduce<string[]>((accu, tag) => {
+	// 		// const tagList: string[] = [];
+	// 		// parseTag(tag, tagList);
+	// 		// accu.push(...tagList);
+	// 		// NOTE: 不解析tag，直接全匹配
+	// 		accu.push(tag);
+	// 		return accu;
+	// 	}, []);
+
+	// 转换
+	// const args: ParsedArgs = {
+	// 	// height: sourceArgs.divHeight,
+	// 	// start: sourceArgs.startDate,
+	// 	// end: sourceArgs.endDate,
+	// 	// min: sourceArgs.minDate,
+	// 	// max: sourceArgs.maxDate,
+	// 	tags: tagList,
+	// 	eventTags: eventWhiteTags,
+	// };
+
+	return sourceArgs;
 }
