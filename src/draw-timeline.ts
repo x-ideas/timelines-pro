@@ -60,7 +60,7 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 		const end = getTimelineEventEndTime(event);
 
 		if (isNil(start)) {
-			console.warn('开始时间为空', event);
+			console.warn('start time is undefined', event);
 			continue;
 		}
 
@@ -72,7 +72,7 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 			className: event.class ?? '',
 			// type: event.type,
 			end: end ?? undefined,
-			group: event.groupName ?? '其他',
+			group: event.groupName ?? 'other',
 		};
 
 		items.add(opt);
@@ -92,14 +92,14 @@ export function drawVisTimeline(opt: IDrawTimelineOptions) {
 			});
 			groupNameSet.add(event.groupName);
 		} else {
-			if (groupNameSet.has('其他')) {
+			if (groupNameSet.has('other')) {
 				continue;
 			}
 			groupInfos.push({
-				id: '其他',
-				content: '其他',
+				id: 'other',
+				content: 'other',
 			});
-			groupNameSet.add('其他');
+			groupNameSet.add('other');
 		}
 	}
 

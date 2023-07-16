@@ -211,7 +211,7 @@ class BinaryExpression extends Expression {
 			}
 
 			default:
-				throw new Error(`不支持的Binary运算符: ${this.operator}`);
+				throw new Error(`unsupported Binary operator: ${this.operator}`);
 		}
 	}
 }

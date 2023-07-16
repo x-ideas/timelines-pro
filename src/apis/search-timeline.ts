@@ -41,14 +41,14 @@ export async function searchTimelineEvents(
 	opt: ISearchTimelineEventsParams
 ): Promise<ITimelineEventItemExtend[]> {
 	if (process.env.NODE_ENV !== 'production') {
-		console.log('[timeline] 文件过滤前', opt.vaultFiles);
+		console.log('[timeline] before file filter ', opt.vaultFiles);
 	}
 	// 使用tags过滤文件
 	const fileList = opt.vaultFiles.filter((file) =>
 		filterFileByTags(file, opt.fileCache, opt.params.tags)
 	);
 	if (process.env.NODE_ENV !== 'production') {
-		console.log('[timeline] 文件过滤后', fileList);
+		console.log('[timeline] after file filter', fileList);
 	}
 	if (!fileList) {
 		// if no files valid for timeline
@@ -66,7 +66,7 @@ export async function searchTimelineEvents(
 	const end = parseTimelineDate(opt.params.dateEnd);
 	if (!isNil(start) && !isNil(end) && start > end) {
 		console.error(
-			'[timeline] 时间查询条件不正确',
+			'[timeline] error time search condition',
 			'start',
 			opt.params.dateStart,
 			'end',

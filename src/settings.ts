@@ -14,7 +14,7 @@ export class TimelinesSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty();
-		containerEl.createEl('h2', { text: 'Obsidian Timelines Settings' });
+		// containerEl.createEl('h2', { text: 'Obsidian Timelines Pro' });
 
 		new Setting(containerEl)
 			.setName('Default timeline tag')

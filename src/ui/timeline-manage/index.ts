@@ -68,7 +68,7 @@ export class TimelinePanel extends ItemView {
 		const eventTag = deleteTarget.innerText;
 
 		menu.addItem((item) => {
-			item.setTitle(`重命名: "${eventTag}"`);
+			item.setTitle(`rename: "${eventTag}"`);
 			item.setIcon('rename');
 			item.onClick(() => {
 				new RenameModal(this.app, eventTag, (newName) => {
@@ -80,7 +80,7 @@ export class TimelinePanel extends ItemView {
 
 		menu.addItem((item) => {
 			// 搜索
-			item.setTitle(`搜索: "${eventTag}"`);
+			item.setTitle(`search: "${eventTag}"`);
 			item.setIcon('search');
 			item.onClick(() => {
 				this.search(eventTag);
@@ -102,7 +102,7 @@ export class TimelinePanel extends ItemView {
 	}
 
 	getDisplayText() {
-		return 'timeline事件标签';
+		return 'timeline event tags';
 	}
 
 	/** 初始化event tags */
@@ -129,7 +129,7 @@ export class TimelinePanel extends ItemView {
 	/** 重命名 */
 	private async rename(oldTag: string, newTag: string) {
 		if (oldTag === newTag) {
-			return new Notice('新标签与旧标签相同');
+			return new Notice('the new tag is same with old one');
 		}
 
 		// 找到需要修改的文件

@@ -2,7 +2,6 @@ import type { TimelinesSettings } from './types';
 import { DEFAULT_SETTINGS } from './constants';
 import { TimelinesSettingTab } from './settings';
 import { TimelineProcessor } from './block';
-import type { TFile } from 'obsidian';
 import { Plugin, MarkdownView } from 'obsidian';
 import { TIMELINE_PANEL, TimelinePanel } from './ui/timeline-manage';
 import './app.css';
@@ -68,8 +67,8 @@ export default class TimelinesPlugin extends Plugin {
 		);
 
 		this.addCommand({
-			id: 'render-timelines-pro',
-			name: 'Render Timeline ',
+			id: 'render',
+			name: 'Render timeline ',
 			callback: async () => {
 				const proc = new TimelineProcessor();
 				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -99,7 +98,7 @@ export default class TimelinesPlugin extends Plugin {
 	onunload() {
 		console.log('unloading plugin');
 
-		this.app.workspace.detachLeavesOfType(TIMELINE_PANEL);
+		// this.app.workspace.detachLeavesOfType(TIMELINE_PANEL);
 	}
 
 	async activateView() {

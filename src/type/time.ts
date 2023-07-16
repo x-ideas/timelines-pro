@@ -31,7 +31,7 @@ export function parseTimelineDate(str?: TimelineDate): number | undefined {
 	const hour = items[3] ?? '0';
 
 	if (isNil(yearStr) || isNil(monthStr) || isNil(dayStr)) {
-		console.error('解析的时间中，年，月，日可能不存在', str);
+		console.error('year, month, day maybe undefined', str);
 		return undefined;
 	}
 
@@ -67,7 +67,7 @@ export function parseTimelineDateElements(
 	const hour = items[3] ?? '0';
 
 	if (isNil(yearStr) || isNil(monthStr) || isNil(dayStr)) {
-		console.error('解析的时间中，年，月，日可能不存在', str);
+		console.error('time year, month, day maybe undefined', str);
 		return undefined;
 	}
 
