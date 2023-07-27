@@ -7,6 +7,7 @@ import { parseMarkdownCode } from './utils';
 import { drawTimeline, drawVisTimeline } from './draw-timeline';
 import { insertFileLinkIfNeed } from './insert-file-link';
 import { searchTimelineEvents } from './apis/search-timeline';
+import * as Sentry from '@sentry/node';
 
 interface IRunOpt {
 	/**
@@ -86,14 +87,16 @@ export class TimelineProcessor {
 		} = opt;
 
 		const args = parseMarkdownCode(source);
-		// 添加默认的标签
-		// NOTE: 暂时注释
-		// if (args.tags) {
-		// 	args.tags.push(settings.timelineTag);
-		// } else {
-		// 	args.tags = [settings.timelineTag];
-		// }
 
+		const transaction = Sentry.startTransaction({
+			name: 'TimelineProcessor Run',
+			description: 'ob timeline插件运行',
+		});
+
+		const search = transaction.startChild({
+			op: 'timeline search',
+			description: 'timeline标签搜索阶段',
+		});
 		const events = await searchTimelineEvents({
 			vaultFiles,
 			fileCache,
@@ -106,12 +109,20 @@ export class TimelineProcessor {
 		timeline.setAttribute('class', 'timeline');
 
 		if (visTimeline) {
+			const visDraw = transaction.startChild({
+				op: 'timeline vis draw',
+				description: 'timeline绘制阶段(vis)',
+			});
 			drawVisTimeline({
 				container: timeline,
 				events,
 				options: args,
 			});
 		} else {
+			const draw = transaction.startChild({
+				op: 'timeline draw',
+				description: 'timeline绘制阶段',
+			});
 			drawTimeline({
 				container: timeline,
 				events,
@@ -121,7 +132,11 @@ export class TimelineProcessor {
 
 		el.appendChild(timeline);
 
-		if (currentFile) {
+		if (currentFile && args.autoInsetFileLinks) {
+			const insert = transaction.startChild({
+				op: 'timeline insert',
+				description: 'timeline插入文件链接阶段',
+			});
 			insertFileLinkIfNeed(currentFile, app, events);
 		} else {
 			console.error('[timeline] currentFile is null');

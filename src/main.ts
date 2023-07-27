@@ -6,6 +6,8 @@ import { Plugin, MarkdownView } from 'obsidian';
 import { TIMELINE_PANEL, TimelinePanel } from './ui/timeline-manage';
 import './app.css';
 
+import './sentry';
+
 export default class TimelinesPlugin extends Plugin {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore

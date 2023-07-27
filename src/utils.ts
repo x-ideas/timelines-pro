@@ -43,33 +43,5 @@ export function parseMarkdownCode(
 		}
 	});
 
-	// 额外处理tags
-
-	// const tagList: string[] = [];
-	// sourceArgs.tags?.split(';').forEach((tag) => parseTag(tag, tagList));
-
-	// // 收集白名单event-tags
-	// const eventWhiteTags = sourceArgs['eventTags']
-	// 	?.split(';')
-	// 	.reduce<string[]>((accu, tag) => {
-	// 		// const tagList: string[] = [];
-	// 		// parseTag(tag, tagList);
-	// 		// accu.push(...tagList);
-	// 		// NOTE: 不解析tag，直接全匹配
-	// 		accu.push(tag);
-	// 		return accu;
-	// 	}, []);
-
-	// 转换
-	// const args: ParsedArgs = {
-	// 	// height: sourceArgs.divHeight,
-	// 	// start: sourceArgs.startDate,
-	// 	// end: sourceArgs.endDate,
-	// 	// min: sourceArgs.minDate,
-	// 	// max: sourceArgs.maxDate,
-	// 	tags: tagList,
-	// 	eventTags: eventWhiteTags,
-	// };
-
 	return sourceArgs;
 }

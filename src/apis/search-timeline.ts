@@ -58,9 +58,6 @@ export async function searchTimelineEvents(
 	const res: ITimelineEventItemExtend[] = [];
 	const timelineEvents = await getTimelineEventInFile(fileList, opt.appVault);
 
-	// 过滤
-	const eventWhiteTags = new Set(opt.params['eventTags']);
-
 	// 判断查询时间是否有效
 	const start = parseTimelineDate(opt.params.dateStart);
 	const end = parseTimelineDate(opt.params.dateEnd);

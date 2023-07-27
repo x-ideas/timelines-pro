@@ -29,7 +29,7 @@ export class TagSelectExp {
 			this.buildParser();
 		}
 
-		return this.testExpression!.run(testStr) || false;
+		return this.testExpression?.run(testStr) || false;
 	}
 
 	private buildParser() {
