@@ -96,13 +96,23 @@ export class TimelineProcessor {
 		const search = transaction.startChild({
 			op: 'timeline search',
 			description: 'timeline标签搜索阶段',
+			data: {
+				...args,
+				filesCount: vaultFiles.length,
+			},
+			tags: {
+				filesCount: vaultFiles.length,
+			},
 		});
+
 		const events = await searchTimelineEvents({
 			vaultFiles,
 			fileCache,
 			appVault,
 			params: args,
 		});
+
+		search.finish();
 
 		// Keep only the files that have the time info
 		const timeline = document.createElement('div');
@@ -112,22 +122,42 @@ export class TimelineProcessor {
 			const visDraw = transaction.startChild({
 				op: 'timeline vis draw',
 				description: 'timeline绘制阶段(vis)',
+				data: {
+					// 事件个数
+					eventCount: events.length,
+				},
+				tags: {
+					// 事件个数
+					eventCount: events.length,
+				},
 			});
 			drawVisTimeline({
 				container: timeline,
 				events,
 				options: args,
 			});
+
+			visDraw.finish();
 		} else {
 			const draw = transaction.startChild({
 				op: 'timeline draw',
 				description: 'timeline绘制阶段',
+				data: {
+					// 事件个数
+					eventCount: events.length,
+				},
+				tags: {
+					// 事件个数
+					eventCount: events.length,
+				},
 			});
 			drawTimeline({
 				container: timeline,
 				events,
 				options: args,
 			});
+
+			draw.finish();
 		}
 
 		el.appendChild(timeline);
@@ -136,10 +166,22 @@ export class TimelineProcessor {
 			const insert = transaction.startChild({
 				op: 'timeline insert',
 				description: 'timeline插入文件链接阶段',
+				data: {
+					// 事件个数
+					eventCount: events.length,
+				},
+				tags: {
+					// 事件个数
+					eventCount: events.length,
+				},
 			});
 			insertFileLinkIfNeed(currentFile, app, events);
+
+			insert.finish();
 		} else {
-			console.error('[timeline] currentFile is null');
+			!currentFile && console.error('[timeline] currentFile is null');
 		}
+
+		transaction.finish();
 	}
 }

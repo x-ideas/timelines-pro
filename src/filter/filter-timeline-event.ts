@@ -9,6 +9,7 @@ import {
 	getTimelineEventStartTime,
 	type ITimelineEventItemExtend,
 } from '../type/timeline-event';
+import type * as Sentry from '@sentry/node';
 
 export interface ITimelineFilterParams {
 	/**
@@ -22,6 +23,8 @@ export interface ITimelineFilterParams {
 	dateStart?: string;
 	/** 搜索条件: 结束时间 */
 	dateEnd?: string;
+
+	span?: Sentry.Span;
 }
 
 /**
@@ -49,7 +52,7 @@ export function filterTimelineEvents(
 }
 
 /**
- * 根据标签过滤
+ * 根据event tag标签过滤
  */
 function filterByEventTag(
 	events: ITimelineEventItemExtend[],
@@ -60,12 +63,10 @@ function filterByEventTag(
 	}
 
 	// 解析tags
-	const tags = params.eventTags.split(';').filter((item) => !!item);
-	if (tags.length === 0) {
-		return events;
-	}
-	// 过滤
-	// const eventWhiteTags = new Set(tags);
+	// const tags = params.eventTags.split(';').filter((item) => !!item);
+	// if (tags.length === 0) {
+	// 	return events;
+	// }
 
 	const tagSelect = new TagSelectExp(params.eventTags);
 
@@ -76,6 +77,7 @@ function filterByEventTag(
 		const start = getTimelineEventStartTime(item);
 		const timeElements = parseTimelineDateElements(start);
 		if (timeElements) {
+			// 增加额外的时间标签
 			tags += `;year_${timeElements.year}`;
 			tags += `;month_${timeElements.month}`;
 			tags += `;day_${timeElements.day}`;
@@ -83,21 +85,15 @@ function filterByEventTag(
 		}
 
 		return tagSelect.test(tags);
-
-		// 指定要选择的event tag
-		// if (item.eventTags?.some((tag) => eventWhiteTags.has(tag))) {
-		// 	return true;
-		// }
-
-		// if (eventWhiteTags.has('none') && !item.eventTags) {
-		// 	// 特殊情况（指定选中没有event tag的timeline)
-		// 	return true;
-		// }
-
-		// return false;
 	});
 }
 
+/**
+ * 按照时间进行过滤
+ * @param events
+ * @param params
+ * @returns
+ */
 function filterByTime(
 	events: ITimelineEventItemExtend[],
 	params?: ITimelineFilterParams

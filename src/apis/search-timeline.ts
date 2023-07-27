@@ -10,6 +10,7 @@ import {
 } from 'src/filter';
 import { parseTimelineDate } from 'src/type/time';
 import { isNil } from 'lodash-es';
+import type * as Sentry from '@sentry/node';
 
 export interface ITimelineSearchParams extends ITimelineFilterParams {
 	/**
@@ -18,6 +19,11 @@ export interface ITimelineSearchParams extends ITimelineFilterParams {
 	 * tag1 && (tag2 || tag3)
 	 */
 	tags?: string;
+
+	/**
+	 * 组名，当一旦出现group，就会按照vis group方式绘制
+	 */
+	group?: string;
 }
 
 interface ISearchTimelineEventsParams {
@@ -30,6 +36,9 @@ interface ISearchTimelineEventsParams {
 	 * 目前绘制参数，在timeline-vis-pro下才生效
 	 */
 	params: ITimelineSearchParams;
+
+	/**  */
+	span?: Sentry.Span;
 }
 
 /**
@@ -41,14 +50,15 @@ export async function searchTimelineEvents(
 	opt: ISearchTimelineEventsParams
 ): Promise<ITimelineEventItemExtend[]> {
 	if (process.env.NODE_ENV !== 'production') {
-		console.log('[timeline] before file filter ', opt.vaultFiles);
+		console.log('[timeline] before file filter ', opt.vaultFiles.length);
 	}
+
 	// 使用tags过滤文件
 	const fileList = opt.vaultFiles.filter((file) =>
 		filterFileByTags(file, opt.fileCache, opt.params.tags)
 	);
 	if (process.env.NODE_ENV !== 'production') {
-		console.log('[timeline] after file filter', fileList);
+		console.log('[timeline] after file filter', fileList.length);
 	}
 	if (!fileList) {
 		// if no files valid for timeline
@@ -56,7 +66,10 @@ export async function searchTimelineEvents(
 	}
 
 	const res: ITimelineEventItemExtend[] = [];
-	const timelineEvents = await getTimelineEventInFile(fileList, opt.appVault);
+	const timelineEventsInFiles = await getTimelineEventInFile(
+		fileList,
+		opt.appVault
+	);
 
 	// 判断查询时间是否有效
 	const start = parseTimelineDate(opt.params.dateStart);
