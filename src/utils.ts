@@ -18,6 +18,7 @@ import type { TimelineEventDrawParams } from './type/draw-params';
 
 /**
  * 解析source中的markdown代码
+ * 支持解析group
  */
 export function parseMarkdownCode(
 	source: string

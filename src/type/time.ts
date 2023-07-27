@@ -52,6 +52,11 @@ export function parseTimelineDate(str?: TimelineDate): number | undefined {
 	return undefined;
 }
 
+/**
+ * 解析时间字符串，返回年月日时
+ * @param str
+ * @returns { year, month, day, hour }, 其中month, day, hour都是两位数, 01, 03, 04这种
+ */
 export function parseTimelineDateElements(
 	str?: TimelineDate
 ): { year: string; month: string; day: string; hour: string } | undefined {

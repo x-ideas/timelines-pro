@@ -183,6 +183,7 @@ function getImgUrl(vaultAdaptor: DataAdapter, path: string): string {
 
 /**
  * 从文件中解析出事件
+ * @returns {Map<string, ITimelineEventItemExtend[]>} key为文件地址, value为事件列表
  */
 export async function getTimelineEventInFile(
 	files: TFile[],

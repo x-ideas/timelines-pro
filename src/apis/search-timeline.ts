@@ -73,23 +73,9 @@ export async function searchTimelineEvents(
 	}
 
 	// 过滤
-	for (const timeline of timelineEvents.values()) {
-		// for (const event of timeline) {
-		// 	if (eventWhiteTags.size > 0) {
-		// 		// 指定要选择的event tag
-		// 		if (event.eventTags?.some((tag) => eventWhiteTags.has(tag))) {
-		// 			res.push(event);
-		// 		}
-
-		// 		if (eventWhiteTags.has('none') && !event.eventTags) {
-		// 			// 特殊情况（指定选中没有event tag的timeline)
-		// 			res.push(event);
-		// 		}
-		// 	} else {
-		// 		res.push(event);
-		// 	}
-		// }
+	for (const timeline of timelineEventsInFiles.values()) {
 		res.push(
+			// 单个文件的timeline event过滤
 			...filterTimelineEvents(timeline, {
 				eventTags: opt.params.eventTags,
 				dateStart: opt.params.dateStart,
