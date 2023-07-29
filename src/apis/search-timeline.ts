@@ -1,17 +1,20 @@
 import type { MetadataCache, TFile, Vault } from 'obsidian';
 import {
 	getTimelineEventInFile,
-	type ITimelineEventItemExtend,
+	type ITimelineEventItemParsed,
 } from 'src/type/timeline-event';
 import {
 	filterFileByTags,
 	filterTimelineEvents,
 	type ITimelineFilterParams,
-} from 'src/filter';
+} from 'src/apis/filter';
 import { parseTimelineDate } from 'src/type/time';
 import { isNil } from 'lodash-es';
 import type * as Sentry from '@sentry/node';
 
+/**
+ *
+ */
 export interface ITimelineSearchParams extends ITimelineFilterParams {
 	/**
 	 * tag列表，用于文件过滤，支持逻辑运算，例如：
@@ -19,11 +22,6 @@ export interface ITimelineSearchParams extends ITimelineFilterParams {
 	 * tag1 && (tag2 || tag3)
 	 */
 	tags?: string;
-
-	/**
-	 * 组名，当一旦出现group，就会按照vis group方式绘制
-	 */
-	group?: string;
 }
 
 interface ISearchTimelineEventsParams {
@@ -45,10 +43,11 @@ interface ISearchTimelineEventsParams {
  * 获取所有有效的的events对象
  * 1. 通过tags对文件过滤
  * 2. 通过event-tags对event过滤
+ * 3. 时间过滤
  */
 export async function searchTimelineEvents(
 	opt: ISearchTimelineEventsParams
-): Promise<ITimelineEventItemExtend[]> {
+): Promise<ITimelineEventItemParsed[]> {
 	if (process.env.NODE_ENV !== 'production') {
 		console.log('[timeline] before file filter ', opt.vaultFiles.length);
 	}
@@ -65,7 +64,8 @@ export async function searchTimelineEvents(
 		return [];
 	}
 
-	const res: ITimelineEventItemExtend[] = [];
+	const res: ITimelineEventItemParsed[] = [];
+	// 获取所有的timelines
 	const timelineEventsInFiles = await getTimelineEventInFile(
 		fileList,
 		opt.appVault

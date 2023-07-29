@@ -62,18 +62,22 @@ export class TagSelectExp {
 function transform(ast: _babel_types.Expression): Expression {
 	switch (ast.type) {
 		case 'LogicalExpression':
+			// && 和 ||
 			return new LogicalExpression(
 				ast.operator,
 				transform(ast.left),
 				transform(ast.right)
 			);
 
+		// !a
 		case 'UnaryExpression':
 			return new UnaryExpression(ast.operator, transform(ast.argument));
 
+		// a
 		case 'Identifier':
 			return new Identifier(ast.name);
 
+		// a/b 层级标签
 		case 'BinaryExpression':
 			// 看成是identifier:
 			return new BinaryExpression(

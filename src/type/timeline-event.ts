@@ -4,13 +4,9 @@ import { parseTimelineDate, type TimelineDate } from './time';
 /**
  * timeline event属性（存放在dataset中）
  */
-export interface ITimelineEventItem {
+export interface ITimelineEventItemSource {
 	/** 类名 */
 	class?: string;
-	/**
-	 * 组名字(相同的group会被放在一起)
-	 */
-	groupName?: string;
 
 	/**
 	 * event的标签，;分割
@@ -51,6 +47,19 @@ export interface ITimelineEventItem {
 
 	/** 图片地址（相对于event的文件） */
 	img?: string;
+
+	/**
+	 * 该事件的值，如5km, 40min
+	 */
+	value?: number;
+
+	/**
+	 * 单位
+	 */
+	unit?: 'distance' | 'time';
+
+	/** 是否是里程碑 */
+	milestone?: boolean;
 }
 
 /** 扩展的timeline event属性，
@@ -61,14 +70,12 @@ export interface ITimelineEventItem {
  * 2. 对属性做了一次解析
  *
  */
-export interface ITimelineEventItemExtend extends ITimelineEventItem {
+export interface ITimelineEventItemParsed extends ITimelineEventItemSource {
 	/** 图片的地址 */
 	imgRealPath?: string;
-
+	/** 内部html */
 	innerHTML?: string;
 
-	/** 事件标签 */
-	// eventTags?: string[];
 	/** 解析eventTags之后的数据(按照;分割了一下) */
 	parsedEventTags?: string[];
 
@@ -82,7 +89,7 @@ export interface ITimelineEventItemExtend extends ITimelineEventItem {
  * 获取timeline的id
  */
 export function getTimelineEventId(
-	dataset?: Pick<ITimelineEventItem, 'date' | 'dateStart' | 'dateEnd'>
+	dataset?: Pick<ITimelineEventItemSource, 'date' | 'dateStart' | 'dateEnd'>
 ) {
 	if (dataset) {
 		if (dataset['date']) {
@@ -94,6 +101,11 @@ export function getTimelineEventId(
 			return `${getTimelineEventTime(
 				dataset['dateStart']
 			)}-${getTimelineEventTime(dataset['dateEnd'])}`;
+		}
+
+		// 将dataStart看作是data一样的功能
+		if (dataset.dateStart) {
+			return getTimelineEventTime(dataset.dateStart) + '';
 		}
 	}
 	return null;
@@ -112,9 +124,10 @@ export function getTimelineEventTime(str?: TimelineDate): number {
 
 /**
  * 获取timeline event的时间描述（用于展示）
+ * 取dateDescription字段，如果没有dateDescription字段，则返回getTimelineEventId()的值
  */
 export function getTimelineEventDateDescription(
-	dataset?: ITimelineEventItemExtend
+	dataset?: ITimelineEventItemParsed
 ) {
 	return dataset?.['dateDescription'] || getTimelineEventId(dataset);
 }
@@ -122,28 +135,28 @@ export function getTimelineEventDateDescription(
 /**
  * 获取timeline中的图片地址
  */
-export function getTimelineEventImagePath(dataset?: ITimelineEventItemExtend) {
+export function getTimelineEventImagePath(dataset?: ITimelineEventItemParsed) {
 	return dataset?.['imgRealPath'];
 }
 
 /**
  * 获取timeline所在的文件地址
  */
-export function getTimelineEventSourcePath(dataset?: ITimelineEventItemExtend) {
+export function getTimelineEventSourcePath(dataset?: ITimelineEventItemParsed) {
 	return dataset?.file.path;
 }
 
 /**
  * 获取timeline开始时间
  */
-export function getTimelineEventStartTime(dataset?: ITimelineEventItemExtend) {
+export function getTimelineEventStartTime(dataset?: ITimelineEventItemParsed) {
 	return dataset?.date || dataset?.dateStart || undefined;
 }
 
 /**
  * 获取timeline结束时间
  */
-export function getTimelineEventEndTime(dataset?: ITimelineEventItemExtend) {
+export function getTimelineEventEndTime(dataset?: ITimelineEventItemParsed) {
 	return dataset?.dateEnd || undefined;
 }
 
@@ -151,7 +164,7 @@ export function getTimelineEventEndTime(dataset?: ITimelineEventItemExtend) {
  * 从dataset中获取排序字段（做了一些解析工作）
  */
 export function getTimelineSortOrder(
-	dataset?: Pick<ITimelineEventItem, 'date' | 'dateStart'>
+	dataset?: Pick<ITimelineEventItemSource, 'date' | 'dateStart'>
 ) {
 	if (dataset) {
 		return (
@@ -183,14 +196,14 @@ function getImgUrl(vaultAdaptor: DataAdapter, path: string): string {
 
 /**
  * 从文件中解析出事件
- * @returns {Map<string, ITimelineEventItemExtend[]>} key为文件地址, value为事件列表
+ * @returns {Map<string, ITimelineEventItemParsed[]>} key为文件地址, value为事件列表
  */
 export async function getTimelineEventInFile(
 	files: TFile[],
 	appVault: Vault
-): Promise<Map<string, ITimelineEventItemExtend[]>> {
+): Promise<Map<string, ITimelineEventItemParsed[]>> {
 	const domparser = new DOMParser();
-	const res = new Map<string, ITimelineEventItemExtend[]>();
+	const res = new Map<string, ITimelineEventItemParsed[]>();
 
 	for (const file of files) {
 		const doc = domparser.parseFromString(
@@ -200,7 +213,7 @@ export async function getTimelineEventInFile(
 		// timeline div
 		const timelineData = doc.getElementsByClassName('ob-timelines');
 
-		const timelines: ITimelineEventItemExtend[] = [];
+		const timelines: ITimelineEventItemParsed[] = [];
 		// NOTE: 额外dataset处理一些参数
 		const notePath = file.path;
 		const path = notePath;
@@ -225,11 +238,9 @@ export async function getTimelineEventInFile(
 			if (event.dataset.img) {
 				imgRealPath = getImgUrl(appVault.adapter, event.dataset.img);
 			}
-			// 读取innerHTML
-			// event.dataset.innerHTML = event.innerHTML;
 
 			// 添加到结果中
-			const timelineEvent: ITimelineEventItemExtend = {
+			const timelineEvent: ITimelineEventItemParsed = {
 				...event.dataset,
 				date: event.dataset.date ? event.dataset.date : event.dataset.dateStart,
 				innerHTML: event.innerHTML,

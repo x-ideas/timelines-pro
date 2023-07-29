@@ -1,11 +1,11 @@
 import type { App, TFile } from 'obsidian';
-import type { ITimelineEventItemExtend } from './type';
+import type { ITimelineEventItemParsed } from '../type';
 
 /** 插入文件链接 */
 export async function insertFileLinkIfNeed(
 	currentFile: TFile,
 	app: App,
-	events: ITimelineEventItemExtend[]
+	events: ITimelineEventItemParsed[]
 ) {
 	const fileContent = await app.vault.read(currentFile);
 

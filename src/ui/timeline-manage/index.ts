@@ -8,7 +8,7 @@ import Component from './timeline-manage.svelte';
 import { RenameModal } from '../rename-modal';
 import { includes } from 'lodash-es';
 import {
-	type ITimelineEventItemExtend,
+	type ITimelineEventItemParsed,
 	getTimelineEventInFile,
 } from 'src/type/timeline-event';
 
@@ -28,7 +28,7 @@ export class TimelinePanel extends ItemView {
 	// @ts-ignore
 	component: Component;
 
-	eventTagsMap: Map<string, ITimelineEventItemExtend[]>;
+	eventTagsMap: Map<string, ITimelineEventItemParsed[]>;
 
 	changeEventRef?: ReturnType<typeof this.app.metadataCache.on>;
 	deleteEventRef?: ReturnType<typeof this.app.metadataCache.on>;

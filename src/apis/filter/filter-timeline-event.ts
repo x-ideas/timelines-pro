@@ -1,21 +1,26 @@
-import { TagSelectExp } from '../expressions/tag-select-exp';
+import { TagSelectExp } from '../../expressions/tag-select-exp';
 import {
 	hasTimeRangeIntersection,
 	parseTimelineDateElements,
 	type TimelineDateRange,
-} from '../type/time';
+} from '../../type/time';
 import {
 	getTimelineEventEndTime,
 	getTimelineEventStartTime,
-	type ITimelineEventItemExtend,
-} from '../type/timeline-event';
+	type ITimelineEventItemParsed,
+} from '../../type/timeline-event';
 import type * as Sentry from '@sentry/node';
 
+/**
+ * timeline事件的过滤条件
+ */
 export interface ITimelineFilterParams {
 	/**
 	 * tag列表，用于event过滤，支持逻辑运算，例如：
 	 * @example
 	 * tag1 && (tag2 || tag3)
+	 * 同时支持内置的year_{xxxx}, month_{xx}, day_{xx}标签
+	 * @see {@link TagSelectExp}
 	 */
 	eventTags?: string;
 
@@ -31,9 +36,9 @@ export interface ITimelineFilterParams {
  * 过滤timeline事件
  */
 export function filterTimelineEvents(
-	events: ITimelineEventItemExtend[],
+	events: ITimelineEventItemParsed[],
 	params?: ITimelineFilterParams
-): ITimelineEventItemExtend[] {
+): ITimelineEventItemParsed[] {
 	// const result = [...events];
 	if (!params) {
 		return events;
@@ -55,9 +60,9 @@ export function filterTimelineEvents(
  * 根据event tag标签过滤
  */
 function filterByEventTag(
-	events: ITimelineEventItemExtend[],
+	events: ITimelineEventItemParsed[],
 	params?: ITimelineFilterParams
-): ITimelineEventItemExtend[] {
+): ITimelineEventItemParsed[] {
 	if (!params || !params.eventTags) {
 		return events;
 	}
@@ -95,9 +100,9 @@ function filterByEventTag(
  * @returns
  */
 function filterByTime(
-	events: ITimelineEventItemExtend[],
+	events: ITimelineEventItemParsed[],
 	params?: ITimelineFilterParams
-): ITimelineEventItemExtend[] {
+): ITimelineEventItemParsed[] {
 	if (!params) {
 		return events;
 	}

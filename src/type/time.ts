@@ -17,13 +17,18 @@ export type TimelineDateRange = [
  * @example
  * 	1940/9/9 = 19400909
  * -231/8/3 => -002310803
+ *
+ * @returns 返回的数字为: {4位数的year}{2位数的month}{2位数的day}{2位数的hour}
  */
-export function parseTimelineDate(str?: TimelineDate): number | undefined {
+export function parseTimelineDate(
+	str?: TimelineDate,
+	splitFlag = '/'
+): number | undefined {
 	str = str?.trim();
 	if (!str) {
 		return undefined;
 	}
-	const items = str.split('/');
+	const items = str.split(splitFlag);
 
 	const yearStr = items[0];
 	const monthStr = items[1];

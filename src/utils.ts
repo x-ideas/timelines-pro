@@ -1,6 +1,9 @@
 import type { ITimelineSearchParams } from './apis/search-timeline';
 import type { TimelineEventDrawParams } from './type/draw-params';
 
+export type ITimelineMarkdownParams = ITimelineSearchParams &
+	TimelineEventDrawParams;
+
 /**
  * Create date of passed string
  * @date - string date in the format YYYY-MM-DD-HH
@@ -20,11 +23,9 @@ import type { TimelineEventDrawParams } from './type/draw-params';
  * 解析source中的markdown代码
  * 支持解析group
  */
-export function parseMarkdownCode(
-	source: string
-): ITimelineSearchParams & TimelineEventDrawParams {
+export function parseMarkdownCode(source: string): ITimelineMarkdownParams {
 	// 解析
-	const sourceArgs: ITimelineSearchParams & TimelineEventDrawParams = {
+	const sourceArgs: ITimelineMarkdownParams = {
 		// 默认值
 		// divHeight: 400,
 		// startDate: moment().subtract(1000, 'year').format('YYYY-MM-DD'),
@@ -45,4 +46,20 @@ export function parseMarkdownCode(
 	});
 
 	return sourceArgs;
+}
+
+/**
+ * 解析source中的markdown代码, 按照空白行(\n\n)分割，支持group
+ * @param source
+ * @returns
+ */
+export function parseMarkdownCodeSource(
+	source: string
+): ITimelineMarkdownParams[] {
+	// 按照空白行分割
+	const sourceList = source.split('\n\n');
+
+	return sourceList.map((aSource) => {
+		return parseMarkdownCode(aSource);
+	});
 }
