@@ -93,6 +93,7 @@ export async function searchTimelineEvents(
 				eventTags: opt.params.eventTags,
 				dateStart: opt.params.dateStart,
 				dateEnd: opt.params.dateEnd,
+				name: opt.params.name,
 			})
 		);
 	}

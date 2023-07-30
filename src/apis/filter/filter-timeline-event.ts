@@ -10,6 +10,7 @@ import {
 	type ITimelineEventItemParsed,
 } from '../../type/timeline-event';
 import type * as Sentry from '@sentry/node';
+import { filterEventsByName } from './filter-str-property';
 
 /**
  * 对于数字类型的过滤条件
@@ -47,6 +48,11 @@ export interface ITimelineFilterParams {
 	 */
 	value?: NumberSearchCondition;
 
+	/**
+	 * 名称过滤，支持模糊匹配
+	 */
+	name?: string;
+
 	span?: Sentry.Span;
 }
 
@@ -69,6 +75,11 @@ export function filterTimelineEvents(
 
 	if (params.dateStart || params.dateEnd) {
 		result = filterByTime(result, params);
+	}
+
+	// 按名字过滤
+	if (params.name) {
+		result = filterEventsByName(result, params);
 	}
 
 	return result;
