@@ -9,7 +9,7 @@ import {
 	type ITimelineFilterParams,
 } from 'src/apis/filter';
 import { parseTimelineDate } from 'src/type/time';
-import { isNil } from 'lodash-es';
+import { isNil } from 'lodash';
 import type * as Sentry from '@sentry/node';
 
 /**

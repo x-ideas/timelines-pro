@@ -1,4 +1,4 @@
-import { isNil, omit } from 'lodash-es';
+import { isNil, omit } from 'lodash';
 import type { DataGroup, DataItem, TimelineOptions } from 'vis-timeline/esnext';
 import { Timeline } from 'vis-timeline/esnext';
 import * as vis from 'vis-data';

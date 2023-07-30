@@ -1,13 +1,9 @@
-import { groupBy, isNil, omit } from 'lodash-es';
-import type { DataGroup, DataItem, TimelineOptions } from 'vis-timeline/esnext';
-import { Timeline } from 'vis-timeline/esnext';
-import * as vis from 'vis-data';
+import { groupBy } from 'lodash';
+import type { TimelineOptions } from 'vis-timeline/esnext';
 import {
 	type ITimelineEventItemParsed,
 	getTimelineEventImagePath,
 	getTimelineEventSourcePath,
-	getTimelineEventStartTime,
-	getTimelineEventEndTime,
 	getTimelineEventId,
 	type ITimelineEventItemSource,
 	getTimelineSortOrder,

@@ -197,7 +197,6 @@ class Identifier extends Expression {
 
 	run(testStr: string) {
 		const tags = testStr.split(';');
-		console.log('testStr', this.pattern, testStr);
 		return tags.some((tag) => minimatch(tag, this.pattern));
 	}
 

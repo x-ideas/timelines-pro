@@ -6,7 +6,7 @@ import { ItemView } from 'obsidian';
 import Component from './timeline-manage.svelte';
 
 import { RenameModal } from '../rename-modal';
-import { includes } from 'lodash-es';
+import { includes } from 'lodash';
 import {
 	type ITimelineEventItemParsed,
 	getTimelineEventInFile,

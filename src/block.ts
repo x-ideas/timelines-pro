@@ -14,7 +14,7 @@ import {
 	drawVisTimeline,
 	type IGroupedTimelineEvent,
 } from './draw/draw-vis-timeline';
-import { omit } from 'lodash-es';
+import { omit } from 'lodash';
 
 interface IRunOpt {
 	/**
