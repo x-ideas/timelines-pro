@@ -2,10 +2,14 @@ import type { TimelinesSettings } from './types';
 import { DEFAULT_SETTINGS } from './constants';
 import { TimelinesSettingTab } from './settings';
 import { TimelineProcessor } from './block';
-import type { TFile } from 'obsidian';
 import { Plugin, MarkdownView } from 'obsidian';
 import { TIMELINE_PANEL, TimelinePanel } from './ui/timeline-manage';
 import './app.css';
+import './sentry';
+import * as Sentry from '@sentry/node';
+import type { ITimelineMarkdownParams } from './utils';
+import type { ITimelineEventItemParsed } from './type';
+import { searchTimelineEvents } from './apis/search-timeline';
 
 export default class TimelinesPlugin extends Plugin {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -22,14 +26,15 @@ export default class TimelinesPlugin extends Plugin {
 		// Register timeline block renderer
 		// 垂直
 		this.registerMarkdownCodeBlockProcessor(
-			'timeline-pro',
+			'timelines-pro',
 			async (source, el, ctx) => {
 				const currentFile = this.app.metadataCache.getFirstLinkpathDest(
 					ctx.sourcePath,
 					''
 				);
+
 				const proc = new TimelineProcessor();
-				await proc.run({
+				await proc.runUnion({
 					source,
 					el,
 					settings: this.settings,
@@ -44,32 +49,32 @@ export default class TimelinesPlugin extends Plugin {
 
 		// Register vis-timeline block renderer
 		// 水平
-		this.registerMarkdownCodeBlockProcessor(
-			'timeline-vis-pro',
-			async (source, el, ctx) => {
-				// 获取当前文件
-				const currentFile = this.app.metadataCache.getFirstLinkpathDest(
-					ctx.sourcePath,
-					''
-				);
+		// this.registerMarkdownCodeBlockProcessor(
+		// 	'timeline-vis-pro',
+		// 	async (source, el, ctx) => {
+		// 		// 获取当前文件
+		// 		const currentFile = this.app.metadataCache.getFirstLinkpathDest(
+		// 			ctx.sourcePath,
+		// 			''
+		// 		);
 
-				const proc = new TimelineProcessor();
-				await proc.run({
-					source,
-					el,
-					settings: this.settings,
-					vaultFiles: this.app.vault.getMarkdownFiles(),
-					fileCache: this.app.metadataCache,
-					appVault: this.app.vault,
-					visTimeline: true,
-					currentFile,
-				});
-			}
-		);
+		// 		const proc = new TimelineProcessor();
+		// 		await proc.run({
+		// 			source,
+		// 			el,
+		// 			settings: this.settings,
+		// 			vaultFiles: this.app.vault.getMarkdownFiles(),
+		// 			fileCache: this.app.metadataCache,
+		// 			appVault: this.app.vault,
+		// 			visTimeline: true,
+		// 			currentFile,
+		// 		});
+		// 	}
+		// );
 
 		this.addCommand({
-			id: 'render-timeline-pro',
-			name: 'Render Timeline ',
+			id: 'render',
+			name: 'Render timeline ',
 			callback: async () => {
 				const proc = new TimelineProcessor();
 				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -97,9 +102,9 @@ export default class TimelinesPlugin extends Plugin {
 	}
 
 	onunload() {
-		console.log('unloading plugin');
+		console.log('unloading timeline plugin');
 
-		this.app.workspace.detachLeavesOfType(TIMELINE_PANEL);
+		// this.app.workspace.detachLeavesOfType(TIMELINE_PANEL);
 	}
 
 	async activateView() {
@@ -121,5 +126,44 @@ export default class TimelinesPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	/**** 暴露出去的接口 */
+
+	/**
+	 * 搜索timeline event
+	 */
+	async searchTimelineEvents(
+		filter?: ITimelineMarkdownParams
+	): Promise<ITimelineEventItemParsed[]> {
+		const vaultFiles = this.app.vault.getMarkdownFiles();
+		const transaction = Sentry.startTransaction({
+			name: 'Timeline-Pro Api(searchTimelineEvents)',
+			description: 'ob timeline api(searchTimelineEvents)',
+			data: {
+				...(filter || {}),
+				filesCount: vaultFiles.length,
+			},
+			tags: {
+				filesCount: vaultFiles.length,
+			},
+		});
+
+		const events = await searchTimelineEvents({
+			vaultFiles: vaultFiles,
+			fileCache: this.app.metadataCache,
+			appVault: this.app.vault,
+			params: filter || {},
+		});
+
+		transaction.finish();
+
+		return events;
+	}
+
+	async getEventsEchartOptions(filter?: ITimelineMarkdownParams) {
+		const res = await this.searchTimelineEvents(filter);
+
+		// 转换成echarts options，用于绘制
 	}
 }

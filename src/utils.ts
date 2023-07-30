@@ -1,6 +1,9 @@
 import type { ITimelineSearchParams } from './apis/search-timeline';
 import type { TimelineEventDrawParams } from './type/draw-params';
 
+export type ITimelineMarkdownParams = ITimelineSearchParams &
+	TimelineEventDrawParams;
+
 /**
  * Create date of passed string
  * @date - string date in the format YYYY-MM-DD-HH
@@ -18,12 +21,11 @@ import type { TimelineEventDrawParams } from './type/draw-params';
 
 /**
  * 解析source中的markdown代码
+ * 支持解析group
  */
-export function parseMarkdownCode(
-	source: string
-): ITimelineSearchParams & TimelineEventDrawParams {
+export function parseMarkdownCode(source: string): ITimelineMarkdownParams {
 	// 解析
-	const sourceArgs: ITimelineSearchParams & TimelineEventDrawParams = {
+	const sourceArgs: ITimelineMarkdownParams = {
 		// 默认值
 		// divHeight: 400,
 		// startDate: moment().subtract(1000, 'year').format('YYYY-MM-DD'),
@@ -43,33 +45,21 @@ export function parseMarkdownCode(
 		}
 	});
 
-	// 额外处理tags
-
-	// const tagList: string[] = [];
-	// sourceArgs.tags?.split(';').forEach((tag) => parseTag(tag, tagList));
-
-	// // 收集白名单event-tags
-	// const eventWhiteTags = sourceArgs['eventTags']
-	// 	?.split(';')
-	// 	.reduce<string[]>((accu, tag) => {
-	// 		// const tagList: string[] = [];
-	// 		// parseTag(tag, tagList);
-	// 		// accu.push(...tagList);
-	// 		// NOTE: 不解析tag，直接全匹配
-	// 		accu.push(tag);
-	// 		return accu;
-	// 	}, []);
-
-	// 转换
-	// const args: ParsedArgs = {
-	// 	// height: sourceArgs.divHeight,
-	// 	// start: sourceArgs.startDate,
-	// 	// end: sourceArgs.endDate,
-	// 	// min: sourceArgs.minDate,
-	// 	// max: sourceArgs.maxDate,
-	// 	tags: tagList,
-	// 	eventTags: eventWhiteTags,
-	// };
-
 	return sourceArgs;
+}
+
+/**
+ * 解析source中的markdown代码, 按照空白行(\n\n)分割，支持group
+ * @param source
+ * @returns
+ */
+export function parseMarkdownCodeSource(
+	source: string
+): ITimelineMarkdownParams[] {
+	// 按照空白行分割
+	const sourceList = source.split('\n\n');
+
+	return sourceList.map((aSource) => {
+		return parseMarkdownCode(aSource);
+	});
 }

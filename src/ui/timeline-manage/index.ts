@@ -8,9 +8,10 @@ import Component from './timeline-manage.svelte';
 import { RenameModal } from '../rename-modal';
 import { includes } from 'lodash-es';
 import {
-	type ITimelineEventItemExtend,
+	type ITimelineEventItemParsed,
 	getTimelineEventInFile,
 } from 'src/type/timeline-event';
+import * as Sentry from '@sentry/node';
 
 export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 
@@ -28,7 +29,7 @@ export class TimelinePanel extends ItemView {
 	// @ts-ignore
 	component: Component;
 
-	eventTagsMap: Map<string, ITimelineEventItemExtend[]>;
+	eventTagsMap: Map<string, ITimelineEventItemParsed[]>;
 
 	changeEventRef?: ReturnType<typeof this.app.metadataCache.on>;
 	deleteEventRef?: ReturnType<typeof this.app.metadataCache.on>;
@@ -38,6 +39,8 @@ export class TimelinePanel extends ItemView {
 		super(leaf);
 
 		this.eventTagsMap = new Map();
+
+		this.icon = 'tags';
 
 		this.changeEventRef = this.app.metadataCache.on(
 			'changed',
@@ -65,10 +68,11 @@ export class TimelinePanel extends ItemView {
 		console.log('[timeline] onMenu', uiEvent, deleteTarget);
 
 		const menu = new Menu();
-		const eventTag = deleteTarget.innerText;
+		const eventTag = (deleteTarget.querySelector('.tag') as HTMLElement)
+			?.innerText;
 
 		menu.addItem((item) => {
-			item.setTitle(`重命名: "${eventTag}"`);
+			item.setTitle(`rename: "${eventTag}"`);
 			item.setIcon('rename');
 			item.onClick(() => {
 				new RenameModal(this.app, eventTag, (newName) => {
@@ -80,7 +84,7 @@ export class TimelinePanel extends ItemView {
 
 		menu.addItem((item) => {
 			// 搜索
-			item.setTitle(`搜索: "${eventTag}"`);
+			item.setTitle(`search: "${eventTag}"`);
 			item.setIcon('search');
 			item.onClick(() => {
 				this.search(eventTag);
@@ -102,34 +106,57 @@ export class TimelinePanel extends ItemView {
 	}
 
 	getDisplayText() {
-		return 'timeline事件标签';
+		return 'timeline event tags';
 	}
 
 	/** 初始化event tags */
 	async initEventTags() {
 		const files = this.app.vault.getMarkdownFiles();
+
+		const transaction = Sentry.startTransaction({
+			name: 'Timeline-Pro UI(初始化all event tags)',
+			description: 'ob timeline UI(初始化all event tags)',
+			data: {
+				filesCount: files.length,
+			},
+			tags: {
+				filesCount: files.length,
+			},
+		});
+
 		const timelineEvents = await getTimelineEventInFile(files, this.app.vault);
+
 		this.eventTagsMap = timelineEvents;
 		console.log('[timeline] initEventTags', timelineEvents);
+		transaction.finish();
 	}
 
 	/** 刷新view */
 	private refreshUI() {
 		const eventTagSet = new Set<string>();
+		const tagCountMap = new Map<string, number>();
+
 		for (const timeline of this.eventTagsMap.values()) {
 			for (const event of timeline) {
-				event.parsedEventTags?.forEach((tag) => eventTagSet.add(tag));
+				event.parsedEventTags?.forEach((tag) => {
+					eventTagSet.add(tag);
+
+					// 计数
+					const count = tagCountMap.get(tag) || 0;
+					tagCountMap.set(tag, count + 1);
+				});
 			}
 		}
 
 		const tagArray = Array.from(eventTagSet);
-		this.component.$set({ tags: tagArray });
+
+		this.component.$set({ tags: tagArray, tagCountMap });
 	}
 
 	/** 重命名 */
 	private async rename(oldTag: string, newTag: string) {
 		if (oldTag === newTag) {
-			return new Notice('新标签与旧标签相同');
+			return new Notice('the new tag is same with old one');
 		}
 
 		// 找到需要修改的文件

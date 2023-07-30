@@ -32,7 +32,7 @@ fork from [obsidian timeline](https://github.com/Darakah/obsidian-timelines)
 
 - timeline 报告所在的文件
 
-```timeline-pro
+```timelines-pro
 tags=人物/苏轼
 ```
 
@@ -50,7 +50,7 @@ tags=人物/苏轼
 
 - timeline 报告所在的文件
 
-```timeline-pro
+```timelines-pro
 eventTags=宋词
 ```
 
@@ -58,7 +58,7 @@ eventTags=宋词
 
 ### 示例三: 满足多个条件
 
-```timeline-pro
+```timelines-pro
 tags=A;B
 ```
 
@@ -68,7 +68,7 @@ tags=A;B
 
 ### 示例四： 满足多个条件
 
-```timeline-pro
+```timelines-pro
 tags=A && B
 ```
 
@@ -76,7 +76,7 @@ tags=A && B
 
 ### 示例五：满足或的条件
 
-```timeline-pro
+```timelines-pro
 tags=A || B
 ```
 
@@ -84,7 +84,7 @@ tags=A || B
 
 ### 示例六：非 条件
 
-```timeline-pro
+```timelines-pro
 tags = !A
 ```
 
@@ -92,7 +92,7 @@ tags = !A
 
 ### 示例七： 复杂组合
 
-```timeline-pro
+```timelines-pro
 tags = A || (B && !C)
 ```
 

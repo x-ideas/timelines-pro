@@ -35,14 +35,6 @@ export function filterFileByTags(
 		return true;
 	}
 
-	// const tagList = tagSelector.split(';').filter((item) => !!item);
-	// if (tagList.length === 0) {
-	// 	return true;
-	// }
-	// // NOTE: 增加一个默认的timeline标签，用于过滤timeline文件
-	// tagList.push('timeline');
-
-	// const finalSelector = tagSelector ? `${tagSelector} && timeline` : 'timeline';
 	const exp = new TagSelectExp(tagSelector);
 
 	const cached = metadataCache.getFileCache(file);
@@ -64,15 +56,6 @@ export function filterFileByTags(
 			// });
 			// 这里的;与eventTags保持一致
 			return exp.test(filetags.join(';'));
-
-			// tags.some((item) => {
-			// 	const ddd = item.split('/');
-			// 	return exp.test(item);
-			// });
-
-			// return tagList.every((val) => {
-			// 	return filetags.indexOf(val as string) >= 0;
-			// });
 		}
 	}
 

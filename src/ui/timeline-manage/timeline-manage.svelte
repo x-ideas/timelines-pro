@@ -2,6 +2,9 @@
   import '../../uno.css'
   // export let tabs: string[];
   export let tags: string[] | undefined;
+
+  // 标签个数统计
+  export let tagCountMap: Map<string, number> = new Map<string, number>();
   export let onClick: (tag: string) => void;
 
   // let currentTab: string = tabs[0];
@@ -14,8 +17,8 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="timeline-event-tag-wrapper text-gray-500" on:click={() => {
       onClick(tag)
-    }}>{tag}
-    <div class='ml-auto'>0</div>
+    }}><span class='tag'>{tag}</span>
+    <div class='ml-auto'>{tagCountMap.get(tag) ?? 0}</div>
   </div>
   {/each}
 
