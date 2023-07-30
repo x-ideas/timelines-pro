@@ -12,6 +12,14 @@ import {
 import type * as Sentry from '@sentry/node';
 
 /**
+ * 对于数字类型的过滤条件
+ * 1. 支持完全匹配， 如 3
+ * 2. 支持比较操作, 如 >=4
+ * 3, 支持范围, 如 [4， 5)
+ */
+export type NumberSearchCondition = string;
+
+/**
  * timeline事件的过滤条件
  */
 export interface ITimelineFilterParams {
@@ -24,10 +32,20 @@ export interface ITimelineFilterParams {
 	 */
 	eventTags?: string;
 
-	/** 搜索条件: 开始时间, 应用timeline event中的date字段 */
+	/** 搜索条件: 开始时间, 应用timeline event中的date字段, /分割 */
 	dateStart?: string;
-	/** 搜索条件: 结束时间 */
+	/** 搜索条件: 结束时间, /分割 */
 	dateEnd?: string;
+
+	/**
+	 * 过滤milestone
+	 */
+	milestone?: boolean;
+
+	/**
+	 * 过滤value
+	 */
+	value?: NumberSearchCondition;
 
 	span?: Sentry.Span;
 }
@@ -66,12 +84,6 @@ function filterByEventTag(
 	if (!params || !params.eventTags) {
 		return events;
 	}
-
-	// 解析tags
-	// const tags = params.eventTags.split(';').filter((item) => !!item);
-	// if (tags.length === 0) {
-	// 	return events;
-	// }
 
 	const tagSelect = new TagSelectExp(params.eventTags);
 

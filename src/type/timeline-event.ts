@@ -2,7 +2,7 @@ import type { DataAdapter, TFile, Vault } from 'obsidian';
 import { parseTimelineDate, type TimelineDate } from './time';
 
 /**
- * timeline event属性（存放在dataset中）
+ * timeline event模型（存放在dataset中）
  */
 export interface ITimelineEventItemSource {
 	/** 类名 */
@@ -39,6 +39,11 @@ export interface ITimelineEventItemSource {
 	 * 用来做id, 最终的id优先级为  dateId > sortOrder
 	 */
 	dateId?: string;
+
+	/**
+	 * 名字，用于标记一类event
+	 */
+	name: string;
 
 	/**
 	 * 标题，用于展示
@@ -247,6 +252,11 @@ export async function getTimelineEventInFile(
 				imgRealPath,
 				parsedEventTags: eventTags,
 				file: file,
+				// 一些属性的额外处理
+				//  解析成数字
+				name: event.dataset['name'] || 'unknown',
+				value: parseValue(event.dataset['value']),
+				milestone: parseBoolean(event.dataset['milestone']),
 			};
 
 			timelines.push(timelineEvent);
@@ -255,4 +265,21 @@ export async function getTimelineEventInFile(
 	}
 
 	return res;
+}
+
+function parseValue(value?: string): number | undefined {
+	if (value) {
+		const num = Number(value);
+		if (!isNaN(num)) {
+			return num;
+		}
+	}
+	return undefined;
+}
+
+function parseBoolean(value?: string): boolean | undefined {
+	if (value) {
+		return value === 'true';
+	}
+	return undefined;
 }

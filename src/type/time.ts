@@ -31,8 +31,8 @@ export function parseTimelineDate(
 	const items = str.split(splitFlag);
 
 	const yearStr = items[0];
-	const monthStr = items[1];
-	const dayStr = items[2];
+	const monthStr = items[1] ?? '0';
+	const dayStr = items[2] ?? '0';
 	const hour = items[3] ?? '0';
 
 	if (isNil(yearStr) || isNil(monthStr) || isNil(dayStr)) {
@@ -72,8 +72,8 @@ export function parseTimelineDateElements(
 	const items = str.split('/');
 
 	const yearStr = items[0];
-	const monthStr = items[1];
-	const dayStr = items[2];
+	const monthStr = items[1] ?? '0';
+	const dayStr = items[2] ?? '0';
 	const hour = items[3] ?? '0';
 
 	if (isNil(yearStr) || isNil(monthStr) || isNil(dayStr)) {

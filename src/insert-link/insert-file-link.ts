@@ -1,13 +1,13 @@
-import type { App, TFile } from 'obsidian';
+import type { App, TFile, Vault } from 'obsidian';
 import type { ITimelineEventItemParsed } from '../type';
 
 /** 插入文件链接 */
 export async function insertFileLinkIfNeed(
 	currentFile: TFile,
-	app: App,
+	vault: Vault,
 	events: ITimelineEventItemParsed[]
 ) {
-	const fileContent = await app.vault.read(currentFile);
+	const fileContent = await vault.read(currentFile);
 
 	// 采用[[文件名]]的形式插入文件链接
 	const links = new Set();
@@ -25,6 +25,6 @@ export async function insertFileLinkIfNeed(
 	if (links.size > 0) {
 		const newFileContent = fileContent + '\n' + Array.from(links).join('\n');
 
-		app.vault.modify(currentFile, newFileContent);
+		vault.modify(currentFile, newFileContent);
 	}
 }

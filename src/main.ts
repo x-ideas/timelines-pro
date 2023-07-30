@@ -5,8 +5,8 @@ import { TimelineProcessor } from './block';
 import { Plugin, MarkdownView } from 'obsidian';
 import { TIMELINE_PANEL, TimelinePanel } from './ui/timeline-manage';
 import './app.css';
-
 import './sentry';
+import * as Sentry from '@sentry/node';
 import type { ITimelineMarkdownParams } from './utils';
 import type { ITimelineEventItemParsed } from './type';
 import { searchTimelineEvents } from './apis/search-timeline';
@@ -32,6 +32,7 @@ export default class TimelinesPlugin extends Plugin {
 					ctx.sourcePath,
 					''
 				);
+
 				const proc = new TimelineProcessor();
 				await proc.runUnion({
 					source,
@@ -135,13 +136,34 @@ export default class TimelinesPlugin extends Plugin {
 	async searchTimelineEvents(
 		filter?: ITimelineMarkdownParams
 	): Promise<ITimelineEventItemParsed[]> {
+		const vaultFiles = this.app.vault.getMarkdownFiles();
+		const transaction = Sentry.startTransaction({
+			name: 'Timeline-Pro Api(searchTimelineEvents)',
+			description: 'ob timeline api(searchTimelineEvents)',
+			data: {
+				...(filter || {}),
+				filesCount: vaultFiles.length,
+			},
+			tags: {
+				filesCount: vaultFiles.length,
+			},
+		});
+
 		const events = await searchTimelineEvents({
-			vaultFiles: this.app.vault.getMarkdownFiles(),
+			vaultFiles: vaultFiles,
 			fileCache: this.app.metadataCache,
 			appVault: this.app.vault,
 			params: filter || {},
 		});
 
+		transaction.finish();
+
 		return events;
+	}
+
+	async getEventsEchartOptions(filter?: ITimelineMarkdownParams) {
+		const res = await this.searchTimelineEvents(filter);
+
+		// 转换成echarts options，用于绘制
 	}
 }
