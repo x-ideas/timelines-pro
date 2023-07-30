@@ -1,10 +1,10 @@
 //import Gallery from './svelte/Gallery.svelte'
 import type { TimelinesSettings } from './types';
 import { RENDER_TIMELINE } from './constants';
-import type { TFile, MarkdownView, MetadataCache, Vault } from 'obsidian';
+import type { TFile, MarkdownView, MetadataCache, Vault, App } from 'obsidian';
 import 'vis-timeline/styles/vis-timeline-graph2d.css';
 import type { ITimelineMarkdownParams } from './utils';
-import { parseMarkdownCode, parseMarkdownCodeSource } from './utils';
+import { parseMarkdownCodeSource } from './utils';
 import { drawTimeline } from './draw/draw-timeline';
 import { insertFileLinkIfNeed } from './insert-link/insert-file-link';
 import { searchTimelineEvents } from './apis/search-timeline';
@@ -14,7 +14,6 @@ import {
 	drawVisTimeline,
 	type IGroupedTimelineEvent,
 } from './draw/draw-vis-timeline';
-import type { TimelineOptions } from 'vis-timeline';
 import { omit } from 'lodash-es';
 
 interface IRunOpt {
@@ -63,7 +62,7 @@ export class TimelineProcessor {
 				div.appendChild(
 					document.createComment(`TIMELINE BEGIN tags='${match[1]}'`)
 				);
-				await this.run({
+				await this.runUnion({
 					source: tagList,
 					el: div,
 					settings,
@@ -80,135 +79,6 @@ export class TimelineProcessor {
 			}
 		}
 	}
-
-	// async run(opt: IRunOpt) {
-	// 	const { source } = opt;
-
-	// 	const args = parseMarkdownCode(source);
-
-	// 	this.runImpl(args, opt);
-	// }
-
-	/**
-	 *
-	 */
-	// async runImpl(
-	// 	filterParam: ITimelineMarkdownParams,
-	// 	opt: Omit<IRunOpt, 'source'>
-	// ) {
-	// 	const {
-	// 		el,
-	// 		settings,
-	// 		vaultFiles,
-	// 		fileCache,
-	// 		appVault,
-	// 		visTimeline,
-	// 		currentFile,
-	// 	} = opt;
-
-	// 	const transaction = Sentry.startTransaction({
-	// 		name: 'TimelineProcessor Run',
-	// 		description: 'ob timeline插件运行',
-	// 	});
-
-	// 	const search = transaction.startChild({
-	// 		op: 'timeline search',
-	// 		description: 'timeline标签搜索阶段',
-	// 		data: {
-	// 			...filterParam,
-	// 			filesCount: vaultFiles.length,
-	// 		},
-	// 		tags: {
-	// 			filesCount: vaultFiles.length,
-	// 		},
-	// 	});
-
-	// 	// 搜索
-	// 	const events = await searchTimelineEvents({
-	// 		vaultFiles,
-	// 		fileCache,
-	// 		appVault,
-	// 		params: filterParam,
-	// 	});
-
-	// 	search.finish();
-
-	// 	// Keep only the files that have the time info
-	// 	const timeline = document.createElement('div');
-	// 	timeline.setAttribute('class', 'timeline');
-
-	// 	// 绘制
-	// 	if (visTimeline) {
-	// 		const visDraw = transaction.startChild({
-	// 			op: 'timeline vis draw',
-	// 			description: 'timeline绘制阶段(vis)',
-	// 			data: {
-	// 				// 事件个数
-	// 				eventCount: events.length,
-	// 			},
-	// 			tags: {
-	// 				// 事件个数
-	// 				eventCount: events.length,
-	// 			},
-	// 		});
-	// 		drawVisTimeline({
-	// 			container: timeline,
-	// 			events,
-	// 			options: filterParam,
-	// 		});
-
-	// 		visDraw.finish();
-	// 	} else {
-	// 		const draw = transaction.startChild({
-	// 			op: 'timeline draw',
-	// 			description: 'timeline绘制阶段',
-	// 			data: {
-	// 				// 事件个数
-	// 				eventCount: events.length,
-	// 			},
-	// 			tags: {
-	// 				// 事件个数
-	// 				eventCount: events.length,
-	// 			},
-	// 		});
-	// 		drawTimeline({
-	// 			container: timeline,
-	// 			events,
-	// 			options: filterParam,
-	// 		});
-
-	// 		draw.finish();
-	// 	}
-
-	// 	el.appendChild(timeline);
-
-	// 	const { autoInsetFileLinks = true } = filterParam;
-
-	// 	// 插入文件链接
-	// 	if (currentFile && autoInsetFileLinks) {
-	// 		const insert = transaction.startChild({
-	// 			op: 'timeline insert',
-	// 			description: 'timeline插入文件链接阶段',
-	// 			data: {
-	// 				// 事件个数
-	// 				eventCount: events.length,
-	// 			},
-	// 			tags: {
-	// 				// 事件个数
-	// 				eventCount: events.length,
-	// 			},
-	// 		});
-	// 		insertFileLinkIfNeed(currentFile, app, events);
-
-	// 		insert.finish();
-	// 	} else {
-	// 		if (!currentFile) {
-	// 			console.error('[timeline] currentFile is null');
-	// 		}
-	// 	}
-
-	// 	transaction.finish();
-	// }
 
 	/**
 	 * 绘制一个垂直的时间轴
@@ -227,6 +97,23 @@ export class TimelineProcessor {
 			currentFile,
 		} = opt;
 
+		const transaction = Sentry.startTransaction({
+			name: 'TimelineProcessor Run',
+			description: 'ob timeline插件运行',
+		});
+
+		const search = transaction.startChild({
+			op: 'timeline search',
+			description: 'timeline标签搜索阶段',
+			data: {
+				...filterParam,
+				filesCount: vaultFiles.length,
+			},
+			tags: {
+				filesCount: vaultFiles.length,
+			},
+		});
+
 		// 搜索
 		const events = await searchTimelineEvents({
 			vaultFiles,
@@ -235,15 +122,32 @@ export class TimelineProcessor {
 			params: filterParam,
 		});
 
+		search.finish();
+
 		// 绘制
 		// Keep only the files that have the time info
 		const timeline = document.createElement('div');
 		timeline.setAttribute('class', 'timeline');
 
+		const draw = transaction.startChild({
+			op: 'timeline vis draw',
+			description: 'timeline绘制阶段',
+			data: {
+				// 事件个数
+				eventCount: events.length,
+			},
+			tags: {
+				// 事件个数
+				eventCount: events.length,
+			},
+		});
+
 		drawTimeline({
 			container: timeline,
 			events,
 		});
+
+		draw.finish();
 
 		el.appendChild(timeline);
 
@@ -251,12 +155,14 @@ export class TimelineProcessor {
 		const { autoInsetFileLinks = true } = filterParam;
 
 		if (currentFile && autoInsetFileLinks) {
-			insertFileLinkIfNeed(currentFile, app, events);
+			insertFileLinkIfNeed(currentFile, opt.appVault, events);
 		} else {
 			if (!currentFile) {
 				console.error('[timeline] currentFile is null');
 			}
 		}
+
+		transaction.finish();
 	}
 
 	/**
@@ -276,16 +182,36 @@ export class TimelineProcessor {
 			currentFile,
 		} = opt;
 
-		const events: IGroupedTimelineEvent[] = [];
-		let extraOptions: TimelineOptions = {};
+		const transaction = Sentry.startTransaction({
+			name: 'TimelineProcessor Run',
+			description: 'ob timeline插件运行',
+		});
+
+		const groupedEvents: IGroupedTimelineEvent[] = [];
+		let extraOptions: ITimelineMarkdownParams = {};
 		for (const filterParam of filterParams) {
+			const search = transaction.startChild({
+				op: 'timeline search',
+				description: 'timeline标签搜索阶段',
+				data: {
+					...filterParam,
+					filesCount: vaultFiles.length,
+				},
+				tags: {
+					filesCount: vaultFiles.length,
+				},
+			});
+
 			const res = await searchTimelineEvents({
 				vaultFiles,
 				fileCache,
 				appVault,
 				params: filterParam,
 			});
-			events.push({
+
+			search.finish();
+
+			groupedEvents.push({
 				groupName: filterParam.groupName || 'no-group',
 				events: res,
 			});
@@ -294,15 +220,32 @@ export class TimelineProcessor {
 			extraOptions = Object.assign(
 				{},
 				extraOptions,
-				omit(filterParam, ['autoInsetFileLinks', 'tags', 'eventTags'])
+				omit(filterParam, ['tags', 'eventTags'])
 			);
 		}
 
 		drawVisTimeline({
-			events,
+			events: groupedEvents,
 			container: el,
 			options: extraOptions,
 		});
+
+		// 插入文件链接
+		const { autoInsetFileLinks = true } = extraOptions;
+
+		if (currentFile && autoInsetFileLinks) {
+			const allEvents = groupedEvents.reduce<ITimelineEventItemParsed[]>(
+				(prev, cur) => {
+					return prev.concat(cur.events);
+				},
+				[]
+			);
+			insertFileLinkIfNeed(currentFile, opt.appVault, allEvents);
+		} else {
+			if (!currentFile) {
+				console.error('[timeline] currentFile is null');
+			}
+		}
 	}
 
 	async runUnion(opt: IRunOpt) {
