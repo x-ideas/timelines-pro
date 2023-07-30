@@ -8,7 +8,7 @@ import './app.css';
 import './sentry';
 import * as Sentry from '@sentry/node';
 import type { ITimelineMarkdownParams } from './utils';
-import type { ITimelineEventItemParsed } from './type';
+import * as TimelineEventApi from './type/timeline-event';
 import { searchTimelineEvents } from './apis/search-timeline';
 
 export default class TimelinesPlugin extends Plugin {
@@ -133,9 +133,9 @@ export default class TimelinesPlugin extends Plugin {
 	/**
 	 * 搜索timeline event
 	 */
-	async searchTimelineEvents(
+	searchTimelineEvents = (
 		filter?: ITimelineMarkdownParams
-	): Promise<ITimelineEventItemParsed[]> {
+	): Promise<TimelineEventApi.ITimelineEventItemParsed[]> => {
 		const vaultFiles = this.app.vault.getMarkdownFiles();
 		const transaction = Sentry.startTransaction({
 			name: 'Timeline-Pro Api(searchTimelineEvents)',
@@ -149,17 +149,27 @@ export default class TimelinesPlugin extends Plugin {
 			},
 		});
 
-		const events = await searchTimelineEvents({
+		return searchTimelineEvents({
 			vaultFiles: vaultFiles,
 			fileCache: this.app.metadataCache,
 			appVault: this.app.vault,
 			params: filter || {},
+		}).then((events) => {
+			transaction.finish();
+
+			return events.sort((a, b) => {
+				return (
+					TimelineEventApi.getTimelineSortOrder(a) -
+					TimelineEventApi.getTimelineSortOrder(b)
+				);
+			});
 		});
+	};
 
-		transaction.finish();
-
-		return events;
-	}
+	api = {
+		...TimelineEventApi,
+		searchTimelineEvents: this.searchTimelineEvents,
+	};
 
 	async getEventsEchartOptions(filter?: ITimelineMarkdownParams) {
 		const res = await this.searchTimelineEvents(filter);

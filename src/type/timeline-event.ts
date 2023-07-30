@@ -134,6 +134,37 @@ export function getTimelineEventTime(str?: TimelineDate): number {
 }
 
 /**
+ * 将时间字符串转换为moment对象，一般用于开放接口，供外界使用
+ */
+export function getTimelineEventMomentTime(str?: TimelineDate): moment.Moment {
+	const info = parseTimelineDateElements(str);
+
+	function parse(str?: string) {
+		if (isNil(str)) {
+			return undefined;
+		}
+
+		const res = Number.parseInt(str);
+		if (Number.isNaN(res)) {
+			return undefined;
+		}
+
+		return res;
+	}
+
+	const month = parse(info?.month);
+
+	const date = moment({
+		year: parse(info?.year),
+		// 这里的month从0开始计算
+		month: month ? month - 1 : month,
+		day: parse(info?.day),
+	});
+
+	return date;
+}
+
+/**
  * 获取timeline event的时间描述（用于展示）
  * 取dateDescription字段，如果没有dateDescription字段，则返回getTimelineEventId()的值
  */
@@ -159,16 +190,28 @@ export function getTimelineEventSourcePath(dataset?: ITimelineEventItemParsed) {
 
 /**
  * 获取timeline开始时间
+ * 暴露给外界使用
  */
 export function getTimelineEventStartTime(dataset?: ITimelineEventItemParsed) {
 	return dataset?.date || dataset?.dateStart || undefined;
 }
 
 /**
- * 获取timeline结束时间
+ * 获取timeline结束时间(直接取dateEnd字段)
+ * 一些场景需要考虑dateEnd是否设置，则用这个函数
  */
 export function getTimelineEventEndTime(dataset?: ITimelineEventItemParsed) {
 	return dataset?.dateEnd || undefined;
+}
+
+/**
+ * 获取timeline结束时间，有dateEnd则取dateEnd, 没有的话，则考虑date, dateStart字段
+ * 暴露给外界使用
+ */
+export function getTimelineEventEndTimeJudged(
+	dataset?: ITimelineEventItemParsed
+) {
+	return getTimelineEventEndTime(dataset) || getTimelineEventStartTime(dataset);
 }
 
 /**

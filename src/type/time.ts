@@ -31,8 +31,8 @@ export function parseTimelineDate(
 	const items = str.split(splitFlag);
 
 	const yearStr = items[0];
-	const monthStr = items[1] ?? '0';
-	const dayStr = items[2] ?? '0';
+	const monthStr = items[1] ?? '1';
+	const dayStr = items[2] ?? '1';
 	const hour = items[3] ?? '0';
 
 	if (isNil(yearStr) || isNil(monthStr) || isNil(dayStr)) {
@@ -61,6 +61,7 @@ export function parseTimelineDate(
  * 解析时间字符串，返回年月日时
  * @param str
  * @returns { year, month, day, hour }, 其中month, day, hour都是两位数, 01, 03, 04这种
+ * month 从1开始
  */
 export function parseTimelineDateElements(
 	str?: TimelineDate
@@ -72,12 +73,15 @@ export function parseTimelineDateElements(
 	const items = str.split('/');
 
 	const yearStr = items[0];
-	const monthStr = items[1] ?? '0';
-	const dayStr = items[2] ?? '0';
+	const monthStr = items[1] ?? '1';
+	const dayStr = items[2] ?? '1';
 	const hour = items[3] ?? '0';
 
 	if (isNil(yearStr) || isNil(monthStr) || isNil(dayStr)) {
-		console.error('time year, month, day maybe undefined', str);
+		console.error(
+			'[parseTimelineDateElements] time year, month, day maybe undefined',
+			str
+		);
 		return undefined;
 	}
 
