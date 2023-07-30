@@ -35,14 +35,6 @@ export function filterFileByTags(
 		return true;
 	}
 
-	// const tagList = tagSelector.split(';').filter((item) => !!item);
-	// if (tagList.length === 0) {
-	// 	return true;
-	// }
-	// // NOTE: 增加一个默认的timeline标签，用于过滤timeline文件
-	// tagList.push('timeline');
-
-	// const finalSelector = tagSelector ? `${tagSelector} && timeline` : 'timeline';
 	const exp = new TagSelectExp(tagSelector);
 
 	const cached = metadataCache.getFileCache(file);

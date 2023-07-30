@@ -1,36 +1,62 @@
-import { TagSelectExp } from '../expressions/tag-select-exp';
+import { TagSelectExp } from '../../expressions/tag-select-exp';
 import {
 	hasTimeRangeIntersection,
 	parseTimelineDateElements,
 	type TimelineDateRange,
-} from '../type/time';
+} from '../../type/time';
 import {
 	getTimelineEventEndTime,
 	getTimelineEventStartTime,
-	type ITimelineEventItemExtend,
-} from '../type/timeline-event';
+	type ITimelineEventItemParsed,
+} from '../../type/timeline-event';
+import type * as Sentry from '@sentry/node';
 
+/**
+ * 对于数字类型的过滤条件
+ * 1. 支持完全匹配， 如 3
+ * 2. 支持比较操作, 如 >=4
+ * 3, 支持范围, 如 [4， 5)
+ */
+export type NumberSearchCondition = string;
+
+/**
+ * timeline事件的过滤条件
+ */
 export interface ITimelineFilterParams {
 	/**
 	 * tag列表，用于event过滤，支持逻辑运算，例如：
 	 * @example
 	 * tag1 && (tag2 || tag3)
+	 * 同时支持内置的year_{xxxx}, month_{xx}, day_{xx}标签
+	 * @see {@link TagSelectExp}
 	 */
 	eventTags?: string;
 
-	/** 搜索条件: 开始时间, 应用timeline event中的date字段 */
+	/** 搜索条件: 开始时间, 应用timeline event中的date字段, /分割 */
 	dateStart?: string;
-	/** 搜索条件: 结束时间 */
+	/** 搜索条件: 结束时间, /分割 */
 	dateEnd?: string;
+
+	/**
+	 * 过滤milestone
+	 */
+	milestone?: boolean;
+
+	/**
+	 * 过滤value
+	 */
+	value?: NumberSearchCondition;
+
+	span?: Sentry.Span;
 }
 
 /**
  * 过滤timeline事件
  */
 export function filterTimelineEvents(
-	events: ITimelineEventItemExtend[],
+	events: ITimelineEventItemParsed[],
 	params?: ITimelineFilterParams
-): ITimelineEventItemExtend[] {
+): ITimelineEventItemParsed[] {
 	// const result = [...events];
 	if (!params) {
 		return events;
@@ -49,23 +75,15 @@ export function filterTimelineEvents(
 }
 
 /**
- * 根据标签过滤
+ * 根据event tag标签过滤
  */
 function filterByEventTag(
-	events: ITimelineEventItemExtend[],
+	events: ITimelineEventItemParsed[],
 	params?: ITimelineFilterParams
-): ITimelineEventItemExtend[] {
+): ITimelineEventItemParsed[] {
 	if (!params || !params.eventTags) {
 		return events;
 	}
-
-	// 解析tags
-	const tags = params.eventTags.split(';').filter((item) => !!item);
-	if (tags.length === 0) {
-		return events;
-	}
-	// 过滤
-	// const eventWhiteTags = new Set(tags);
 
 	const tagSelect = new TagSelectExp(params.eventTags);
 
@@ -76,6 +94,7 @@ function filterByEventTag(
 		const start = getTimelineEventStartTime(item);
 		const timeElements = parseTimelineDateElements(start);
 		if (timeElements) {
+			// 增加额外的时间标签
 			tags += `;year_${timeElements.year}`;
 			tags += `;month_${timeElements.month}`;
 			tags += `;day_${timeElements.day}`;
@@ -83,25 +102,19 @@ function filterByEventTag(
 		}
 
 		return tagSelect.test(tags);
-
-		// 指定要选择的event tag
-		// if (item.eventTags?.some((tag) => eventWhiteTags.has(tag))) {
-		// 	return true;
-		// }
-
-		// if (eventWhiteTags.has('none') && !item.eventTags) {
-		// 	// 特殊情况（指定选中没有event tag的timeline)
-		// 	return true;
-		// }
-
-		// return false;
 	});
 }
 
+/**
+ * 按照时间进行过滤
+ * @param events
+ * @param params
+ * @returns
+ */
 function filterByTime(
-	events: ITimelineEventItemExtend[],
+	events: ITimelineEventItemParsed[],
 	params?: ITimelineFilterParams
-): ITimelineEventItemExtend[] {
+): ITimelineEventItemParsed[] {
 	if (!params) {
 		return events;
 	}

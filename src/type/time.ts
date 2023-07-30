@@ -17,17 +17,22 @@ export type TimelineDateRange = [
  * @example
  * 	1940/9/9 = 19400909
  * -231/8/3 => -002310803
+ *
+ * @returns 返回的数字为: {4位数的year}{2位数的month}{2位数的day}{2位数的hour}
  */
-export function parseTimelineDate(str?: TimelineDate): number | undefined {
+export function parseTimelineDate(
+	str?: TimelineDate,
+	splitFlag = '/'
+): number | undefined {
 	str = str?.trim();
 	if (!str) {
 		return undefined;
 	}
-	const items = str.split('/');
+	const items = str.split(splitFlag);
 
 	const yearStr = items[0];
-	const monthStr = items[1];
-	const dayStr = items[2];
+	const monthStr = items[1] ?? '0';
+	const dayStr = items[2] ?? '0';
 	const hour = items[3] ?? '0';
 
 	if (isNil(yearStr) || isNil(monthStr) || isNil(dayStr)) {
@@ -52,6 +57,11 @@ export function parseTimelineDate(str?: TimelineDate): number | undefined {
 	return undefined;
 }
 
+/**
+ * 解析时间字符串，返回年月日时
+ * @param str
+ * @returns { year, month, day, hour }, 其中month, day, hour都是两位数, 01, 03, 04这种
+ */
 export function parseTimelineDateElements(
 	str?: TimelineDate
 ): { year: string; month: string; day: string; hour: string } | undefined {
@@ -62,8 +72,8 @@ export function parseTimelineDateElements(
 	const items = str.split('/');
 
 	const yearStr = items[0];
-	const monthStr = items[1];
-	const dayStr = items[2];
+	const monthStr = items[1] ?? '0';
+	const dayStr = items[2] ?? '0';
 	const hour = items[3] ?? '0';
 
 	if (isNil(yearStr) || isNil(monthStr) || isNil(dayStr)) {

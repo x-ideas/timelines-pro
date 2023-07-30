@@ -29,7 +29,7 @@ export class TagSelectExp {
 			this.buildParser();
 		}
 
-		return this.testExpression!.run(testStr) || false;
+		return this.testExpression?.run(testStr) || false;
 	}
 
 	private buildParser() {
@@ -42,17 +42,35 @@ export class TagSelectExp {
 					return item.type === 'ExpressionStatement';
 				}
 			);
-			if (firstExpression === -1) {
+
+			// 找到Directive
+			// 对于只有一个“‘tag’”的情况（因为tag中可能有一些特殊字符，所以需要''包裹，在一个的情况下，会成为Directive）
+			const firstDirective = this._parseResult.program.directives.findIndex(
+				(item) => {
+					return item.type === 'Directive';
+				}
+			);
+
+			if (firstExpression !== -1) {
+				this.testExpression = transform(
+					(
+						this._parseResult.program.body[
+							firstExpression
+						] as _babel_types.ExpressionStatement
+					).expression
+				);
+			} else if (firstDirective !== -1) {
+				// 特殊情况，只有一个tag的情况，并且还被''包裹
+				this.testExpression = new Identifier(
+					(
+						this._parseResult.program.directives[
+							firstDirective
+						] as _babel_types.Directive
+					).value.value
+				);
+			} else {
 				throw new Error('表达式解析失败: 未找到表达式');
 			}
-
-			this.testExpression = transform(
-				(
-					this._parseResult.program.body[
-						firstExpression
-					] as _babel_types.ExpressionStatement
-				).expression
-			);
 		} catch (error: any) {
 			throw new Error(`表达式解析失败: ${error?.message}`);
 		}
@@ -62,28 +80,35 @@ export class TagSelectExp {
 function transform(ast: _babel_types.Expression): Expression {
 	switch (ast.type) {
 		case 'LogicalExpression':
+			// && 和 ||
 			return new LogicalExpression(
 				ast.operator,
 				transform(ast.left),
 				transform(ast.right)
 			);
 
+		// !a
 		case 'UnaryExpression':
 			return new UnaryExpression(ast.operator, transform(ast.argument));
 
+		// a
 		case 'Identifier':
 			return new Identifier(ast.name);
 
+		// a/b 层级标签
 		case 'BinaryExpression':
 			// 看成是identifier:
 			return new BinaryExpression(
 				ast.operator,
-				transform(ast.left),
+				transform(ast.left as _babel_types.Expression),
 				transform(ast.right)
 			);
 
 		case 'NumericLiteral':
 			return new Identifier(ast.value.toString());
+
+		case 'StringLiteral':
+			return new Identifier(ast.value);
 
 		default:
 			throw new Error(`不支持的ast类型: ${JSON.stringify(ast)}`);
@@ -172,6 +197,7 @@ class Identifier extends Expression {
 
 	run(testStr: string) {
 		const tags = testStr.split(';');
+		console.log('testStr', this.pattern, testStr);
 		return tags.some((tag) => minimatch(tag, this.pattern));
 	}
 
