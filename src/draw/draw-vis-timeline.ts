@@ -53,8 +53,8 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 					attr: { href: `${getTimelineEventSourcePath(event)}` },
 					text: event.title,
 				});
-			noteCard.createEl('p', { text: event.innerHTML }, (el) => {
-				el.innerHTML = event.innerHTML || '';
+			noteCard.createEl('p', { text: event.content }, (el) => {
+				el.innerHTML = event.content || '';
 			});
 
 			// 计算开始时间，结束时间

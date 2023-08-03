@@ -62,15 +62,22 @@ export interface ITimelineEventItemSource {
 	/**
 	 * 该事件的值，如5km, 40min
 	 */
-	value?: number;
+	value?: string;
 
 	/**
 	 * 单位
 	 */
 	unit?: 'distance' | 'time';
 
-	/** 是否是里程碑 */
-	milestone?: boolean;
+	/**
+	 * 是否是里程碑
+	 * 为'true'的时候表示是里程碑
+	 */
+	milestone?: string;
+	/**
+	 * 内容
+	 */
+	content?: string;
 }
 
 /** 扩展的timeline event属性，
@@ -81,14 +88,25 @@ export interface ITimelineEventItemSource {
  * 2. 对属性做了一次解析
  *
  */
-export interface ITimelineEventItemParsed extends ITimelineEventItemSource {
+export interface ITimelineEventItemParsed
+	extends Omit<ITimelineEventItemSource, 'value' | 'milestone'> {
 	/** 图片的地址 */
 	imgRealPath?: string;
 	/** 内部html */
-	innerHTML?: string;
+	content?: string;
 
 	/** 解析eventTags之后的数据(按照;分割了一下) */
 	parsedEventTags?: string[];
+
+	/**
+	 * 转换为number
+	 */
+	value?: number;
+	/**
+	 * 是否是里程碑
+	 * 转换成boolean
+	 */
+	milestone?: boolean;
 
 	/** 关联的文件 */
 	file: TFile;
@@ -136,7 +154,9 @@ export function getTimelineEventTime(str?: TimelineDate): number {
 /**
  * 将时间字符串转换为moment对象，一般用于开放接口，供外界使用
  */
-export function getTimelineEventMomentTime(str?: TimelineDate): moment.Moment {
+export function getTimelineEventMomentTime(
+	str?: TimelineDate
+): moment.Moment | undefined {
 	const info = parseTimelineDateElements(str);
 
 	function parse(str?: string) {
@@ -160,6 +180,11 @@ export function getTimelineEventMomentTime(str?: TimelineDate): moment.Moment {
 		month: month ? month - 1 : month,
 		day: parse(info?.day),
 	});
+
+	if (!date.isValid()) {
+		console.error(`[timelines-pro] invalid date: ${str}`);
+		return undefined;
+	}
 
 	return date;
 }
@@ -297,14 +322,14 @@ export async function getTimelineEventInFile(
 			const timelineEvent: ITimelineEventItemParsed = {
 				...event.dataset,
 				date: event.dataset.date ? event.dataset.date : event.dataset.dateStart,
-				innerHTML: event.innerHTML,
+				content: event.innerHTML,
 				imgRealPath,
 				parsedEventTags: eventTags,
 				file: file,
 				// 一些属性的额外处理
 				//  解析成数字
 				name: event.dataset['name'] || 'unknown',
-				value: parseValue(event.dataset['value']),
+				value: parseNumber(event.dataset['value']),
 				milestone: parseBoolean(event.dataset['milestone']),
 			};
 
@@ -316,7 +341,7 @@ export async function getTimelineEventInFile(
 	return res;
 }
 
-function parseValue(value?: string): number | undefined {
+function parseNumber(value?: string): number | undefined {
 	if (value) {
 		const num = Number(value);
 		if (!isNaN(num)) {

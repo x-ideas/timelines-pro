@@ -3,7 +3,7 @@ import { Notice, type TFile, type WorkspaceLeaf } from 'obsidian';
 import { Menu } from 'obsidian';
 import { ItemView } from 'obsidian';
 
-import Component from './timeline-manage.svelte';
+import Component from './timeline-events-manage.svelte';
 
 import { RenameModal } from '../rename-modal';
 import { includes } from 'lodash';
@@ -12,6 +12,7 @@ import {
 	getTimelineEventInFile,
 } from 'src/type/timeline-event';
 import * as Sentry from '@sentry/node';
+import { CreateTimelineEventModal } from '../create-timeline-event-modal';
 
 export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 
@@ -24,7 +25,7 @@ function getSearchTagRegExp2(tag: string) {
 	return `/data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]/`;
 }
 
-export class TimelinePanel extends ItemView {
+export class TimelineEventsPanel extends ItemView {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	component: Component;
@@ -35,7 +36,7 @@ export class TimelinePanel extends ItemView {
 	deleteEventRef?: ReturnType<typeof this.app.metadataCache.on>;
 
 	constructor(leaf: WorkspaceLeaf) {
-		console.log('[timeine] TimelinePanel constructor');
+		console.log('[timeine] TimelineEventsPanel constructor');
 		super(leaf);
 
 		this.eventTagsMap = new Map();
@@ -136,6 +137,9 @@ export class TimelinePanel extends ItemView {
 		const eventTagSet = new Set<string>();
 		const tagCountMap = new Map<string, number>();
 
+		const nameSet = new Set<string>();
+		const nameCountMap = new Map<string, number>();
+
 		for (const timeline of this.eventTagsMap.values()) {
 			for (const event of timeline) {
 				event.parsedEventTags?.forEach((tag) => {
@@ -145,12 +149,25 @@ export class TimelinePanel extends ItemView {
 					const count = tagCountMap.get(tag) || 0;
 					tagCountMap.set(tag, count + 1);
 				});
+
+				if (event.name) {
+					nameSet.add(event.name);
+
+					// 计数
+					const count = nameCountMap.get(event.name) || 0;
+					nameCountMap.set(event.name, count + 1);
+				}
 			}
 		}
 
 		const tagArray = Array.from(eventTagSet);
 
-		this.component.$set({ tags: tagArray, tagCountMap });
+		this.component.$set({
+			tags: tagArray,
+			tagCountMap,
+			names: Array.from(nameSet),
+			nameCountMap,
+		});
 	}
 
 	/** 重命名 */
@@ -232,6 +249,7 @@ export class TimelinePanel extends ItemView {
 			target: this.contentEl,
 			props: {
 				tags: [],
+				names: [],
 				onClick: (tag: string) => {
 					this.search(tag);
 				},

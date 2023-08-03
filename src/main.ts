@@ -3,13 +3,17 @@ import { DEFAULT_SETTINGS } from './constants';
 import { TimelinesSettingTab } from './settings';
 import { TimelineProcessor } from './block';
 import { Plugin, MarkdownView } from 'obsidian';
-import { TIMELINE_PANEL, TimelinePanel } from './ui/timeline-manage';
+import {
+	TIMELINE_PANEL,
+	TimelineEventsPanel,
+} from './ui/timeline-events-manage';
 import './app.css';
 import './sentry';
 import * as Sentry from '@sentry/node';
 import type { ITimelineMarkdownParams } from './utils';
 import * as TimelineEventApi from './type/timeline-event';
 import { searchTimelineEvents } from './apis/search-timeline';
+import { CreateTimelineEventModal } from './ui/create-timeline-event-modal';
 
 export default class TimelinesPlugin extends Plugin {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -94,7 +98,7 @@ export default class TimelinesPlugin extends Plugin {
 
 		this.addSettingTab(new TimelinesSettingTab(this.app, this));
 
-		this.registerView(TIMELINE_PANEL, (leaf) => new TimelinePanel(leaf));
+		this.registerView(TIMELINE_PANEL, (leaf) => new TimelineEventsPanel(leaf));
 
 		this.addRibbonIcon('tags', 'Timeline', () => {
 			this.activateView();
@@ -166,9 +170,22 @@ export default class TimelinesPlugin extends Plugin {
 		});
 	};
 
+	showCreateModal = (
+		onOk: (info: TimelineEventApi.ITimelineEventItemSource) => void
+	) => {
+		new CreateTimelineEventModal(this.app, (info) => {
+			// 修改文件
+			// this.rename(eventTag, newName);
+			if (typeof onOk === 'function') {
+				onOk(info);
+			}
+		}).open();
+	};
+
 	api = {
 		...TimelineEventApi,
 		searchTimelineEvents: this.searchTimelineEvents,
+		showCreateModal: this.showCreateModal,
 	};
 
 	async getEventsEchartOptions(filter?: ITimelineMarkdownParams) {

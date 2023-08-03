@@ -96,8 +96,8 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 					attr: { href: `${getTimelineEventSourcePath(event)}` },
 					text: event.title,
 				});
-			noteCard.createEl('p', { text: event.innerHTML }, (el) => {
-				el.innerHTML = event.innerHTML || '';
+			noteCard.createEl('p', { text: event.content }, (el) => {
+				el.innerHTML = event.content || '';
 			});
 		}
 
