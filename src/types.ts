@@ -1,6 +1,3 @@
-import type { TFile } from 'obsidian';
-import type { TimelineOptions } from 'vis-timeline';
-
 export interface TimelinesSettings {
 	/** 标签 */
 	timelineTag: string;

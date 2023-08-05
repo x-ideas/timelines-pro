@@ -107,10 +107,10 @@
 <div>
   <button on:click={() => {
     // 校验是否合法
-    if (!info.name) {
-      new Notice('名字不能为空');
-      return;
-    }
+    // if (!info.name) {
+    //   new Notice('名字不能为空');
+    //   return;
+    // }
 
     if (!info.date) {
       new Notice('时间不能为空');
