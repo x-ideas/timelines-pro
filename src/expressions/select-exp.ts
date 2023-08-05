@@ -7,17 +7,18 @@ type ITagSelectExpOpt = {
 };
 
 /**
- * 标签选择表达式,支持逻辑运算，括号
- * @example
- *  a && (b || !c)
+ * 字符串选择表达式，可以用“”来包裹字符串，此时支持模糊匹配
  */
-export class TagSelectExp {
-	private _exp: string;
-	private _opt?: ITagSelectExpOpt;
+export class StringSelectExp {
+	/**
+	 * pattern字符串，如：a && (b || !c)
+	 */
+	protected _exp: string;
+	protected _opt?: ITagSelectExpOpt;
 
-	private _parseResult?: ReturnType<typeof parser.parse>;
+	protected _parseResult?: ReturnType<typeof parser.parse>;
 
-	private testExpression?: Expression;
+	protected testExpression?: Expression;
 
 	constructor(exp: string, opt?: ITagSelectExpOpt) {
 		this._exp = exp;
@@ -32,7 +33,7 @@ export class TagSelectExp {
 		return this.testExpression?.run(testStr) || false;
 	}
 
-	private buildParser() {
+	protected buildParser() {
 		try {
 			this._parseResult = parser.parse(this._exp);
 
@@ -76,6 +77,35 @@ export class TagSelectExp {
 		}
 	}
 }
+
+/**
+ * 标签选择表达式,支持逻辑运算，括号
+ * @example
+ *  a && (b || !c)
+ * 跟StringSelectExp不同的点在于，它会对tag进行解析，而不是直接对字符串进行解析
+ */
+export class TagSelectExp extends StringSelectExp {
+	test(testStr: string): boolean {
+		if (!this._parseResult) {
+			this.buildParser();
+		}
+
+		// 对字符串进行解析
+		const tags = testStr.split(';');
+		return tags.some((tag) => {
+			return super.test(tag);
+		});
+
+		// return this.testExpression?.run(testStr) || false;
+	}
+}
+
+/**
+ * 数字表达式
+ * 支持
+ *  * =2, >3, >=5, <6, <=7, !=8,  >3 && <6, 2 || 3
+ */
+export class NumberSelectExp {}
 
 function transform(ast: _babel_types.Expression): Expression {
 	switch (ast.type) {

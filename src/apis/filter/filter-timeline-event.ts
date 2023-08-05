@@ -1,4 +1,4 @@
-import { TagSelectExp } from '../../expressions/tag-select-exp';
+import { TagSelectExp } from '../../expressions/select-exp';
 import {
 	hasTimeRangeIntersection,
 	parseTimelineDateElements,

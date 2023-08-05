@@ -1,6 +1,6 @@
 import type { MetadataCache, TFile } from 'obsidian';
 import { getAllTags } from 'obsidian';
-import { TagSelectExp } from 'src/expressions/tag-select-exp';
+import { TagSelectExp } from 'src/expressions/select-exp';
 
 /** 解析出父子tag可能的所有组合 */
 function parseTag(tag: string, tagList: string[]) {

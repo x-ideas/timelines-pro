@@ -1,4 +1,4 @@
-import { TagSelectExp } from '../tag-select-exp';
+import { TagSelectExp } from '../select-exp';
 
 describe('tag select测试', () => {
 	const eventTags = '南明史;书籍;其他;读书笔记';

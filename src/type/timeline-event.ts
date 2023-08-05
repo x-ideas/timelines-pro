@@ -48,8 +48,9 @@ export interface ITimelineEventItemSource {
 
 	/**
 	 * 名字，用于标记一类event
+	 * 如,项目的名字
 	 */
-	name: string;
+	name?: string;
 
 	/**
 	 * 标题，用于展示
