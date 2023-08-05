@@ -17,12 +17,27 @@ import { CreateTimelineEventModal } from '../create-timeline-event-modal';
 export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 
 /** 搜索全文用的 */
-function getSearchTagRegExp(tag: string) {
+function getSearchTagRegExpGlobal(tag: string) {
 	return new RegExp(`data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]`, 'g');
 }
 /** 给搜索组件用的 */
 function getSearchTagRegExp2(tag: string) {
 	return `/data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]/`;
+}
+
+/**
+ *
+ */
+function getSearchNameRegExp(name: string) {
+	// 转义名称中的\字符
+	const splitName = name.split('\\');
+	return `/data-name\\W*=\\W*${splitName.join('\\/')}/`;
+}
+
+function getSearchNameRegExpGlobal(name: string) {
+	// 转义名称中的\字符
+	const splitName = name.split('\\');
+	return new RegExp(`data-name\\W*=\\W*${splitName.join('\\/')}`, 'g');
 }
 
 export class TimelineEventsPanel extends ItemView {
@@ -73,12 +88,12 @@ export class TimelineEventsPanel extends ItemView {
 			?.innerText;
 
 		menu.addItem((item) => {
-			item.setTitle(`rename: "${eventTag}"`);
-			item.setIcon('rename');
+			item.setTitle(`renameTag: "${eventTag}"`);
+			item.setIcon('renameTag');
 			item.onClick(() => {
-				new RenameModal(this.app, eventTag, (newName) => {
+				new RenameModal(this.app, eventTag, (newName: string) => {
 					// 修改文件
-					this.rename(eventTag, newName);
+					this.renameTag(eventTag, newName);
 				}).open();
 			});
 		});
@@ -88,7 +103,7 @@ export class TimelineEventsPanel extends ItemView {
 			item.setTitle(`search: "${eventTag}"`);
 			item.setIcon('search');
 			item.onClick(() => {
-				this.search(eventTag);
+				this.search(getSearchTagRegExp2(eventTag));
 			});
 		});
 
@@ -171,7 +186,7 @@ export class TimelineEventsPanel extends ItemView {
 	}
 
 	/** 重命名 */
-	private async rename(oldTag: string, newTag: string) {
+	private async renameTag(oldTag: string, newTag: string) {
 		if (oldTag === newTag) {
 			return new Notice('the new tag is same with old one');
 		}
@@ -189,7 +204,7 @@ export class TimelineEventsPanel extends ItemView {
 		}
 
 		// 正则规则: eventTags: 'a;b'
-		const reg = getSearchTagRegExp(oldTag);
+		const reg = getSearchTagRegExpGlobal(oldTag);
 
 		// 修改文件
 		for (const file of files) {
@@ -205,8 +220,42 @@ export class TimelineEventsPanel extends ItemView {
 		}
 	}
 
+	private async renameName(oldName: string, newName?: string) {
+		if (oldName === newName) {
+			return new Notice('the new tag is same with old one');
+		}
+
+		// 找到需要修改的文件
+		const files: TFile[] = [];
+		for (const timeline of this.eventTagsMap.values()) {
+			for (const event of timeline) {
+				if (event.name === oldName) {
+					if (event.file.path) {
+						files.push(event.file);
+					}
+				}
+			}
+		}
+
+		// 正则规则: eventTags: 'a;b'
+		const reg = getSearchNameRegExpGlobal(oldName);
+
+		// 修改文件
+		for (const file of files) {
+			const fileContent = await this.app.vault.read(file);
+			const newFileContent = fileContent.replace(
+				reg,
+				(match, p1, p2, offset, origin, groups) => {
+					return `data-event-name='${p1 ? p1 : ''}${newName}${p2 ? p2 : ''}'`;
+				}
+			);
+
+			this.app.vault.modify(file, newFileContent);
+		}
+	}
+
 	/** 搜索 */
-	private search(tag: string) {
+	private search(str: string) {
 		const searchPlugin: Plugin =
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
@@ -217,7 +266,7 @@ export class TimelineEventsPanel extends ItemView {
 		if (searchPlugin && searchPlugin.instance) {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			searchPlugin.instance.openGlobalSearch(getSearchTagRegExp2(tag));
+			searchPlugin.instance.openGlobalSearch(str);
 		}
 	}
 
@@ -250,8 +299,11 @@ export class TimelineEventsPanel extends ItemView {
 			props: {
 				tags: [],
 				names: [],
-				onClick: (tag: string) => {
-					this.search(tag);
+				onTagClick: (tag: string) => {
+					this.search(getSearchTagRegExp2(tag));
+				},
+				onNameClick: (name: string) => {
+					this.search(getSearchNameRegExp(name));
 				},
 			},
 		});

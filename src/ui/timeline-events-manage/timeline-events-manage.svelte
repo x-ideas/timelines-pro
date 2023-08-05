@@ -10,7 +10,9 @@
   // 名字个数统计
   export let nameCountMap: Map<string, number> = new Map<string, number>();
 
-  export let onClick: (tag: string) => void;
+  export let onTagClick: (tag: string) => void;
+
+  export let onNameClick: (name: string) => void;
 
 </script>
 
@@ -19,7 +21,7 @@
   {#each (tags??[]) as tag}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="timeline-event-tag-wrapper text-gray-500" on:click={() => {
-      onClick(tag)
+      onTagClick(tag)
     }}><span class='tag'>{tag}</span>
     <div class='ml-auto'>{tagCountMap.get(tag) ?? 0}</div>
   </div>
@@ -30,7 +32,7 @@
   {#each (names??[]) as name}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="timeline-event-tag-wrapper text-gray-500" on:click={() => {
-      onClick(name)
+      onNameClick(name)
     }}><span class='tag'>{name}</span>
     <div class='ml-auto'>{nameCountMap.get(name) ?? 0}</div>
   </div>
