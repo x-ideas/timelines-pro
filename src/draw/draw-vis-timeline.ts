@@ -9,6 +9,7 @@ import {
 	getTimelineEventStartTime,
 	getTimelineEventEndTime,
 } from '../type/timeline-event';
+import { parseTimelineDateElements } from 'src/type';
 
 export interface IGroupedTimelineEvent {
 	groupName: string;
@@ -58,22 +59,31 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 			});
 
 			// 计算开始时间，结束时间
-			const start = getTimelineEventStartTime(event);
-			const end = getTimelineEventEndTime(event);
+			const start = parseTimelineDateElements(getTimelineEventStartTime(event));
+			const end = parseTimelineDateElements(getTimelineEventEndTime(event));
 
 			if (isNil(start)) {
 				console.warn('start time is undefined', event);
 				continue;
 			}
 
+			const contentDom = document.createElement('div');
+			const timeDom = document.createElement('div');
+			timeDom.setText(event.dateDescription || '');
+
+			const titleDom = document.createElement('div');
+			titleDom.setText(event.title || '');
+			contentDom.appendChild(timeDom);
+			contentDom.appendChild(titleDom);
+
 			const opt: DataItem = {
 				// id: getTimelineEventId(event) || '',
-				content: event.title ?? '',
+				content: contentDom as unknown as string,
 				title: noteCard.outerHTML,
-				start: start,
+				start: `${start.year}-${start.month}-${start.day}`,
 				className: event.class ?? '',
 				// type: event.type,
-				end: end ?? undefined,
+				end: end ? `${end.year}-${end.month}-${end.day}` : undefined,
 				group: groupEvent.groupName,
 			};
 
@@ -114,7 +124,7 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 		showCurrentTime: false,
 		showTooltips: false,
 		// 删除一些不需要的字段
-		...omit(options, 'tags', 'eventTags'),
+		...options,
 		template: function (item: any, element: HTMLElement, data: any) {
 			const eventContainer = document.createElement('div');
 			eventContainer.setText(item.content);

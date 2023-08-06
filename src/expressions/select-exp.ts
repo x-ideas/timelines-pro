@@ -2,25 +2,26 @@ import type * as _babel_types from '@babel/types';
 import { minimatch } from 'minimatch';
 import * as parser from '@babel/parser';
 
-type ITagSelectExpOpt = {
+type IStringSelectExpOpt = {
 	//
 };
 
 /**
  * 字符串选择表达式，可以用“”来包裹字符串，此时支持模糊匹配
+ * 支持 && || ! 运算，如：a && (b || !c)
  */
 export class StringSelectExp {
 	/**
 	 * pattern字符串，如：a && (b || !c)
 	 */
 	protected _exp: string;
-	protected _opt?: ITagSelectExpOpt;
+	protected _opt?: IStringSelectExpOpt;
 
 	protected _parseResult?: ReturnType<typeof parser.parse>;
 
 	protected testExpression?: Expression;
 
-	constructor(exp: string, opt?: ITagSelectExpOpt) {
+	constructor(exp: string, opt?: IStringSelectExpOpt) {
 		this._exp = exp;
 		this._opt = opt;
 	}
@@ -75,28 +76,6 @@ export class StringSelectExp {
 		} catch (error: any) {
 			throw new Error(`表达式解析失败: ${error?.message}`);
 		}
-	}
-}
-
-/**
- * 标签选择表达式,支持逻辑运算，括号
- * @example
- *  a && (b || !c)
- * 跟StringSelectExp不同的点在于，它会对tag进行解析，而不是直接对字符串进行解析
- */
-export class TagSelectExp extends StringSelectExp {
-	test(testStr: string): boolean {
-		if (!this._parseResult) {
-			this.buildParser();
-		}
-
-		// 对字符串进行解析
-		const tags = testStr.split(';');
-		return tags.some((tag) => {
-			return super.test(tag);
-		});
-
-		// return this.testExpression?.run(testStr) || false;
 	}
 }
 

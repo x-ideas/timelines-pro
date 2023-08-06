@@ -1,4 +1,4 @@
-import { TagSelectExp } from '../../expressions/select-exp';
+import { StringSelectExp } from '../../expressions/select-exp';
 import {
 	hasTimeRangeIntersection,
 	parseTimelineDateElements,
@@ -29,7 +29,7 @@ export interface ITimelineFilterParams {
 	 * @example
 	 * tag1 && (tag2 || tag3)
 	 * 同时支持内置的year_{xxxx}, month_{xx}, day_{xx}标签
-	 * @see {@link TagSelectExp}
+	 * @see {@link StringSelectExp}
 	 */
 	eventTags?: string;
 
@@ -96,7 +96,7 @@ function filterByEventTag(
 		return events;
 	}
 
-	const tagSelect = new TagSelectExp(params.eventTags);
+	const tagSelect = new StringSelectExp(params.eventTags);
 
 	return events.filter((item) => {
 		let tags = item.eventTags ? item.eventTags : 'none';
