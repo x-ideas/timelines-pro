@@ -67,18 +67,9 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 				continue;
 			}
 
-			const contentDom = document.createElement('div');
-			const timeDom = document.createElement('div');
-			timeDom.setText(event.dateDescription || '');
-
-			const titleDom = document.createElement('div');
-			titleDom.setText(event.title || '');
-			contentDom.appendChild(timeDom);
-			contentDom.appendChild(titleDom);
-
 			const opt: DataItem = {
 				// id: getTimelineEventId(event) || '',
-				content: contentDom as unknown as string,
+				content: `${event.dateDescription || ''}<br>${event.title || ''}`,
 				title: noteCard.outerHTML,
 				start: `${start.year}-${start.month}-${start.day}`,
 				className: event.class ?? '',
@@ -125,11 +116,12 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 		showTooltips: false,
 		// 删除一些不需要的字段
 		...options,
-		template: function (item: any, element: HTMLElement, data: any) {
+		template: function (item: DataItem, element: HTMLElement, data: any) {
 			const eventContainer = document.createElement('div');
-			eventContainer.setText(item.content);
+			eventContainer.innerHTML = item.content || '';
+			// eventContainer.setText(item.content);
 			const eventCard = eventContainer.createDiv();
-			eventCard.outerHTML = item.title;
+			eventCard.outerHTML = item.title || '';
 			eventContainer.addEventListener('click', (event) => {
 				if (process.env.NODE_ENV === 'development') {
 					console.log('[timeline]: click item', item, element, data);
