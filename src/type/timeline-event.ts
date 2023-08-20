@@ -309,13 +309,15 @@ export async function getTimelineEventInFile(
 					.reduce<string[]>((accu, tag) => {
 						accu.push(tag);
 						return accu;
-					}, []);
+					}, [])
+					.filter((tag) => !!tag);
 			}
 
 			// event.dataset.path = notePath;
 
 			let imgRealPath = '';
 			if (event.dataset.img) {
+				// console.log('real image', file. + event.dataset.img);
 				imgRealPath = getImgUrl(appVault.adapter, event.dataset.img);
 			}
 

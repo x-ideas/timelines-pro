@@ -11,6 +11,7 @@ import {
 } from '../../type/timeline-event';
 import type * as Sentry from '@sentry/node';
 import { filterEventsByName } from './filter-str-property';
+import { parseTag } from './parse-parent-children-tag';
 
 /**
  * 对于数字类型的过滤条件
@@ -99,20 +100,28 @@ function filterByEventTag(
 	const tagSelect = new StringSelectExp(params.eventTags);
 
 	return events.filter((item) => {
-		let tags = item.eventTags ? item.eventTags : 'none';
+		const tags = item.parsedEventTags || [];
+
+		const finalTags: string[] = [];
+		for (const tag of tags) {
+			const allTags: string[] = [];
+			// 解析父子tag
+			parseTag(tag, allTags);
+			finalTags.push(...allTags);
+		}
 
 		// 增加时间相关的tag
 		const start = getTimelineEventStartTime(item);
 		const timeElements = parseTimelineDateElements(start);
 		if (timeElements) {
 			// 增加额外的时间标签
-			tags += `;year_${timeElements.year}`;
-			tags += `;month_${timeElements.month}`;
-			tags += `;day_${timeElements.day}`;
-			tags += `;hour_${timeElements.hour}`;
+			finalTags.push(`year_${timeElements.year}`);
+			finalTags.push(`;month_${timeElements.month}`);
+			finalTags.push(`;day_${timeElements.day}`);
+			finalTags.push(`;hour_${timeElements.hour}`);
 		}
 
-		return tagSelect.test(tags);
+		return tagSelect.test(finalTags.join(';'));
 	});
 }
 

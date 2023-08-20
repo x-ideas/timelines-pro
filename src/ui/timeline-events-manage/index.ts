@@ -178,9 +178,9 @@ export class TimelineEventsPanel extends ItemView {
 		const tagArray = Array.from(eventTagSet);
 
 		this.component.$set({
-			tags: tagArray,
+			tags: tagArray.sort(),
 			tagCountMap,
-			names: Array.from(nameSet),
+			names: Array.from(nameSet).sort(),
 			nameCountMap,
 		});
 	}

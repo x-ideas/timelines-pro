@@ -14,6 +14,7 @@ import type { ITimelineMarkdownParams } from './utils';
 import * as TimelineEventApi from './type/timeline-event';
 import { searchTimelineEvents } from './apis/search-timeline';
 import { CreateTimelineEventModal } from './ui/create-timeline-event-modal';
+import { insertFileLinkIfNeed } from './insert-link/insert-file-link';
 
 export default class TimelinesPlugin extends Plugin {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -50,31 +51,6 @@ export default class TimelinesPlugin extends Plugin {
 				});
 			}
 		);
-
-		// Register vis-timeline block renderer
-		// 水平
-		// this.registerMarkdownCodeBlockProcessor(
-		// 	'timeline-vis-pro',
-		// 	async (source, el, ctx) => {
-		// 		// 获取当前文件
-		// 		const currentFile = this.app.metadataCache.getFirstLinkpathDest(
-		// 			ctx.sourcePath,
-		// 			''
-		// 		);
-
-		// 		const proc = new TimelineProcessor();
-		// 		await proc.run({
-		// 			source,
-		// 			el,
-		// 			settings: this.settings,
-		// 			vaultFiles: this.app.vault.getMarkdownFiles(),
-		// 			fileCache: this.app.metadataCache,
-		// 			appVault: this.app.vault,
-		// 			visTimeline: true,
-		// 			currentFile,
-		// 		});
-		// 	}
-		// );
 
 		this.addCommand({
 			id: 'render',
@@ -137,7 +113,7 @@ export default class TimelinesPlugin extends Plugin {
 	/**
 	 * 搜索timeline event
 	 */
-	searchTimelineEvents = (
+	private searchTimelineEvents = (
 		filter?: ITimelineMarkdownParams
 	): Promise<TimelineEventApi.ITimelineEventItemParsed[]> => {
 		const vaultFiles = this.app.vault.getMarkdownFiles();
@@ -170,7 +146,7 @@ export default class TimelinesPlugin extends Plugin {
 		});
 	};
 
-	showCreateModal = (
+	private showCreateModal = (
 		onOk: (info: TimelineEventApi.ITimelineEventItemSource) => void
 	) => {
 		new CreateTimelineEventModal(this.app, (info) => {
@@ -186,11 +162,6 @@ export default class TimelinesPlugin extends Plugin {
 		...TimelineEventApi,
 		searchTimelineEvents: this.searchTimelineEvents,
 		showCreateModal: this.showCreateModal,
+		insertFileLinkIfNeed: insertFileLinkIfNeed,
 	};
-
-	async getEventsEchartOptions(filter?: ITimelineMarkdownParams) {
-		const res = await this.searchTimelineEvents(filter);
-
-		// 转换成echarts options，用于绘制
-	}
 }
