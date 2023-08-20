@@ -22,7 +22,20 @@ export function parseTag(tag: string, tagList: string[]) {
 }
 
 interface TagWithParentInfo {
+	/**
+	 * @example
+	 * 		am
+	 */
 	tag: string;
+	/**
+	 * @example
+	 *  hello/i/am
+	 */
+	fullTag: string;
+	/**
+	 * @example
+	 * 	hello/i
+	 */
 	parent: string | undefined;
 }
 
@@ -40,10 +53,13 @@ export function parseTagWithParentInfo(tag: string): TagWithParentInfo[] {
 	// I.e., #hello/i/am would yield [#hello/i/am, #hello/i, #hello]. */
 	// tagList.push(tag);
 	while (tag.contains('/')) {
+		const index = tag.lastIndexOf('/');
+		const selfTag = tag.substring(index + 1);
 		const parentTag = tag.substring(0, tag.lastIndexOf('/'));
 		result.push({
-			tag,
+			tag: selfTag,
 			parent: parentTag,
+			fullTag: tag,
 		});
 
 		tag = parentTag;
@@ -51,6 +67,7 @@ export function parseTagWithParentInfo(tag: string): TagWithParentInfo[] {
 
 	result.push({
 		tag,
+		fullTag: tag,
 		parent: undefined,
 	});
 

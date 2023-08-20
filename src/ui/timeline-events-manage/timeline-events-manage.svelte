@@ -3,6 +3,7 @@
   import { parseTagWithParentInfo } from 'src/apis/filter/parse-parent-children-tag';
   import { TagTreeData } from '../tag-tree/types';
   import TagTree from '../tag-tree/tag-tree.svelte'
+  import TagZone from '../tag-hander/tag-handler.svelte'
 
   // export let tabs: string[];
   export let tags: string[] | undefined;
@@ -18,6 +19,12 @@
 
   export let onNameClick: (name: string) => void;
 
+
+  let innerTags = tags;
+  $: {
+    innerTags = tags;
+  }
+
   function makeTreeData(tagNames: string[], tagCounts: Map<string, number>): TagTreeData[] {
     // 根据/分割tag
     const tagTreeData: TagTreeData[] = [];
@@ -29,7 +36,7 @@
 
       const allTags = parseTagWithParentInfo(tagName);
 
-      for(const {tag, parent} of allTags) {
+      for(const {tag, parent, fullTag} of allTags) {
         let info = tagInfoMap[tag];
         if (info) {
           info.count += count;
@@ -38,6 +45,7 @@
             count: count,
             name: tag,
             id: tag,
+            fullName: fullTag,
             parentId: parent,
             children: []
           }
@@ -56,6 +64,7 @@
         id,
         parentId,
         name,
+        fullName: tagInfo.fullName,
         count,
         children: []
       }
@@ -71,13 +80,60 @@
     return Object.values(tagInfoMap).filter(item => !item.parentId);
   }
 
-  $: tagTreeData = makeTreeData(tags ?? [], tagCountMap);
+  $: tagTreeData = makeTreeData(innerTags ?? [], tagCountMap);
+
+
+  function sortA2Z() {
+    innerTags = innerTags?.sort((a, b) => {
+      return a.localeCompare(b);
+    })
+  }
+
+  function sortZ2A() {
+    innerTags = innerTags?.sort((a, b) => {
+      return b.localeCompare(a);
+    })
+  }
+
+  function sortCountHigh2Low() {
+
+    function sort(a: TagTreeData, b: TagTreeData) {
+      const aCount = a.count;
+      const bCount = b.count;
+
+      a.children.sort(sort);
+      b.children.sort(sort);
+
+      return bCount - aCount;
+    }
+
+    // 根据层级排序
+    tagTreeData = tagTreeData.sort(sort);
+  }
+
+  function sortCountLow2High() {
+    function sort(a: TagTreeData, b: TagTreeData) {
+      const aCount = a.count;
+      const bCount = b.count;
+
+      a.children.sort(sort);
+      b.children.sort(sort);
+
+      return aCount - bCount;
+    }
+
+    // 根据层级排序
+    tagTreeData = tagTreeData.sort(sort);
+  }
 
 </script>
 
 
-  <div class='timeline-event-head'>EventTags</div>
-  <TagTree roots={tagTreeData} />
+  <TagZone title={'EventTags'} sortA2Z={sortA2Z} sortZ2A={sortZ2A} sortCountHigh2Low={sortCountHigh2Low} sortCountLow2High={sortCountLow2High}></TagZone>
+  <div class='timeline-event-head'></div>
+  <TagTree roots={tagTreeData} onClick={(node) => {
+    onTagClick(node.fullName)
+  }}/>
 
   <hr class='mt-2 mb-2' />
   <div class='timeline-event-head'>EventNames</div>
@@ -93,9 +149,7 @@
 
 
 <style lang='css'>
-  .timeline-event-head {
-    font-size: 16px;
-  }
+
 
   .timeline-event-tag-wrapper {
     display: flex;

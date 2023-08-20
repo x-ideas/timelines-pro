@@ -12,17 +12,18 @@ import {
 	getTimelineEventInFile,
 } from 'src/type/timeline-event';
 import * as Sentry from '@sentry/node';
-import { CreateTimelineEventModal } from '../create-timeline-event-modal';
 
 export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 
 /** 搜索全文用的 */
 function getSearchTagRegExpGlobal(tag: string) {
-	return new RegExp(`data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]`, 'g');
+	// return new RegExp(`data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]`, 'g');
+	return tag;
 }
 /** 给搜索组件用的 */
 function getSearchTagRegExp2(tag: string) {
-	return `/data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]/`;
+	// return `/data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]/`;
+	return tag;
 }
 
 /**
@@ -31,13 +32,15 @@ function getSearchTagRegExp2(tag: string) {
 function getSearchNameRegExp(name: string) {
 	// 转义名称中的\字符
 	const splitName = name.split('\\');
-	return `/data-name\\W*=\\W*${splitName.join('\\/')}/`;
+	// return `/data-name\\W*=\\W*${splitName.join('\\/')}/`;
+	return name;
 }
 
 function getSearchNameRegExpGlobal(name: string) {
 	// 转义名称中的\字符
-	const splitName = name.split('\\');
-	return new RegExp(`data-name\\W*=\\W*${splitName.join('\\/')}`, 'g');
+	// const splitName = name.split('\\');
+	// return new RegExp(`data-name\\W*=\\W*${splitName.join('\\/')}`, 'g');
+	return name;
 }
 
 export class TimelineEventsPanel extends ItemView {
