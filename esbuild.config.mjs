@@ -21,6 +21,9 @@ const context = await esbuild.context({
     esbuildSvelte({
       compilerOptions: { css: true },
       preprocess: [sveltePreprocess()],
+      filterWarnings() {
+        return false;
+      },
     }),
   ],
   entryPoints: ['src/main.ts'],

@@ -35,8 +35,8 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 	});
 
 	if (process.env.NODE_ENV === 'development') {
-		console.log('[timeline]: groupEvents', groupEvents);
-		console.log('[timeline]: sortedEvents', sortedEvents);
+		// console.log('[timeline]: groupEvents', groupEvents);
+		// console.log('[timeline]: sortedEvents', sortedEvents);
 	}
 
 	let eventCount = 0;

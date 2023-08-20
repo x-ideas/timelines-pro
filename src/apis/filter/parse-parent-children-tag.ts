@@ -20,3 +20,39 @@ export function parseTag(tag: string, tagList: string[]) {
 		tagList.push(tag);
 	}
 }
+
+interface TagWithParentInfo {
+	tag: string;
+	parent: string | undefined;
+}
+
+export function parseTagWithParentInfo(tag: string): TagWithParentInfo[] {
+	const result: TagWithParentInfo[] = [];
+
+	tag = tag.trim();
+
+	// Skip empty tags
+	if (tag.length === 0) {
+		return result;
+	}
+
+	// Parse all subtags out of the given tag.
+	// I.e., #hello/i/am would yield [#hello/i/am, #hello/i, #hello]. */
+	// tagList.push(tag);
+	while (tag.contains('/')) {
+		const parentTag = tag.substring(0, tag.lastIndexOf('/'));
+		result.push({
+			tag,
+			parent: parentTag,
+		});
+
+		tag = parentTag;
+	}
+
+	result.push({
+		tag,
+		parent: undefined,
+	});
+
+	return result;
+}
