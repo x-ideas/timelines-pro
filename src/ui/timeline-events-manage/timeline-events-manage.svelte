@@ -35,13 +35,12 @@
       const count = tagCounts.get(tagName) ?? 0;
 
       const allTags = parseTagWithParentInfo(tagName);
-
       for(const {tag, parent, fullTag} of allTags) {
-        let info = tagInfoMap[tag];
+        let info = tagInfoMap[fullTag];
         if (info) {
           info.count += count;
         } else {
-          tagInfoMap[tag] = {
+          tagInfoMap[fullTag] = {
             count: count,
             name: tag,
             id: tag,
@@ -53,26 +52,15 @@
       }
     }
 
-
-    // 生成树
+    // 生成树(支持多层级)
     for (const tagInfo of Object.values(tagInfoMap)) {
-      const {id, parentId, name, count} = tagInfo;
-      const parentInfo = tagInfoMap[parentId ?? ''];
-      const parent = parentInfo ? parentInfo : undefined;
+      const { parentId } = tagInfo;
+      const parentInfo = tagInfoMap[parentId ?? ''] ?? undefined;
 
-      const tagTreeItem: TagTreeData = {
-        id,
-        parentId,
-        name,
-        fullName: tagInfo.fullName,
-        count,
-        children: []
-      }
-
-      if (parent) {
-        parent.children.push(tagTreeItem);
+      if (parentInfo) {
+        parentInfo.children.push(tagInfo);
       } else {
-        tagTreeData.push(tagTreeItem);
+        tagTreeData.push(tagInfo);
       }
     }
 
