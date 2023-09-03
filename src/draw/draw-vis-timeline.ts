@@ -68,8 +68,11 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 			}
 
 			const opt: DataItem = {
-				// id: getTimelineEventId(event) || '',
-				content: `${event.dateDescription || ''}<br>${event.title || ''}`,
+				content: `${
+					event.dateDescription || ''
+				}<br><a href=${getTimelineEventSourcePath(
+					event
+				)} class="internal-link">${event.title || ''}</a>`,
 				title: noteCard.outerHTML,
 				start: `${start.year}-${start.month}-${start.day}`,
 				className: event.class ?? '',
@@ -122,18 +125,19 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 			// eventContainer.setText(item.content);
 			const eventCard = eventContainer.createDiv();
 			eventCard.outerHTML = item.title || '';
-			eventContainer.addEventListener('click', (event) => {
-				if (process.env.NODE_ENV === 'development') {
-					console.log('[timeline]: click item', item, element, data);
-				}
-				// 计算位子
+			// 取消点击事件
+			// eventContainer.addEventListener('click', (event) => {
+			// 	if (process.env.NODE_ENV === 'development') {
+			// 		console.log('[timeline]: click item', item, element, data);
+			// 	}
+			// 	// 计算位子
 
-				const el = eventContainer.getElementsByClassName(
-					'timeline-card'
-				)[0] as HTMLElement;
-				el?.style.setProperty('display', 'block');
-				el?.style.setProperty('top', `-${el.clientHeight + 10}px`);
-			});
+			// 	const el = eventContainer.getElementsByClassName(
+			// 		'timeline-card'
+			// 	)[0] as HTMLElement;
+			// 	el?.style.setProperty('display', 'block');
+			// 	el?.style.setProperty('top', `-${el.clientHeight + 10}px`);
+			// });
 			return eventContainer;
 		},
 	};
