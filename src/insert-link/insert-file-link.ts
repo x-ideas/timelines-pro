@@ -12,7 +12,11 @@ export async function insertFileLinkIfNeed(
 	// 采用[[文件名]]的形式插入文件链接
 	const links = new Set();
 	// 判断是否需要插入文件链接
-	for (const event of events) {
+	// 先根据创建时间排序
+
+	for (const event of events.sort(
+		(aEv, bEv) => aEv.file.stat.ctime - bEv.file.stat.ctime
+	)) {
 		if (
 			!fileContent.includes(`[[${event.file.basename}]]`) &&
 			// 排除自身
