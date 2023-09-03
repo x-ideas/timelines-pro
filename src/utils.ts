@@ -57,7 +57,14 @@ export function parseMarkdownCodeSource(
 	source: string
 ): ITimelineMarkdownParams[] {
 	// 按照空白行分割
-	const sourceList = source.trim().split('\n\n');
+	const sourceList = source
+		.trim()
+		.split('\n\n')
+		.filter((line) => {
+			return !!line && !line.match(/^\s+$/);
+		});
+
+	console.log('sourceList', sourceList);
 
 	return sourceList.map((aSource) => {
 		return parseMarkdownCode(aSource);
