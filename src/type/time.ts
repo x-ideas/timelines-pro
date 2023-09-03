@@ -51,7 +51,7 @@ export function parseTimelineDate(
 	const res = `${isNegative ? '-' : ''}${yy}${mm}${dd}${hh}`;
 
 	const time = Number.parseInt(res);
-	if (Number.isNumber(time)) {
+	if (typeof time === 'number') {
 		return time;
 	}
 	return undefined;
@@ -109,12 +109,6 @@ export function hasTimeRangeIntersection(
 		parseTimelineDate(timeRange2[0]),
 		parseTimelineDate(timeRange2[1]),
 	];
-
-	console.log(
-		'[timeline] hasTimeRangeIntersection',
-		numTimeRange1,
-		numTimeRange2
-	);
 
 	return hasTimeRangeIntersectionImpl(numTimeRange1, numTimeRange2);
 }

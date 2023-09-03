@@ -220,7 +220,13 @@ export class TimelineProcessor {
 			extraOptions = Object.assign(
 				{},
 				extraOptions,
-				omit(filterParam, ['tags', 'eventTags', 'groupName'])
+				omit(filterParam, [
+					'tags',
+					'eventTags',
+					'groupName',
+					'dateStart',
+					'dateEnd',
+				])
 			);
 		}
 

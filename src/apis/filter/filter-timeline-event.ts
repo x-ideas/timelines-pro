@@ -6,6 +6,7 @@ import {
 } from '../../type/time';
 import {
 	getTimelineEventEndTime,
+	getTimelineEventEndTimeJudged,
 	getTimelineEventStartTime,
 	type ITimelineEventItemParsed,
 } from '../../type/timeline-event';
@@ -144,7 +145,7 @@ function filterByTime(
 	return events.filter((item) => {
 		const eventTimeRange: TimelineDateRange = [
 			getTimelineEventStartTime(item),
-			getTimelineEventEndTime(item),
+			getTimelineEventEndTimeJudged(item),
 		];
 
 		// 判断是否有交集

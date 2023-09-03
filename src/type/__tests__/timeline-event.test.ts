@@ -5,7 +5,7 @@ describe('timeline-event', () => {
 		it('701', () => {
 			const res = getTimelineEventMomentTime('701');
 
-			expect(res.format('YYYY-MM-DD')).toBe('0701-01-01');
+			expect(res?.format('YYYY-MM-DD')).toBe('0701-01-01');
 		});
 	});
 });

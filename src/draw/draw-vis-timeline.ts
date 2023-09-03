@@ -108,7 +108,7 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 	}
 
 	if (process.env.NODE_ENV === 'development') {
-		console.log('[timeline]: items', items);
+		// console.log('[timeline]: items', items);
 	}
 
 	const timelineOpt: TimelineOptions = {

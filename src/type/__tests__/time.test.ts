@@ -1,4 +1,4 @@
-import { parseTimelineDateElements } from '../time';
+import { hasTimeRangeIntersection, parseTimelineDateElements } from '../time';
 
 describe('time', () => {
 	describe('parseTimelineDateElements', () => {
@@ -10,6 +10,18 @@ describe('time', () => {
 				day: '01',
 				hour: '00',
 			});
+		});
+	});
+
+	describe('hasTimeRangeIntersection', () => {
+		it('sss', () => {
+			expect(
+				hasTimeRangeIntersection(
+					['1646/10', '1662/3'],
+					// 开区间
+					['1645/07/27', undefined]
+				)
+			).toBe(true);
 		});
 	});
 });
