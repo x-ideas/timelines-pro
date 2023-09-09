@@ -8,4 +8,4 @@ export const DEFAULT_SETTINGS: TimelinesSettings = {
 };
 
 export const RENDER_TIMELINE =
-	/<!--TIMELINE BEGIN tags=['"]([^"]*?)['"]-->([\s\S]*?)<!--TIMELINE END-->/i;
+	/<!--TIMELINE BEGIN source=['"]([^"]*?)['"]-->([\s\S]*?)<!--TIMELINE END-->/i;

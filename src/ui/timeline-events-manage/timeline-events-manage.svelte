@@ -5,6 +5,9 @@
   import TagTree from '../tag-tree/tag-tree.svelte'
   import TagZone from '../tag-hander/tag-handler.svelte'
 
+  /** 初始化加载*/
+  export let initLoading: boolean = false;
+
   // export let tabs: string[];
   export let tags: string[] | undefined;
 
@@ -116,7 +119,11 @@
 
 </script>
 
-
+{#if initLoading}
+  <div class='loading-container'>
+    <div>Loading</div>
+  </div>
+{:else}
   <TagZone title={'EventTags'} sortA2Z={sortA2Z} sortZ2A={sortZ2A} sortCountHigh2Low={sortCountHigh2Low} sortCountLow2High={sortCountLow2High}></TagZone>
   <div class='timeline-event-head'></div>
   <TagTree roots={tagTreeData} onClick={(node) => {
@@ -133,6 +140,9 @@
     <div class='ml-auto'>{nameCountMap.get(name) ?? 0}</div>
   </div>
   {/each}
+{/if}
+
+
 
 
 
@@ -144,5 +154,15 @@
     flex-direction: row;
     flex-wrap: wrap;
     margin: 4px;
+  }
+
+  .loading-container {
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
   }
 </style>

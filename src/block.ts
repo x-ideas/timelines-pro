@@ -1,7 +1,7 @@
 //import Gallery from './svelte/Gallery.svelte'
 import type { TimelinesSettings } from './types';
 import { RENDER_TIMELINE } from './constants';
-import type { TFile, MarkdownView, MetadataCache, Vault, App } from 'obsidian';
+import type { TFile, MarkdownView, App } from 'obsidian';
 import 'vis-timeline/styles/vis-timeline-graph2d.css';
 import type { ITimelineMarkdownParams } from './utils';
 import { parseMarkdownCodeSource } from './utils';
@@ -27,8 +27,9 @@ interface IRunOpt {
 	el: HTMLElement;
 	settings: TimelinesSettings;
 	vaultFiles: TFile[];
-	fileCache: MetadataCache;
-	appVault: Vault;
+	app: App;
+	// fileCache: MetadataCache;
+	// appVault: Vault;
 
 	/**
 	 * 是否使用vis-timeline绘制
@@ -43,8 +44,9 @@ export class TimelineProcessor {
 		sourceView: MarkdownView,
 		settings: TimelinesSettings,
 		vaultFiles: TFile[],
-		fileCache: MetadataCache,
-		appVault: Vault,
+		app: App,
+		// fileCache: MetadataCache,
+		// appVault: Vault,
 		currentFile: TFile | null
 	) {
 		const editor = sourceView.editor;
@@ -52,7 +54,7 @@ export class TimelineProcessor {
 			const source = editor.getValue();
 			const match = RENDER_TIMELINE.exec(source);
 			if (match) {
-				const tagList = match[1];
+				const source = match[1];
 
 				const div = document.createElement('div');
 				const rendered = document.createElement('div');
@@ -60,15 +62,16 @@ export class TimelineProcessor {
 				rendered.setText(new Date().toString());
 
 				div.appendChild(
-					document.createComment(`TIMELINE BEGIN tags='${match[1]}'`)
+					document.createComment(`TIMELINE BEGIN source='${match[1]}'`)
 				);
 				await this.runUnion({
-					source: tagList,
+					source: source,
 					el: div,
 					settings,
 					vaultFiles,
-					fileCache,
-					appVault,
+					app,
+					// fileCache,
+					// appVault,
 					visTimeline: false,
 					currentFile,
 				});
@@ -91,8 +94,9 @@ export class TimelineProcessor {
 			el,
 			settings,
 			vaultFiles,
-			fileCache,
-			appVault,
+			app,
+			// fileCache,
+			// appVault,
 			visTimeline,
 			currentFile,
 		} = opt;
@@ -117,8 +121,9 @@ export class TimelineProcessor {
 		// 搜索
 		const events = await searchTimelineEvents({
 			vaultFiles,
-			fileCache,
-			appVault,
+			app,
+			// fileCache,
+			// appVault,
 			params: filterParam,
 		});
 
@@ -155,7 +160,7 @@ export class TimelineProcessor {
 		const { autoInsetFileLinks = true } = filterParam;
 
 		if (currentFile && autoInsetFileLinks) {
-			insertFileLinkIfNeed(currentFile, opt.appVault, events);
+			insertFileLinkIfNeed(currentFile, opt.app.vault, events);
 		} else {
 			if (!currentFile) {
 				console.error('[timeline] currentFile is null');
@@ -176,8 +181,9 @@ export class TimelineProcessor {
 			el,
 			settings,
 			vaultFiles,
-			fileCache,
-			appVault,
+			// fileCache,
+			// appVault,
+			app,
 			visTimeline,
 			currentFile,
 		} = opt;
@@ -204,8 +210,9 @@ export class TimelineProcessor {
 
 			const res = await searchTimelineEvents({
 				vaultFiles,
-				fileCache,
-				appVault,
+				app,
+				// fileCache,
+				// appVault,
 				params: filterParam,
 			});
 
@@ -246,7 +253,7 @@ export class TimelineProcessor {
 				},
 				[]
 			);
-			insertFileLinkIfNeed(currentFile, opt.appVault, allEvents);
+			insertFileLinkIfNeed(currentFile, opt.app.vault, allEvents);
 		} else {
 			if (!currentFile) {
 				console.error('[timeline] currentFile is null');

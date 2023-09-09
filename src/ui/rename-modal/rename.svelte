@@ -5,6 +5,10 @@
 
   let newName: string = tagName;
 
+  $: {
+    newName = tagName;
+  }
+
   $: isValidInput = newName.trim().length > 0;
 </script>
 

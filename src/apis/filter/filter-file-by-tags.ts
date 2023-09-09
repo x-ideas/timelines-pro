@@ -1,4 +1,4 @@
-import type { MetadataCache, TFile } from 'obsidian';
+import type { App, TFile } from 'obsidian';
 import { getAllTags } from 'obsidian';
 import { StringSelectExp } from 'src/expressions/select-exp';
 import { parseTag } from './parse-parent-children-tag';
@@ -6,21 +6,17 @@ import { parseTag } from './parse-parent-children-tag';
 /**
  * 根据tagList(白名单），过滤文件
  * @param {TFile} file 当前文件
- * @param {MetadataCache} metadataCache ob的metadataCache对象
- * @param {string | undefined} tags tags过滤条件，支持逻辑运算
+ * @param {App} app ob的app对象
+ * @param {string | undefined} tagSelector tags过滤条件，支持逻辑运算
  */
-export function filterFileByTags(
-	file: TFile,
-	metadataCache: MetadataCache,
-	tagSelector?: string
-) {
+export function filterFileByTags(file: TFile, app: App, tagSelector?: string) {
 	if (!tagSelector) {
 		return true;
 	}
 
 	const exp = new StringSelectExp(tagSelector);
 
-	const cached = metadataCache.getFileCache(file);
+	const cached = app.metadataCache.getFileCache(file);
 	if (cached) {
 		// 文件的tag
 		const tags = getAllTags(cached)?.map((e) => e.slice(1, e.length));

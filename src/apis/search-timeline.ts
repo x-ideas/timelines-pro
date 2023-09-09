@@ -1,4 +1,4 @@
-import type { MetadataCache, TFile, Vault } from 'obsidian';
+import type { App, MetadataCache, TFile, Vault } from 'obsidian';
 import {
 	getTimelineEventInFile,
 	type ITimelineEventItemParsed,
@@ -27,8 +27,8 @@ export interface ITimelineSearchParams extends ITimelineFilterParams {
 interface ISearchTimelineEventsParams {
 	/** obsidian相关的信息 */
 	vaultFiles: TFile[];
-	fileCache: MetadataCache;
-	appVault: Vault;
+	app: App;
+	// appVault: Vault;
 	/**
 	 * 搜索和绘制参数
 	 * 目前绘制参数，在timeline-vis-pro下才生效
@@ -54,7 +54,7 @@ export async function searchTimelineEvents(
 
 	// 使用tags过滤文件
 	const fileList = opt.vaultFiles.filter((file) =>
-		filterFileByTags(file, opt.fileCache, opt.params.tags)
+		filterFileByTags(file, opt.app, opt.params.tags)
 	);
 	if (process.env.NODE_ENV !== 'production') {
 		console.log('[timeline] after file filter', fileList.length);
@@ -68,7 +68,7 @@ export async function searchTimelineEvents(
 	// 获取所有的timelines
 	const timelineEventsInFiles = await getTimelineEventInFile(
 		fileList,
-		opt.appVault
+		opt.app.vault
 	);
 
 	// 判断查询时间是否有效

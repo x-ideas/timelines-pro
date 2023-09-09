@@ -15,6 +15,7 @@ import * as TimelineEventApi from './type/timeline-event';
 import { searchTimelineEvents } from './apis/search-timeline';
 import { CreateTimelineEventModal } from './ui/create-timeline-event-modal';
 import { insertFileLinkIfNeed } from './insert-link/insert-file-link';
+import { EventTagsManage } from './event-tags-manage';
 
 export default class TimelinesPlugin extends Plugin {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -27,6 +28,11 @@ export default class TimelinesPlugin extends Plugin {
 		// Load message
 		await this.loadSettings();
 		console.log('Loaded Timelines Plugin');
+
+		setTimeout(() => {
+			// 初始化
+			EventTagsManage.getInstance().init(this.app);
+		}, 0);
 
 		// Register timeline block renderer
 		// 垂直
@@ -44,8 +50,9 @@ export default class TimelinesPlugin extends Plugin {
 					el,
 					settings: this.settings,
 					vaultFiles: this.app.vault.getMarkdownFiles(),
-					fileCache: this.app.metadataCache,
-					appVault: this.app.vault,
+					// fileCache: this.app.metadataCache,
+					// appVault: this.app.vault,
+					app: this.app,
 					visTimeline: false,
 					currentFile: currentFile,
 				});
@@ -64,11 +71,20 @@ export default class TimelinesPlugin extends Plugin {
 						view,
 						this.settings,
 						this.app.vault.getMarkdownFiles(),
-						this.app.metadataCache,
-						this.app.vault,
+						this.app,
+						// this.app.metadataCache,
+						// this.app.vault,
 						view.file
 					);
 				}
+			},
+		});
+
+		this.addCommand({
+			id: 'show event tags panel',
+			name: 'Show Event Tags Panel',
+			callback: () => {
+				this.activateView();
 			},
 		});
 
@@ -131,8 +147,9 @@ export default class TimelinesPlugin extends Plugin {
 
 		return searchTimelineEvents({
 			vaultFiles: vaultFiles,
-			fileCache: this.app.metadataCache,
-			appVault: this.app.vault,
+			// fileCache: this.app.metadataCache,
+			// appVault: this.app.vault,
+			app: this.app,
 			params: filter || {},
 		}).then((events) => {
 			transaction.finish();

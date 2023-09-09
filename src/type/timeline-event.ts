@@ -1,4 +1,4 @@
-import type { DataAdapter, TFile, Vault } from 'obsidian';
+import type { App, DataAdapter, TFile, Vault } from 'obsidian';
 import {
 	parseTimelineDate,
 	parseTimelineDateElements,
@@ -339,6 +339,88 @@ export async function getTimelineEventInFile(
 			timelines.push(timelineEvent);
 		}
 		res.set(path, timelines);
+	}
+
+	return res;
+}
+
+/**
+ * 文件中的所有标签信息
+ */
+export interface FileTagInfos {
+	file: TFile;
+	/** 事件标签 */
+	eventTags: ITimelineEventItemParsed[];
+}
+
+/**
+ * 从文件见获取tags和event tags
+ */
+export async function getTimelineEventsAndTagsInFile(
+	files: TFile[],
+	app: App
+): Promise<Map<TFile, FileTagInfos>> {
+	const domparser = new DOMParser();
+	const res = new Map<TFile, FileTagInfos>();
+
+	for (const file of files) {
+		const doc = domparser.parseFromString(
+			await app.vault.read(file),
+			'text/html'
+		);
+		// timeline div
+		const timelineData = doc.getElementsByClassName('ob-timelines');
+
+		const timelines: ITimelineEventItemParsed[] = [];
+		// NOTE: 额外dataset处理一些参数
+		const notePath = file.path;
+		const path = notePath;
+		for (const event of timelineData as any) {
+			if (!(event instanceof HTMLElement)) {
+				continue;
+			}
+
+			let eventTags: string[] = [];
+			if (event.dataset['eventTags']) {
+				eventTags = event.dataset['eventTags']
+					.split(';')
+					.reduce<string[]>((accu, tag) => {
+						accu.push(tag);
+						return accu;
+					}, [])
+					.filter((tag) => !!tag);
+			}
+
+			// event.dataset.path = notePath;
+
+			let imgRealPath = '';
+			if (event.dataset.img) {
+				// console.log('real image', file. + event.dataset.img);
+				imgRealPath = getImgUrl(app.vault.adapter, event.dataset.img);
+			}
+
+			// 添加到结果中
+			const timelineEvent: ITimelineEventItemParsed = {
+				...event.dataset,
+				date: event.dataset.date ? event.dataset.date : event.dataset.dateStart,
+				content: event.innerHTML,
+				imgRealPath,
+				parsedEventTags: eventTags,
+				file: file,
+				// 一些属性的额外处理
+				//  解析成数字
+				name: event.dataset['name'] || 'unknown',
+				value: parseNumber(event.dataset['value']),
+				milestone: parseBoolean(event.dataset['milestone']),
+			};
+
+			timelines.push(timelineEvent);
+		}
+		const info: FileTagInfos = {
+			eventTags: timelines,
+			file: file,
+		};
+		res.set(file, info);
 	}
 
 	return res;

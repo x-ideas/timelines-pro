@@ -7,11 +7,10 @@ import Component from './timeline-events-manage.svelte';
 
 import { RenameModal } from '../rename-modal';
 import { includes } from 'lodash';
-import {
-	type ITimelineEventItemParsed,
-	getTimelineEventInFile,
-} from 'src/type/timeline-event';
+
 import * as Sentry from '@sentry/node';
+import { EventTagsManage } from 'src/event-tags-manage';
+import { getTimelineEventInFile } from 'src/type';
 
 export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 
@@ -52,16 +51,14 @@ export class TimelineEventsPanel extends ItemView {
 	// @ts-ignore
 	component: Component;
 
-	eventTagsMap: Map<string, ITimelineEventItemParsed[]>;
-
 	changeEventRef?: ReturnType<typeof this.app.metadataCache.on>;
 	deleteEventRef?: ReturnType<typeof this.app.metadataCache.on>;
+
+	initLoading = true;
 
 	constructor(leaf: WorkspaceLeaf) {
 		console.log('[timeine] TimelineEventsPanel constructor');
 		super(leaf);
-
-		this.eventTagsMap = new Map();
 
 		this.icon = 'tags';
 
@@ -84,6 +81,11 @@ export class TimelineEventsPanel extends ItemView {
 			document.off('contextmenu', '.timeline-event-tag-wrapper', this.onMenu, {
 				capture: true,
 			});
+		});
+
+		EventTagsManage.getInstance().onRefreshFinished(() => {
+			this.initLoading = false;
+			this.refreshUI();
 		});
 	}
 
@@ -137,26 +139,25 @@ export class TimelineEventsPanel extends ItemView {
 	}
 
 	/** 初始化event tags */
-	async initEventTags() {
-		const files = this.app.vault.getMarkdownFiles();
-
-		const transaction = Sentry.startTransaction({
-			name: 'Timeline-Pro UI(初始化all event tags)',
-			description: 'ob timeline UI(初始化all event tags)',
-			data: {
-				filesCount: files.length,
-			},
-			tags: {
-				filesCount: files.length,
-			},
-		});
-
-		const timelineEvents = await getTimelineEventInFile(files, this.app.vault);
-
-		this.eventTagsMap = timelineEvents;
-		console.log('[timeline] initEventTags', timelineEvents);
-		transaction.finish();
-	}
+	// async initEventTags() {
+	// 	const files = this.app.vault.getMarkdownFiles();
+	// 	// const transaction = Sentry.startTransaction({
+	// 	// 	name: 'Timeline-Pro UI(初始化all event tags)',
+	// 	// 	description: 'ob timeline UI(初始化all event tags)',
+	// 	// 	data: {
+	// 	// 		filesCount: files.length,
+	// 	// 	},
+	// 	// 	tags: {
+	// 	// 		filesCount: files.length,
+	// 	// 	},
+	// 	// });
+	// 	console.time('old init');
+	// 	const timelineEvents = await getTimelineEventInFile(files, this.app.vault);
+	// 	console.timeEnd('old init');
+	// 	// this.eventTagsMap = timelineEvents;
+	// 	// console.log('[timeline] initEventTags', timelineEvents);
+	// 	// transaction.finish();
+	// }
 
 	/** 刷新view */
 	private refreshUI() {
@@ -166,8 +167,9 @@ export class TimelineEventsPanel extends ItemView {
 		const nameSet = new Set<string>();
 		const nameCountMap = new Map<string, number>();
 
-		for (const timeline of this.eventTagsMap.values()) {
-			for (const event of timeline) {
+		const infos = EventTagsManage.getInstance().getEventTags();
+		for (const timeline of infos.values()) {
+			for (const event of timeline.eventTags) {
 				event.parsedEventTags?.forEach((tag) => {
 					eventTagSet.add(tag);
 
@@ -189,6 +191,7 @@ export class TimelineEventsPanel extends ItemView {
 		const tagArray = Array.from(eventTagSet);
 
 		this.component.$set({
+			initLoading: this.initLoading,
 			tags: tagArray.sort(),
 			tagCountMap,
 			names: Array.from(nameSet).sort(),
@@ -202,10 +205,12 @@ export class TimelineEventsPanel extends ItemView {
 			return new Notice('the new tag is same with old one');
 		}
 
+		const tagInfos = EventTagsManage.getInstance().getEventTags();
+
 		// 找到需要修改的文件
 		const files: TFile[] = [];
-		for (const timeline of this.eventTagsMap.values()) {
-			for (const event of timeline) {
+		for (const timeline of tagInfos.values()) {
+			for (const event of timeline.eventTags) {
 				if (includes(event.eventTags, oldTag)) {
 					if (event.file.path) {
 						files.push(event.file);
@@ -233,40 +238,6 @@ export class TimelineEventsPanel extends ItemView {
 		new Notice('replace success');
 	}
 
-	private async renameName(oldName: string, newName?: string) {
-		if (oldName === newName) {
-			return new Notice('the new tag is same with old one');
-		}
-
-		// 找到需要修改的文件
-		const files: TFile[] = [];
-		for (const timeline of this.eventTagsMap.values()) {
-			for (const event of timeline) {
-				if (event.name === oldName) {
-					if (event.file.path) {
-						files.push(event.file);
-					}
-				}
-			}
-		}
-
-		// 正则规则: eventTags: 'a;b'
-		const reg = getSearchNameRegExpGlobal(oldName);
-
-		// 修改文件
-		for (const file of files) {
-			const fileContent = await this.app.vault.read(file);
-			const newFileContent = fileContent.replace(
-				reg,
-				(match, p1, p2, offset, origin, groups) => {
-					return `data-event-name='${p1 ? p1 : ''}${newName}${p2 ? p2 : ''}'`;
-				}
-			);
-
-			this.app.vault.modify(file, newFileContent);
-		}
-	}
-
 	/** 搜索 */
 	private search(str: string) {
 		const searchPlugin: Plugin =
@@ -287,21 +258,18 @@ export class TimelineEventsPanel extends ItemView {
 	 * 文件更新
 	 */
 	async onFileUpdated(file: TFile) {
-		const timelineEvents = await getTimelineEventInFile([file], this.app.vault);
+		const res = await EventTagsManage.getInstance().updateFileEventTags(file);
 
-		for (const [path, events] of timelineEvents) {
-			// 覆盖
-			this.eventTagsMap.set(path, events);
+		if (res) {
+			this.refreshUI();
 		}
-
-		this.refreshUI();
 	}
 
 	/**
 	 * 文件删除
 	 */
 	async onFileDeleted(file: TFile) {
-		this.eventTagsMap.delete(file.path);
+		await EventTagsManage.getInstance().deleteFileEventTags(file);
 		this.refreshUI();
 	}
 
@@ -320,8 +288,21 @@ export class TimelineEventsPanel extends ItemView {
 				},
 			},
 		});
-		await this.initEventTags();
 
+		const files = this.app.vault.getMarkdownFiles();
+		const transaction = Sentry.startTransaction({
+			name: 'Timeline-Pro UI(初始化all event tags)',
+			description: 'ob timeline UI(初始化all event tags)',
+			data: {
+				filesCount: files.length,
+			},
+			tags: {
+				filesCount: files.length,
+			},
+		});
+
+		await EventTagsManage.getInstance().refresh();
+		transaction.finish();
 		this.refreshUI();
 	}
 
