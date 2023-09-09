@@ -19,14 +19,14 @@ export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 function getSearchTagRegExpGlobal(tag: string) {
 	const aa = tag.replace(/\//g, '\\/');
 
-	return new RegExp(`data-event-tags\\W*=\\W*['"](.*)${aa}[';]`, 'g');
+	return new RegExp(`data-event-tags\\W*=\\W*(.*?)['";]${aa}[';\\/]`, 'g');
 }
 /** 给搜索组件用的，搜索时使用(比如，点击触发搜索，右击搜索) */
 function getSearchTagRegExp2(tag: string) {
 	// 处理tag中的/字符串,因为最后会用reg包装，防止/的干扰
 	const aa = tag.replace(/\//g, '\\/');
 
-	return `/data-event-tags\\W*=\\W*['"](.*)${aa}[';]/`;
+	return `/data-event-tags\\W*=\\W*(.*?)['";]${aa}[';\\/]/`;
 	// return tag;
 }
 
