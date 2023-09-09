@@ -15,6 +15,7 @@ import {
 	type IGroupedTimelineEvent,
 } from './draw/draw-vis-timeline';
 import { omit } from 'lodash';
+import { EventTagsManage } from './event-tags-manage';
 
 interface IRunOpt {
 	/**
@@ -119,13 +120,9 @@ export class TimelineProcessor {
 		});
 
 		// 搜索
-		const events = await searchTimelineEvents({
-			vaultFiles,
-			app,
-			// fileCache,
-			// appVault,
-			params: filterParam,
-		});
+		const events = await EventTagsManage.getInstance().searchTimelineEvents(
+			filterParam
+		);
 
 		search.finish();
 
@@ -139,17 +136,17 @@ export class TimelineProcessor {
 			description: 'timeline绘制阶段',
 			data: {
 				// 事件个数
-				eventCount: events.length,
+				eventCount: (events || []).length,
 			},
 			tags: {
 				// 事件个数
-				eventCount: events.length,
+				eventCount: (events || []).length,
 			},
 		});
 
 		drawTimeline({
 			container: timeline,
-			events,
+			events: events || [],
 		});
 
 		draw.finish();
@@ -160,7 +157,7 @@ export class TimelineProcessor {
 		const { autoInsetFileLinks = true } = filterParam;
 
 		if (currentFile && autoInsetFileLinks) {
-			insertFileLinkIfNeed(currentFile, opt.app.vault, events);
+			insertFileLinkIfNeed(currentFile, opt.app.vault, events || []);
 		} else {
 			if (!currentFile) {
 				console.error('[timeline] currentFile is null');
@@ -208,19 +205,15 @@ export class TimelineProcessor {
 				},
 			});
 
-			const res = await searchTimelineEvents({
-				vaultFiles,
-				app,
-				// fileCache,
-				// appVault,
-				params: filterParam,
-			});
+			const res = await EventTagsManage.getInstance().searchTimelineEvents(
+				filterParam
+			);
 
 			search.finish();
 
 			groupedEvents.push({
 				groupName: filterParam.groupName || 'no-group',
-				events: res,
+				events: res || [],
 			});
 
 			// 额外的绘制参数可以存在任何一个配置中间

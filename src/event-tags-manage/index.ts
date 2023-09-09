@@ -66,7 +66,6 @@ export class EventTagsManage extends Events {
 		this.tagsMap = timelineEvents;
 
 		console.timeEnd(tag);
-		console.log('刷新生生世世', this.tagsMap);
 		// 发送消息
 		this.triggerRefreshFinished();
 	}
