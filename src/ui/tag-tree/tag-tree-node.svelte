@@ -39,18 +39,17 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon right-triangle"><path d="M3 8L12 17L21 8"></path></svg>
       </div>
     {/if}
-    <Title on:click={() => {
-      onClick?.(node);
-    }} tag={node.name} count={node.count}></Title>
+    <Title onClick={(_node) => {
+      onClick?.(_node);
+    }} node={node} tag={node.name} count={node.count}></Title>
   </div>
 
 
     {#if innerOpen && node.children && node.children.length > 0}
     <div class='tree-item-children'>
       {#each node.children as child}
-          <svelte:self node={child} onClick={() => {
-            onClick?.(child)
-          // dispatch('click', child)
+          <svelte:self node={child} onClick={(_node) => {
+            onClick?.(_node)
       }}/>
       {/each}
     </div>

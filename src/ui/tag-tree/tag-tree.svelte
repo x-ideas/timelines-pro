@@ -11,7 +11,9 @@
 <!-- 用ob的样式 -->
 <!-- <div class='tree-item tree-item-self'> -->
   {#each roots as root}
-    <TreeNode node={root} onClick={onClick} on:toggle/>
+    <TreeNode node={root} onClick={(node) => {
+      onClick?.(node)
+    }} on:toggle/>
   {/each}
 <!-- </div> -->
 
