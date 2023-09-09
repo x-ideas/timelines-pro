@@ -15,15 +15,19 @@ import * as Sentry from '@sentry/node';
 
 export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 
-/** 搜索全文用的 */
+/** 搜索全文用的, rename用的 相比于搜索，多了一个g */
 function getSearchTagRegExpGlobal(tag: string) {
-	// return new RegExp(`data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]`, 'g');
-	return tag;
+	const aa = tag.replace(/\//g, '\\/');
+
+	return new RegExp(`data-event-tags\\W*=\\W*['"](.*)${aa}[';]`, 'g');
 }
-/** 给搜索组件用的 */
+/** 给搜索组件用的，搜索时使用(比如，点击触发搜索，右击搜索) */
 function getSearchTagRegExp2(tag: string) {
-	// return `/data-event-tags\\W*=\\W*['"](.*)${tag}(.*)['"]/`;
-	return tag;
+	// 处理tag中的/字符串,因为最后会用reg包装，防止/的干扰
+	const aa = tag.replace(/\//g, '\\/');
+
+	return `/data-event-tags\\W*=\\W*['"](.*)${aa}[';]/`;
+	// return tag;
 }
 
 /**
@@ -83,32 +87,36 @@ export class TimelineEventsPanel extends ItemView {
 		});
 	}
 
-	onMenu = (uiEvent: MouseEvent, deleteTarget: HTMLElement) => {
-		console.log('[timeline] onMenu', uiEvent, deleteTarget);
+	onMenu = (uiEvent: MouseEvent, target: HTMLElement) => {
+		console.log('[timeline] onMenu', uiEvent, target);
 
 		const menu = new Menu();
-		const eventTag = (deleteTarget.querySelector('.tag') as HTMLElement)
-			?.innerText;
 
-		menu.addItem((item) => {
-			item.setTitle(`renameTag: "${eventTag}"`);
-			item.setIcon('renameTag');
-			item.onClick(() => {
-				new RenameModal(this.app, eventTag, (newName: string) => {
-					// 修改文件
-					this.renameTag(eventTag, newName);
-				}).open();
-			});
-		});
+		const eventTag = target?.dataset['fullName'];
 
-		menu.addItem((item) => {
-			// 搜索
-			item.setTitle(`search: "${eventTag}"`);
-			item.setIcon('search');
-			item.onClick(() => {
-				this.search(getSearchTagRegExp2(eventTag));
+		if (eventTag) {
+			menu.addItem((item) => {
+				item.setTitle(`renameTag: "${eventTag}"`);
+				item.setIcon('renameTag');
+				item.onClick(() => {
+					new RenameModal(this.app, eventTag, (newName: string) => {
+						// 修改文件
+						this.renameTag(eventTag, newName);
+					}).open();
+				});
 			});
-		});
+		}
+
+		if (eventTag) {
+			menu.addItem((item) => {
+				// 搜索
+				item.setTitle(`search: "${eventTag}"`);
+				item.setIcon('search');
+				item.onClick(() => {
+					this.search(getSearchTagRegExp2(eventTag));
+				});
+			});
+		}
 
 		this.app.workspace.trigger(
 			'timeline-event-tag-wrapper:contextmenu',
@@ -214,6 +222,7 @@ export class TimelineEventsPanel extends ItemView {
 			const fileContent = await this.app.vault.read(file);
 			const newFileContent = fileContent.replace(
 				reg,
+				// newTag,
 				(match, p1, p2, offset, origin, groups) => {
 					return `data-event-tags='${p1 ? p1 : ''}${newTag}${p2 ? p2 : ''}'`;
 				}
@@ -221,6 +230,7 @@ export class TimelineEventsPanel extends ItemView {
 
 			this.app.vault.modify(file, newFileContent);
 		}
+		new Notice('replace success');
 	}
 
 	private async renameName(oldName: string, newName?: string) {
