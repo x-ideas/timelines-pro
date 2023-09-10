@@ -16,6 +16,8 @@ import { CreateTimelineEventModal } from './ui/create-timeline-event-modal';
 import { insertFileLinkIfNeed } from './insert-link/insert-file-link';
 import { EventTagsManage } from './event-tags-manage';
 import { TagSuggestions } from './suggestion/tag-suggestion';
+import { TimelineSuggestion } from './suggestion/timeline-suggestion';
+import { ValueUnitSuggesiton } from './suggestion/value-unit-suggestion';
 
 export default class TimelinesPlugin extends Plugin {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -25,6 +27,8 @@ export default class TimelinesPlugin extends Plugin {
 	changeEventRef?: ReturnType<typeof this.app.metadataCache.on>;
 
 	tagSuggestion: TagSuggestions;
+	timelineSuggestion: TimelineSuggestion;
+	valueUnitSuggestion: ValueUnitSuggesiton;
 
 	async onload() {
 		// Load message
@@ -32,6 +36,8 @@ export default class TimelinesPlugin extends Plugin {
 		console.log('Loaded Timelines Plugin');
 
 		this.tagSuggestion = new TagSuggestions(this.app);
+		this.timelineSuggestion = new TimelineSuggestion(this.app);
+		this.valueUnitSuggestion = new ValueUnitSuggesiton(this.app);
 
 		setTimeout(() => {
 			// 初始化
@@ -97,6 +103,8 @@ export default class TimelinesPlugin extends Plugin {
 		this.registerView(TIMELINE_PANEL, (leaf) => new TimelineEventsPanel(leaf));
 
 		this.registerEditorSuggest(this.tagSuggestion);
+		this.registerEditorSuggest(this.timelineSuggestion);
+		this.registerEditorSuggest(this.valueUnitSuggestion);
 
 		this.addRibbonIcon('tags', 'Timeline', () => {
 			this.activateView();

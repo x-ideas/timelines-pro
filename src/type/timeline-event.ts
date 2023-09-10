@@ -8,6 +8,10 @@ import moment from 'moment';
 import { isNil } from 'lodash';
 import type { BaseValue } from 'src/data-value/base-value';
 import { parserDataValue } from 'src/data-value/data-value-parser';
+import {
+	TimeDurationUnit,
+	TimeDurationValue,
+} from 'src/data-value/time-duration-value';
 
 /**
  * timeline event模型（存放在dataset中）
@@ -68,11 +72,6 @@ export interface ITimelineEventItemSource {
 	value?: string;
 
 	/**
-	 * 单位
-	 */
-	unit?: 'distance' | 'time';
-
-	/**
 	 * 是否是里程碑
 	 * 为'true'的时候表示是里程碑
 	 */
@@ -102,7 +101,12 @@ export interface ITimelineEventItemParsed
 	parsedEventTags?: string[];
 
 	/**
-	 * 转换为number
+	 * 事件花费的时长(输入)
+	 */
+	timeCost: TimeDurationValue;
+
+	/**
+	 * 事件的值(输出，如距离)
 	 */
 	value?: BaseValue;
 	/**
@@ -334,7 +338,8 @@ export async function getTimelineEventInFile(
 				// 一些属性的额外处理
 				//  解析成数字
 				name: event.dataset['name'] || 'unknown',
-				value: parseNumber(event.dataset['value']),
+				value: parseValue(event.dataset['value']),
+				timeCost: parseTimeDurationValue(event.dataset['timeCost']),
 				milestone: parseBoolean(event.dataset['milestone']),
 			};
 
@@ -412,7 +417,8 @@ export async function getTimelineEventsAndTagsInFile(
 				// 一些属性的额外处理
 				//  解析成数字
 				name: event.dataset['name'] || 'unknown',
-				value: parseNumber(event.dataset['value']),
+				value: parseValue(event.dataset['value']),
+				timeCost: parseTimeDurationValue(event.dataset['timeCost']),
 				milestone: parseBoolean(event.dataset['milestone']),
 			};
 
@@ -428,15 +434,17 @@ export async function getTimelineEventsAndTagsInFile(
 	return res;
 }
 
-function parseNumber(value?: string): BaseValue {
+function parseValue(value?: string): BaseValue {
 	return parserDataValue(value);
-	// if (value) {
-	// 	const num = Number(value);
-	// 	if (!isNaN(num)) {
-	// 		return num;
-	// 	}
-	// }
-	// return undefined;
+}
+
+function parseTimeDurationValue(value?: string): TimeDurationValue {
+	const ss = parserDataValue(value);
+	if (ss instanceof TimeDurationValue) {
+		return ss;
+	}
+
+	return new TimeDurationValue(0, TimeDurationUnit.Minute);
 }
 
 function parseBoolean(value?: string): boolean | undefined {
