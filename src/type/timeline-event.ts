@@ -6,6 +6,8 @@ import {
 } from './time';
 import moment from 'moment';
 import { isNil } from 'lodash';
+import type { BaseValue } from 'src/data-value/base-value';
+import { parserDataValue } from 'src/data-value/data-value-parser';
 
 /**
  * timeline event模型（存放在dataset中）
@@ -102,7 +104,7 @@ export interface ITimelineEventItemParsed
 	/**
 	 * 转换为number
 	 */
-	value?: number;
+	value?: BaseValue;
 	/**
 	 * 是否是里程碑
 	 * 转换成boolean
@@ -426,14 +428,15 @@ export async function getTimelineEventsAndTagsInFile(
 	return res;
 }
 
-function parseNumber(value?: string): number | undefined {
-	if (value) {
-		const num = Number(value);
-		if (!isNaN(num)) {
-			return num;
-		}
-	}
-	return undefined;
+function parseNumber(value?: string): BaseValue {
+	return parserDataValue(value);
+	// if (value) {
+	// 	const num = Number(value);
+	// 	if (!isNaN(num)) {
+	// 		return num;
+	// 	}
+	// }
+	// return undefined;
 }
 
 function parseBoolean(value?: string): boolean | undefined {

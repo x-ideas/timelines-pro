@@ -10,7 +10,6 @@ import { includes } from 'lodash';
 
 import * as Sentry from '@sentry/node';
 import { EventTagsManage } from 'src/event-tags-manage';
-import { getTimelineEventInFile } from 'src/type';
 
 export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 
@@ -18,7 +17,7 @@ export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 function getSearchTagRegExpGlobal(tag: string) {
 	const aa = tag.replace(/\//g, '\\/');
 
-	return new RegExp(`data-event-tags\\W*=\\W*(.*?)['";]${aa}[';\\/]`, 'g');
+	return new RegExp(`data-event-tags\\W*=\\W*(.*?['";])${aa}([';\\/])`, 'g');
 }
 /** 给搜索组件用的，搜索时使用(比如，点击触发搜索，右击搜索) */
 function getSearchTagRegExp2(tag: string) {
@@ -229,7 +228,7 @@ export class TimelineEventsPanel extends ItemView {
 				reg,
 				// newTag,
 				(match, p1, p2, offset, origin, groups) => {
-					return `data-event-tags='${p1 ? p1 : ''}${newTag}${p2 ? p2 : ''}'`;
+					return `data-event-tags=${p1 ? p1 : ''}${newTag}${p2 ? p2 : ''}`;
 				}
 			);
 
