@@ -7,7 +7,6 @@ import type { ITimelineMarkdownParams } from './utils';
 import { parseMarkdownCodeSource } from './utils';
 import { drawTimeline } from './draw/draw-timeline';
 import { insertFileLinkIfNeed } from './insert-link/insert-file-link';
-import { searchTimelineEvents } from './apis/search-timeline';
 import * as Sentry from '@sentry/node';
 import type { ITimelineEventItemParsed } from './type';
 import {

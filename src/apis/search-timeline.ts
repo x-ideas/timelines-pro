@@ -45,58 +45,58 @@ interface ISearchTimelineEventsParams {
  * 2. 通过event-tags对event过滤
  * 3. 时间过滤
  */
-export async function searchTimelineEvents(
-	opt: ISearchTimelineEventsParams
-): Promise<ITimelineEventItemParsed[]> {
-	if (process.env.NODE_ENV !== 'production') {
-		console.log('[timeline] before file filter ', opt.vaultFiles.length);
-	}
+// export async function searchTimelineEvents(
+// 	opt: ISearchTimelineEventsParams
+// ): Promise<ITimelineEventItemParsed[]> {
+// 	if (process.env.NODE_ENV !== 'production') {
+// 		console.log('[timeline] before file filter ', opt.vaultFiles.length);
+// 	}
 
-	// 使用tags过滤文件
-	const fileList = opt.vaultFiles.filter((file) =>
-		filterFileByTags(file, opt.app, opt.params.tags)
-	);
-	if (process.env.NODE_ENV !== 'production') {
-		console.log('[timeline] after file filter', fileList.length);
-	}
-	if (!fileList) {
-		// if no files valid for timeline
-		return [];
-	}
+// 	// 使用tags过滤文件
+// 	const fileList = opt.vaultFiles.filter((file) =>
+// 		filterFileByTags(file, opt.app, opt.params.tags)
+// 	);
+// 	if (process.env.NODE_ENV !== 'production') {
+// 		console.log('[timeline] after file filter', fileList.length);
+// 	}
+// 	if (!fileList) {
+// 		// if no files valid for timeline
+// 		return [];
+// 	}
 
-	const res: ITimelineEventItemParsed[] = [];
-	// 获取所有的timelines
-	const timelineEventsInFiles = await getTimelineEventInFile(
-		fileList,
-		opt.app.vault
-	);
+// 	const res: ITimelineEventItemParsed[] = [];
+// 	// 获取所有的timelines
+// 	const timelineEventsInFiles = await getTimelineEventInFile(
+// 		fileList,
+// 		opt.app.vault
+// 	);
 
-	// 判断查询时间是否有效
-	const start = parseTimelineDate(opt.params.dateStart);
-	const end = parseTimelineDate(opt.params.dateEnd);
-	if (!isNil(start) && !isNil(end) && start > end) {
-		console.error(
-			'[timeline] error time search condition',
-			'start',
-			opt.params.dateStart,
-			'end',
-			opt.params.dateEnd
-		);
-		return [];
-	}
+// 	// 判断查询时间是否有效
+// 	const start = parseTimelineDate(opt.params.dateStart);
+// 	const end = parseTimelineDate(opt.params.dateEnd);
+// 	if (!isNil(start) && !isNil(end) && start > end) {
+// 		console.error(
+// 			'[timeline] error time search condition',
+// 			'start',
+// 			opt.params.dateStart,
+// 			'end',
+// 			opt.params.dateEnd
+// 		);
+// 		return [];
+// 	}
 
-	// 过滤
-	for (const timeline of timelineEventsInFiles.values()) {
-		res.push(
-			// 单个文件的timeline event过滤
-			...filterTimelineEvents(timeline, {
-				eventTags: opt.params.eventTags,
-				dateStart: opt.params.dateStart,
-				dateEnd: opt.params.dateEnd,
-				name: opt.params.name,
-			})
-		);
-	}
+// 	// 过滤
+// 	for (const timeline of timelineEventsInFiles.values()) {
+// 		res.push(
+// 			// 单个文件的timeline event过滤
+// 			...filterTimelineEvents(timeline, {
+// 				eventTags: opt.params.eventTags,
+// 				dateStart: opt.params.dateStart,
+// 				dateEnd: opt.params.dateEnd,
+// 				name: opt.params.name,
+// 			})
+// 		);
+// 	}
 
-	return res;
-}
+// 	return res;
+// }

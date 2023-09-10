@@ -12,7 +12,6 @@ import './sentry';
 import * as Sentry from '@sentry/node';
 import type { ITimelineMarkdownParams } from './utils';
 import * as TimelineEventApi from './type/timeline-event';
-import { searchTimelineEvents } from './apis/search-timeline';
 import { CreateTimelineEventModal } from './ui/create-timeline-event-modal';
 import { insertFileLinkIfNeed } from './insert-link/insert-file-link';
 import { EventTagsManage } from './event-tags-manage';
@@ -152,22 +151,18 @@ export default class TimelinesPlugin extends Plugin {
 			},
 		});
 
-		return searchTimelineEvents({
-			vaultFiles: vaultFiles,
-			// fileCache: this.app.metadataCache,
-			// appVault: this.app.vault,
-			app: this.app,
-			params: filter || {},
-		}).then((events) => {
-			transaction.finish();
+		return EventTagsManage.getInstance()
+			.searchTimelineEvents(filter || {})
+			.then((events) => {
+				transaction.finish();
 
-			return events.sort((a, b) => {
-				return (
-					TimelineEventApi.getTimelineSortOrder(a) -
-					TimelineEventApi.getTimelineSortOrder(b)
-				);
+				return (events || []).sort((a, b) => {
+					return (
+						TimelineEventApi.getTimelineSortOrder(a) -
+						TimelineEventApi.getTimelineSortOrder(b)
+					);
+				});
 			});
-		});
 	};
 
 	private showCreateModal = (
