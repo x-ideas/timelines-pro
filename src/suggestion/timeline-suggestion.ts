@@ -40,8 +40,7 @@ export class TimelineSuggestion extends EditorSuggest<SuggestInfo> {
 	): EditorSuggestTriggerInfo | null {
 		const line = editor.getLine(cursor.line);
 
-		const trggierPriex = '<span class="ob-timelines"';
-		const match = line.match(/^<span class=['"]ob-timelines['"](.*?)>/);
+		const match = line.match(/<span class=['"]ob-timelines['"](.*?)/);
 
 		if (!match || match.index === undefined) {
 			return null;
@@ -49,6 +48,12 @@ export class TimelineSuggestion extends EditorSuggest<SuggestInfo> {
 
 		const remainProperties = new Set(Keys);
 		const matchedStr = match[1] || '';
+
+		// 标签关闭
+		if (matchedStr.includes('>')) {
+			return null;
+		}
+
 		// 已经输入的属性
 		const matchedKeyArr = matchedStr
 			.split(' ')

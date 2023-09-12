@@ -18,6 +18,7 @@ import { EventTagsManage } from './event-tags-manage';
 import { TagSuggestions } from './suggestion/tag-suggestion';
 import { TimelineSuggestion } from './suggestion/timeline-suggestion';
 import { ValueUnitSuggesiton } from './suggestion/value-unit-suggestion';
+import { drawVisTimeline } from './draw/draw-vis-timeline';
 
 export default class TimelinesPlugin extends Plugin {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -190,5 +191,6 @@ export default class TimelinesPlugin extends Plugin {
 		searchTimelineEvents: this.searchTimelineEvents,
 		showCreateModal: this.showCreateModal,
 		insertFileLinkIfNeed: insertFileLinkIfNeed,
+		drawVisTimeline: drawVisTimeline,
 	};
 }

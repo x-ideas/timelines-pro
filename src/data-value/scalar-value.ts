@@ -11,4 +11,8 @@ export class ScalarValue extends BaseValue {
 
 		throw new Error('不同类型的值不能相加');
 	}
+
+	toString(): string {
+		return `${this.value}`;
+	}
 }

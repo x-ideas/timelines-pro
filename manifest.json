@@ -6,5 +6,5 @@
   "description": "Create a timeline view of all notes with the specified combination of tags",
   "author": "xjiaxiang",
   "authorUrl": "https://github.com/SaiRS",
-  "isDesktopOnly": true
+  "isDesktopOnly": false
 }

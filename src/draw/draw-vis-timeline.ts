@@ -142,10 +142,6 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 		},
 	};
 
-	if (process.env.NODE_ENV === 'development') {
-		console.log('[timeline]: timelineOpt', timelineOpt);
-	}
-
 	container.setAttribute('class', 'timeline-vis');
 	if (groupInfos.length > 0) {
 		new Timeline(container, items, new vis.DataSet(groupInfos), timelineOpt);
