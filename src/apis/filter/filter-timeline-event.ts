@@ -5,12 +5,10 @@ import {
 	type TimelineDateRange,
 } from '../../type/time';
 import {
-	getTimelineEventEndTime,
 	getTimelineEventEndTimeJudged,
 	getTimelineEventStartTime,
 	type ITimelineEventItemParsed,
 } from '../../type/timeline-event';
-import type * as Sentry from '@sentry/node';
 import { filterEventsByName } from './filter-str-property';
 import { parseTag } from './parse-parent-children-tag';
 
@@ -54,8 +52,6 @@ export interface ITimelineFilterParams {
 	 * 名称过滤，支持模糊匹配
 	 */
 	name?: string;
-
-	span?: Sentry.Span;
 }
 
 /**

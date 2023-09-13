@@ -54,8 +54,6 @@ export class EventTagsManage extends Events {
 			return;
 		}
 
-		const tag = 'event tag manage refresh';
-		console.time(tag);
 		const files = this.app.vault.getMarkdownFiles();
 
 		const timelineEvents = await getTimelineEventsAndTagsInFile(
@@ -64,8 +62,6 @@ export class EventTagsManage extends Events {
 		);
 
 		this.tagsMap = timelineEvents;
-
-		console.timeEnd(tag);
 		// 发送消息
 		this.triggerRefreshFinished();
 	}

@@ -8,7 +8,6 @@ import Component from './timeline-events-manage.svelte';
 import { RenameModal } from '../rename-modal';
 import { includes } from 'lodash';
 
-import * as Sentry from '@sentry/node';
 import { EventTagsManage } from 'src/event-tags-manage';
 
 export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
@@ -136,27 +135,6 @@ export class TimelineEventsPanel extends ItemView {
 	getDisplayText() {
 		return 'timeline event tags';
 	}
-
-	/** 初始化event tags */
-	// async initEventTags() {
-	// 	const files = this.app.vault.getMarkdownFiles();
-	// 	// const transaction = Sentry.startTransaction({
-	// 	// 	name: 'Timeline-Pro UI(初始化all event tags)',
-	// 	// 	description: 'ob timeline UI(初始化all event tags)',
-	// 	// 	data: {
-	// 	// 		filesCount: files.length,
-	// 	// 	},
-	// 	// 	tags: {
-	// 	// 		filesCount: files.length,
-	// 	// 	},
-	// 	// });
-	// 	console.time('old init');
-	// 	const timelineEvents = await getTimelineEventInFile(files, this.app.vault);
-	// 	console.timeEnd('old init');
-	// 	// this.eventTagsMap = timelineEvents;
-	// 	// console.log('[timeline] initEventTags', timelineEvents);
-	// 	// transaction.finish();
-	// }
 
 	/** 刷新view */
 	private refreshUI() {
@@ -289,20 +267,12 @@ export class TimelineEventsPanel extends ItemView {
 			},
 		});
 
-		const files = this.app.vault.getMarkdownFiles();
-		const transaction = Sentry.startTransaction({
-			name: 'Timeline-Pro UI(初始化all event tags)',
-			description: 'ob timeline UI(初始化all event tags)',
-			data: {
-				filesCount: files.length,
-			},
-			tags: {
-				filesCount: files.length,
-			},
-		});
+		const label = '[ob timelines] 初始化all event tags';
+		console.time(label);
 
 		await EventTagsManage.getInstance().refresh();
-		transaction.finish();
+
+		console.timeEnd(label);
 		this.refreshUI();
 	}
 

@@ -8,8 +8,7 @@ import {
 	TimelineEventsPanel,
 } from './ui/timeline-events-manage';
 import './app.css';
-import './sentry';
-import * as Sentry from '@sentry/node';
+
 import type { ITimelineMarkdownParams } from './utils';
 import * as TimelineEventApi from './type/timeline-event';
 import { CreateTimelineEventModal } from './ui/create-timeline-event-modal';
@@ -148,22 +147,14 @@ export default class TimelinesPlugin extends Plugin {
 		filter?: ITimelineMarkdownParams
 	): Promise<TimelineEventApi.ITimelineEventItemParsed[]> => {
 		const vaultFiles = this.app.vault.getMarkdownFiles();
-		const transaction = Sentry.startTransaction({
-			name: 'Timeline-Pro Api(searchTimelineEvents)',
-			description: 'ob timeline api(searchTimelineEvents)',
-			data: {
-				...(filter || {}),
-				filesCount: vaultFiles.length,
-			},
-			tags: {
-				filesCount: vaultFiles.length,
-			},
-		});
+
+		const label = '[ob timelines]: 搜索';
+		console.time(label);
 
 		return EventTagsManage.getInstance()
 			.searchTimelineEvents(filter || {})
 			.then((events) => {
-				transaction.finish();
+				console.timeEnd(label);
 
 				return (events || []).sort((a, b) => {
 					return (

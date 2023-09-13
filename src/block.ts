@@ -7,7 +7,6 @@ import type { ITimelineMarkdownParams } from './utils';
 import { parseMarkdownCodeSource } from './utils';
 import { drawTimeline } from './draw/draw-timeline';
 import { insertFileLinkIfNeed } from './insert-link/insert-file-link';
-import * as Sentry from '@sentry/node';
 import type { ITimelineEventItemParsed } from './type';
 import {
 	drawVisTimeline,
@@ -101,54 +100,30 @@ export class TimelineProcessor {
 			currentFile,
 		} = opt;
 
-		const transaction = Sentry.startTransaction({
-			name: 'TimelineProcessor Run',
-			description: 'ob timeline插件运行',
-		});
-
-		const search = transaction.startChild({
-			op: 'timeline search',
-			description: 'timeline标签搜索阶段',
-			data: {
-				...filterParam,
-				filesCount: vaultFiles.length,
-			},
-			tags: {
-				filesCount: vaultFiles.length,
-			},
-		});
+		const label = '[ob timelines]: timeline标签搜索阶段';
+		console.time(label);
 
 		// 搜索
 		const events = await EventTagsManage.getInstance().searchTimelineEvents(
 			filterParam
 		);
 
-		search.finish();
+		console.timeEnd(label);
 
 		// 绘制
 		// Keep only the files that have the time info
 		const timeline = document.createElement('div');
 		timeline.setAttribute('class', 'timeline');
 
-		const draw = transaction.startChild({
-			op: 'timeline vis draw',
-			description: 'timeline绘制阶段',
-			data: {
-				// 事件个数
-				eventCount: (events || []).length,
-			},
-			tags: {
-				// 事件个数
-				eventCount: (events || []).length,
-			},
-		});
+		const drawLabel = '[ob timelines]: timeline绘制阶段';
 
+		console.time(drawLabel);
 		drawTimeline({
 			container: timeline,
 			events: events || [],
 		});
 
-		draw.finish();
+		console.timeEnd();
 
 		el.appendChild(timeline);
 
@@ -184,31 +159,16 @@ export class TimelineProcessor {
 			currentFile,
 		} = opt;
 
-		const transaction = Sentry.startTransaction({
-			name: 'TimelineProcessor Run',
-			description: 'ob timeline插件运行',
-		});
-
 		const groupedEvents: IGroupedTimelineEvent[] = [];
 		let extraOptions: ITimelineMarkdownParams = {};
 		for (const filterParam of filterParams) {
-			const search = transaction.startChild({
-				op: 'timeline search',
-				description: 'timeline标签搜索阶段',
-				data: {
-					...filterParam,
-					filesCount: vaultFiles.length,
-				},
-				tags: {
-					filesCount: vaultFiles.length,
-				},
-			});
+			const label = '[ob timelines]: timeline标签搜索阶段';
+			console.time(label);
 
 			const res = await EventTagsManage.getInstance().searchTimelineEvents(
 				filterParam
 			);
-
-			search.finish();
+			console.timeEnd(label);
 
 			groupedEvents.push({
 				groupName: filterParam.groupName || 'no-group',

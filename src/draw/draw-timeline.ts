@@ -34,11 +34,6 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 		return getTimelineSortOrder(item1) - getTimelineSortOrder(item2);
 	});
 
-	if (process.env.NODE_ENV === 'development') {
-		// console.log('[timeline]: groupEvents', groupEvents);
-		// console.log('[timeline]: sortedEvents', sortedEvents);
-	}
-
 	let eventCount = 0;
 	for (const events of sortedEvents) {
 		// 相同的一组
