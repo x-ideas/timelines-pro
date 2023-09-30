@@ -40,10 +40,8 @@ export class MarkdownBlockTagSuggestion extends EditorSuggest<SuggestInfo> {
 		const match = line.match(/(?:tags|eventTags)\s*=\s*(.*)/);
 
 		if (match) {
-			// 分割
-			const allTags = match[1];
 			// && || !, ()符号
-			const blackList = ['&', '|', '!', '(', ')', ' '];
+			const blackList = ['&', '|', '!', '(', ')', ' ', '='];
 			// 找到正在输入的那个tag
 			let start = cursor.ch;
 			while (start > 1 && !blackList.includes(line.charAt(start - 1))) {
