@@ -18,6 +18,7 @@ import { TagSuggestions } from './suggestion/tag-suggestion';
 import { TimelineSuggestion } from './suggestion/timeline-suggestion';
 import { ValueUnitSuggesiton } from './suggestion/value-unit-suggestion';
 import { drawVisTimeline } from './draw/draw-vis-timeline';
+import { MarkdownBlockTagSuggestion } from './suggestion/markdown-block-tag-suggestion';
 
 export default class TimelinesPlugin extends Plugin {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -29,6 +30,7 @@ export default class TimelinesPlugin extends Plugin {
 	tagSuggestion: TagSuggestions;
 	timelineSuggestion: TimelineSuggestion;
 	valueUnitSuggestion: ValueUnitSuggesiton;
+	markdownBlockTagSuggestion: MarkdownBlockTagSuggestion;
 
 	async onload() {
 		// Load message
@@ -38,6 +40,7 @@ export default class TimelinesPlugin extends Plugin {
 		this.tagSuggestion = new TagSuggestions(this.app);
 		this.timelineSuggestion = new TimelineSuggestion(this.app);
 		this.valueUnitSuggestion = new ValueUnitSuggesiton(this.app);
+		this.markdownBlockTagSuggestion = new MarkdownBlockTagSuggestion(this.app);
 
 		setTimeout(() => {
 			// 初始化
@@ -105,6 +108,7 @@ export default class TimelinesPlugin extends Plugin {
 		this.registerEditorSuggest(this.tagSuggestion);
 		this.registerEditorSuggest(this.timelineSuggestion);
 		this.registerEditorSuggest(this.valueUnitSuggestion);
+		this.registerEditorSuggest(this.markdownBlockTagSuggestion);
 
 		this.addRibbonIcon('tags', 'Timeline', () => {
 			this.activateView();
