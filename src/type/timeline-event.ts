@@ -6,12 +6,12 @@ import {
 } from './time';
 import moment from 'moment';
 import { isNil } from 'lodash';
-import type { BaseValue } from 'src/data-value/base-value';
-import { parserDataValue } from 'src/data-value/data-value-parser';
+import type { BaseValue } from '../data-value/base-value';
+import { parserDataValue } from '../data-value/data-value-parser';
 import {
 	TimeDurationUnit,
 	TimeDurationValue,
-} from 'src/data-value/time-duration-value';
+} from '../data-value/time-duration-value';
 
 /**
  * timeline event模型（存放在dataset中）

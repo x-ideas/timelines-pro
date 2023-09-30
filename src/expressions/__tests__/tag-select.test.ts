@@ -30,8 +30,9 @@ describe('tag select测试', () => {
 		expect(condition3.test('南明史;书籍;其他;读书笔记')).toBe(false);
 		expect(condition3.test('南明史;书籍;读书笔记')).toBe(true);
 
-		const condition4 = new StringSelectExp('书籍 && !其他');
-		expect(condition4.test('南明史;书籍;其他;读书笔记')).toBe(false);
+		// 如果!后面是一个层级的标签，需要用()包裹起来
+		const condition4 = new StringSelectExp('书籍 && !(其他/a)');
+		expect(condition4.test('南明史;书籍;其他/a;读书笔记')).toBe(false);
 		expect(condition4.test('南明史;书籍;读书笔记')).toBe(true);
 
 		const condition5 = new StringSelectExp('书籍 || !其他');
