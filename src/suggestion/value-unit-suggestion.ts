@@ -30,14 +30,6 @@ export class ValueUnitSuggesiton extends EditorSuggest<SuggestInfo> {
 	): EditorSuggestTriggerInfo | null {
 		const line = editor.getLine(cursor.line);
 
-		const match = line.match(
-			/\s((?:data-value)|(?:data-time-cost))=['"](.*?)['"]/
-		);
-		if (!match || match.index === undefined) {
-			return null;
-		}
-
-		// 并且cursor前面是数字
 		const strBeforeCursor = editor.getRange(
 			{
 				line: cursor.line,
@@ -46,7 +38,23 @@ export class ValueUnitSuggesiton extends EditorSuggest<SuggestInfo> {
 			cursor
 		);
 
-		console.log('strBeforeCursor', strBeforeCursor);
+		const match = strBeforeCursor.match(
+			/\s((?:data-value)|(?:data-time-cost))=['"](.*?)['"]?$/
+		);
+
+		if (!match || match.index === undefined) {
+			return null;
+		}
+
+		// 并且cursor前面是数字
+		// const strBeforeCursor = editor.getRange(
+		// 	{
+		// 		line: cursor.line,
+		// 		ch: 0,
+		// 	},
+		// 	cursor
+		// );
+
 		if (!strBeforeCursor.match(/(-?\d+\.?\d*)$/)) {
 			return null;
 		}
