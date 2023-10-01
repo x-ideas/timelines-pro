@@ -16,7 +16,8 @@
       milestone: '',
       dateEnd: '',
       title: '',
-      name: ''
+      name: '',
+      timeCost: '0'
     }
 </script>
 
@@ -60,6 +61,12 @@
   <div>事件value</div>
   <input value={info.value} type='number' on:change={(event) => {
     info.value = event.currentTarget.value;
+  }} />
+</div>
+<div class='flex'>
+  <div>时间花费</div>
+  <input value={info.timeCost} type='number' on:change={(event) => {
+    info.timeCost = event.currentTarget.value;
   }} />
 </div>
 

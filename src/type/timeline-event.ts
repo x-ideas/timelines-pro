@@ -72,6 +72,11 @@ export interface ITimelineEventItemSource {
 	value?: string;
 
 	/**
+	 * 事件花费的时长(输入), 如50min, 4h
+	 */
+	timeCost: string;
+
+	/**
 	 * 是否是里程碑
 	 * 为'true'的时候表示是里程碑
 	 */
@@ -91,7 +96,7 @@ export interface ITimelineEventItemSource {
  *
  */
 export interface ITimelineEventItemParsed
-	extends Omit<ITimelineEventItemSource, 'value' | 'milestone'> {
+	extends Omit<ITimelineEventItemSource, 'value' | 'milestone' | 'timeCost'> {
 	/** 图片的地址 */
 	imgRealPath?: string;
 	/** 内部html */
@@ -101,14 +106,15 @@ export interface ITimelineEventItemParsed
 	parsedEventTags?: string[];
 
 	/**
+	 * 事件的值(输出，如距离)
+	 */
+	value?: BaseValue;
+
+	/**
 	 * 事件花费的时长(输入)
 	 */
 	timeCost: TimeDurationValue;
 
-	/**
-	 * 事件的值(输出，如距离)
-	 */
-	value?: BaseValue;
 	/**
 	 * 是否是里程碑
 	 * 转换成boolean
