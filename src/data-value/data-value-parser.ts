@@ -9,7 +9,8 @@ import { TimeDurationValue, isTimeDurationUnit } from './time-duration-value';
  * 解析数据值
  */
 export function parserDataValue(val?: string): BaseValue {
-	const reg = /^(-?\d+\.?\d+)\s*([a-zA-Z]+)?$/;
+	// const reg = /^(-?\d+\.?\d+)\s*([a-zA-Z]+)?$/;
+	const reg = /^(-?\d+(?:\.\d+)?)\s*([a-zA-Z]+)?$/;
 	if (!val) {
 		return new ScalarValue(0, ScalarUnit.None);
 	}
