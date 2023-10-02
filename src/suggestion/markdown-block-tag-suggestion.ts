@@ -37,7 +37,7 @@ export class MarkdownBlockTagSuggestion extends EditorSuggest<SuggestInfo> {
 	): EditorSuggestTriggerInfo | null {
 		// 是否位于markdown block
 		const line = editor.getLine(cursor.line);
-		const match = line.match(/(?:tags|eventTags)\s*=\s*(.*)/);
+		const match = line.match(/^(?:tags|eventTags)\s*=\s*(.*)/);
 
 		if (match) {
 			// && || !, ()符号

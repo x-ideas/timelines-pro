@@ -40,7 +40,7 @@ export class TagSuggestions extends EditorSuggest<SuggestInfo> {
 
 		// 是否data-event-tags=''
 		const triggerPrefix = ' data-event-tags=';
-		const match = line.match(/\sdata-event-tags=['"](.*?)['"]/);
+		const match = line.match(/\sdata-event-tags=['"]([^]*?)['"]/);
 		if (!match || match.index === undefined) {
 			return null;
 		}

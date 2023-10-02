@@ -39,7 +39,7 @@ export class ValueUnitSuggesiton extends EditorSuggest<SuggestInfo> {
 		);
 
 		const match = strBeforeCursor.match(
-			/\s((?:data-value)|(?:data-time-cost))=['"](.*?)['"]?$/
+			/\s((?:data-value)|(?:data-time-cost))=['"]([^>=\s]*?)['"]?$/
 		);
 
 		if (!match || match.index === undefined) {
