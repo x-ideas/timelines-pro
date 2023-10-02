@@ -8,6 +8,9 @@ import {
 	getTimelineEventSourcePath,
 	getTimelineEventStartTime,
 	getTimelineEventEndTime,
+	getTimelineEventId,
+	getTimelineEventMomentTime,
+	getTimelineEventEndTimeJudged,
 } from '../type/timeline-event';
 import { parseTimelineDateElements } from 'src/type';
 
@@ -30,8 +33,17 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 	const { events, options, container } = opt;
 
 	const items = new vis.DataSet<DataItem>([]);
+
+	const milestoneEvents: ITimelineEventItemParsed[] = [];
+
 	for (const groupEvent of events) {
 		for (const event of groupEvent.events) {
+			// 记录milestone
+			if (event.milestone) {
+				milestoneEvents.push(event);
+				// continue;
+			}
+
 			const noteCard = document.createElement('div');
 			noteCard.className = 'timeline-card';
 
@@ -139,9 +151,36 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 	};
 
 	container.setAttribute('class', 'timeline-vis');
+	let timeline;
 	if (groupInfos.length > 0) {
-		new Timeline(container, items, new vis.DataSet(groupInfos), timelineOpt);
+		timeline = new Timeline(
+			container,
+			items,
+			new vis.DataSet(groupInfos),
+			timelineOpt
+		);
 	} else {
-		new Timeline(container, items, timelineOpt);
+		timeline = new Timeline(container, items, timelineOpt);
+	}
+
+	// 增加 milestone(也就是marker)
+	for (const milestone of milestoneEvents) {
+		const id = getTimelineEventId(milestone) || Math.random().toString(16);
+
+		const endDate = getTimelineEventMomentTime(
+			getTimelineEventEndTimeJudged(milestone)
+		);
+		if (!endDate) {
+			console.warn('[timeline]: milestone end date is undefined', milestone);
+			continue;
+		}
+
+		timeline.addCustomTime(endDate?.valueOf(), id);
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		timeline.setCustomTimeMarker(
+			`${milestone.dateDescription || ''}:${milestone.milestone || ''}`,
+			id
+		);
 	}
 }

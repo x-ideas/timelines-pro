@@ -116,10 +116,9 @@ export interface ITimelineEventItemParsed
 	timeCost: TimeDurationValue;
 
 	/**
-	 * 是否是里程碑
-	 * 转换成boolean
+	 * 里程碑描述
 	 */
-	milestone?: boolean;
+	milestone?: string;
 
 	/** 关联的文件 */
 	file: TFile;
@@ -425,7 +424,7 @@ export async function getTimelineEventsAndTagsInFile(
 				name: event.dataset['name'] || 'unknown',
 				value: parseValue(event.dataset['value']),
 				timeCost: parseTimeDurationValue(event.dataset['timeCost']),
-				milestone: parseBoolean(event.dataset['milestone']),
+				milestone: event.dataset['milestone'],
 			};
 
 			timelines.push(timelineEvent);
