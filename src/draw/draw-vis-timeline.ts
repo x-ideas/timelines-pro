@@ -5,7 +5,7 @@ import * as vis from 'vis-data';
 import {
 	type ITimelineEventItemParsed,
 	getTimelineEventImagePath,
-	getTimelineEventSourcePathForAHref,
+	getTimelineEventSourcePath,
 	getTimelineEventStartTime,
 	getTimelineEventEndTime,
 	getTimelineEventId,
@@ -63,7 +63,9 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 				.createEl('h3')
 				.createEl('a', {
 					cls: 'internal-link',
-					attr: { href: `${getTimelineEventSourcePathForAHref(event)}` },
+					attr: {
+						href: `${JSON.stringify(getTimelineEventSourcePath(event))}`,
+					},
 					text: event.title,
 				});
 			noteCard.createEl('p', { text: event.content }, (el) => {
@@ -80,10 +82,8 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 			}
 
 			const opt: DataItem = {
-				content: `${
-					event.dateDescription || ''
-				}<br><a href=${getTimelineEventSourcePathForAHref(
-					event
+				content: `${event.dateDescription || ''}<br><a href=${JSON.stringify(
+					getTimelineEventSourcePath(event)
 				)} class="internal-link">${event.title || ''}</a>`,
 				title: noteCard.outerHTML,
 				start: `${start.year}-${start.month}-${start.day}`,

@@ -225,17 +225,6 @@ export function getTimelineEventSourcePath(dataset?: ITimelineEventItemParsed) {
 	return dataset?.file.path;
 }
 
-export function getTimelineEventSourcePathForAHref(
-	dataset?: ITimelineEventItemParsed
-) {
-	const path = dataset?.file.path;
-	if (path) {
-		// 替换掉空格
-		return path.replace(/\s+/g, '%20');
-	}
-	return path;
-}
-
 /**
  * 获取timeline开始时间
  * 暴露给外界使用

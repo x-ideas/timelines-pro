@@ -3,7 +3,7 @@ import type { TimelineOptions } from 'vis-timeline/esnext';
 import {
 	type ITimelineEventItemParsed,
 	getTimelineEventImagePath,
-	getTimelineEventSourcePathForAHref,
+	getTimelineEventSourcePath,
 	getTimelineEventId,
 	type ITimelineEventItemSource,
 	getTimelineSortOrder,
@@ -88,7 +88,9 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 				.createEl('h3')
 				.createEl('a', {
 					cls: 'internal-link',
-					attr: { href: `${getTimelineEventSourcePathForAHref(event)}` },
+					attr: {
+						href: `${JSON.stringify(getTimelineEventSourcePath(event))}`,
+					},
 					text: event.title,
 				});
 			noteCard.createEl('p', { text: event.content }, (el) => {
