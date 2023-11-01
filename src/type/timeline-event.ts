@@ -225,6 +225,17 @@ export function getTimelineEventSourcePath(dataset?: ITimelineEventItemParsed) {
 	return dataset?.file.path;
 }
 
+export function getTimelineEventSourcePathForAHref(
+	dataset?: ITimelineEventItemParsed
+) {
+	const path = dataset?.file.path;
+	if (path) {
+		// 替换掉空格
+		return path.replace(/\s+/g, '%20');
+	}
+	return path;
+}
+
 /**
  * 获取timeline开始时间
  * 暴露给外界使用
@@ -283,77 +294,6 @@ function getImgUrl(vaultAdaptor: DataAdapter, path: string): string {
 	}
 
 	return vaultAdaptor.getResourcePath(path);
-}
-
-/**
- * 从文件中解析出事件
- * @returns {Map<string, ITimelineEventItemParsed[]>} key为文件地址, value为事件列表
- */
-export async function getTimelineEventInFile(
-	files: TFile[],
-	appVault: Vault
-): Promise<Map<string, ITimelineEventItemParsed[]>> {
-	const domparser = new DOMParser();
-	const res = new Map<string, ITimelineEventItemParsed[]>();
-
-	for (const file of files) {
-		const doc = domparser.parseFromString(
-			await appVault.read(file),
-			'text/html'
-		);
-		// timeline div
-		const timelineData = doc.getElementsByClassName('ob-timelines');
-
-		const timelines: ITimelineEventItemParsed[] = [];
-		// NOTE: 额外dataset处理一些参数
-		const notePath = file.path;
-		const path = notePath;
-		for (const event of timelineData as any) {
-			if (!(event instanceof HTMLElement)) {
-				continue;
-			}
-
-			let eventTags: string[] = [];
-			if (event.dataset['eventTags']) {
-				eventTags = event.dataset['eventTags']
-					.split(';')
-					.reduce<string[]>((accu, tag) => {
-						accu.push(tag);
-						return accu;
-					}, [])
-					.filter((tag) => !!tag);
-			}
-
-			// event.dataset.path = notePath;
-
-			let imgRealPath = '';
-			if (event.dataset.img) {
-				// console.log('real image', file. + event.dataset.img);
-				imgRealPath = getImgUrl(appVault.adapter, event.dataset.img);
-			}
-
-			// 添加到结果中
-			const timelineEvent: ITimelineEventItemParsed = {
-				...event.dataset,
-				date: event.dataset.date ? event.dataset.date : event.dataset.dateStart,
-				content: event.innerHTML,
-				imgRealPath,
-				parsedEventTags: eventTags,
-				file: file,
-				// 一些属性的额外处理
-				//  解析成数字
-				name: event.dataset['name'] || 'unknown',
-				value: parseValue(event.dataset['value']),
-				timeCost: parseTimeDurationValue(event.dataset['timeCost']),
-				milestone: parseBoolean(event.dataset['milestone']),
-			};
-
-			timelines.push(timelineEvent);
-		}
-		res.set(path, timelines);
-	}
-
-	return res;
 }
 
 /**
@@ -450,11 +390,4 @@ function parseTimeDurationValue(value?: string): TimeDurationValue {
 	}
 
 	return new TimeDurationValue(0, TimeDurationUnit.Minute);
-}
-
-function parseBoolean(value?: string): boolean | undefined {
-	if (value) {
-		return value === 'true';
-	}
-	return undefined;
 }

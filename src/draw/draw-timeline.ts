@@ -3,7 +3,7 @@ import type { TimelineOptions } from 'vis-timeline/esnext';
 import {
 	type ITimelineEventItemParsed,
 	getTimelineEventImagePath,
-	getTimelineEventSourcePath,
+	getTimelineEventSourcePathForAHref,
 	getTimelineEventId,
 	type ITimelineEventItemSource,
 	getTimelineSortOrder,
@@ -23,7 +23,7 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 
 	// 组合events
 	const groupEvents = groupBy(events, (event) => {
-		return getTimelineEventId(event as ITimelineEventItemSource);
+		return getTimelineEventId(event);
 	});
 
 	// 排序
@@ -88,7 +88,7 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 				.createEl('h3')
 				.createEl('a', {
 					cls: 'internal-link',
-					attr: { href: `${getTimelineEventSourcePath(event)}` },
+					attr: { href: `${getTimelineEventSourcePathForAHref(event)}` },
 					text: event.title,
 				});
 			noteCard.createEl('p', { text: event.content }, (el) => {
