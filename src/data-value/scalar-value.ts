@@ -12,6 +12,14 @@ export class ScalarValue extends BaseValue {
 		throw new Error('不同类型的值不能相加');
 	}
 
+	subtract(aValue: ScalarValue): BaseValue {
+		return this.add(new ScalarValue(-aValue.value, aValue.unit));
+	}
+
+	clone(): ScalarValue {
+		return new ScalarValue(this.value, this.unit);
+	}
+
 	toString(): string {
 		return `${this.value}`;
 	}

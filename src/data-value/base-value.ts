@@ -21,6 +21,9 @@ export abstract class BaseValue {
 
 	abstract add(aValue: BaseValue): BaseValue;
 
+	abstract subtract(aValue: BaseValue): BaseValue;
+
+	abstract clone(): BaseValue;
 	toString() {
 		return `${this.value}${this.unit}`;
 	}

@@ -32,6 +32,14 @@ export class DistanceValue extends BaseValue {
 		}
 	}
 
+	subtract(aValue: DistanceValue): BaseValue {
+		return this.add(new DistanceValue(-aValue.value, aValue.unit));
+	}
+
+	clone(): DistanceValue {
+		return new DistanceValue(this.value, this.unit);
+	}
+
 	toMeterDistanceValue() {
 		const factor = this.getFactor(this.unit as DistanceUnit);
 		const dd = this.getFactor(DistanceUnit.Meter);

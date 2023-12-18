@@ -137,8 +137,6 @@ export class TimelineProcessor {
 				console.error('[timeline] currentFile is null');
 			}
 		}
-
-		transaction.finish();
 	}
 
 	/**

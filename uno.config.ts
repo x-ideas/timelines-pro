@@ -1,5 +1,7 @@
 import { defineConfig } from 'unocss';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 export default defineConfig({
 	cli: {
 		entry: {
@@ -7,4 +9,4 @@ export default defineConfig({
 			outFile: 'src/uno.css',
 		},
 	},
-});
+}) as ReturnType<typeof defineConfig>;

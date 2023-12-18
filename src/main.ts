@@ -27,9 +27,17 @@ export default class TimelinesPlugin extends Plugin {
 
 	changeEventRef?: ReturnType<typeof this.app.metadataCache.on>;
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	tagSuggestion: TagSuggestions;
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	timelineSuggestion: TimelineSuggestion;
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	valueUnitSuggestion: ValueUnitSuggesiton;
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	markdownBlockTagSuggestion: MarkdownBlockTagSuggestion;
 
 	async onload() {

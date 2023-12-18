@@ -25,9 +25,9 @@ export class TimeDurationValue extends BaseValue {
 		}
 
 		// 类型是否一致
-		if (aValue instanceof TimeDurationValue) {
+		if (isTimeDurationUnit(aValue.unit)) {
 			const mindd = this.toMinTimeDurationValue();
-			const aMin = aValue.toMinTimeDurationValue();
+			const aMin = (aValue as TimeDurationValue).toMinTimeDurationValue();
 
 			// 相加
 			return new TimeDurationValue(
@@ -39,6 +39,14 @@ export class TimeDurationValue extends BaseValue {
 				`不同类型的值不能相加: ${this.toString()}, ${aValue.toString()}`
 			);
 		}
+	}
+
+	subtract(aValue: TimeDurationValue): BaseValue {
+		return this.add(new TimeDurationValue(-aValue.value, aValue.unit));
+	}
+
+	clone(): TimeDurationValue {
+		return new TimeDurationValue(this.value, this.unit);
 	}
 
 	/** 转换为分钟 */
