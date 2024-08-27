@@ -1,6 +1,6 @@
 <script lang="ts">
   import TreeNode from './tag-tree-node.svelte';
-  import { TagTreeData } from './types';
+  import { type TagTreeData } from './types';
 
   export let roots: TagTreeData[] = [];
 

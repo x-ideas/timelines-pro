@@ -1,6 +1,6 @@
 <script lang="ts">
-  import '../../uno.css'
-  import { TagTreeData } from '../tag-tree/types';
+  // import '../../uno.css'
+  import { type TagTreeData } from '../tag-tree/types';
   export let tag: string = '';
   export let count: number = 0;
   export let node: TagTreeData;

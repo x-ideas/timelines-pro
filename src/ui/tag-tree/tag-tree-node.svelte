@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TagTreeData } from "./types";
+  import { type TagTreeData } from "./types";
   import Title from '../tag-title/tag-title.svelte'
   import { createEventDispatcher } from "svelte";
 

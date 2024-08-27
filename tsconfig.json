@@ -15,7 +15,7 @@
     "declaration": true,
     "lib": ["dom", "es5", "scripthost", "es2015"],
     "allowSyntheticDefaultImports": true,
-    "verbatimModuleSyntax": false
+    "verbatimModuleSyntax": true
   },
   "include": ["src/**/*.ts"]
 }

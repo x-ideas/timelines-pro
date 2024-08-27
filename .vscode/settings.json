@@ -1,6 +1,6 @@
 {
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true // 启用它, 开启save时执行eslint --fix
+    "source.fixAll.eslint": "explicit"
   },
   "eslint.nodeEnv": "development",
   "eslint.validate": [

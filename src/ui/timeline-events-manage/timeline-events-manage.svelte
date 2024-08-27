@@ -1,7 +1,7 @@
 <script lang="ts">
 
   import { parseTagWithParentInfo } from 'src/apis/filter/parse-parent-children-tag';
-  import { TagTreeData } from '../tag-tree/types';
+  import { type TagTreeData } from '../tag-tree/types';
   import TagTree from '../tag-tree/tag-tree.svelte'
   import TagZone from '../tag-hander/tag-handler.svelte'
 
