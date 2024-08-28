@@ -8,6 +8,7 @@ import {
 	TimelineEventsPanel,
 } from './ui/timeline-events-manage';
 import './app.css';
+import 'virtual:uno.css';
 
 import type { ITimelineMarkdownParams } from './utils';
 import * as TimelineEventApi from './type/timeline-event';
@@ -132,7 +133,7 @@ export default class TimelinesPlugin extends Plugin {
 	async activateView() {
 		this.app.workspace.detachLeavesOfType(TIMELINE_PANEL);
 
-		await this.app.workspace.getRightLeaf(false).setViewState({
+		await this.app.workspace.getRightLeaf?.(false)?.setViewState({
 			type: TIMELINE_PANEL,
 			active: true,
 		});

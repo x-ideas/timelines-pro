@@ -1,7 +1,7 @@
 <script lang="ts">
   import moment from "moment";
   import { Notice } from "obsidian";
-  import { type ITimelineEventItemSource, getTimelineEventMomentTime } from "src/type";
+  import { type ITimelineEventItemSource, getTimelineEventMomentTime } from "../../type";
 
     export let onOk: (newName: ITimelineEventItemSource) => void | undefined;
     export let onCancel: () => void | undefined;

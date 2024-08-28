@@ -6,8 +6,8 @@ import type {
 	TFile,
 } from 'obsidian';
 import { EditorSuggest } from 'obsidian';
-import { DistanceUnit } from 'src/data-value/distance-value';
-import { TimeDurationUnit } from 'src/data-value/time-duration-value';
+import { DistanceUnit } from '../data-value/distance-value';
+import { TimeDurationUnit } from '../data-value/time-duration-value';
 
 class SuggestInfo {
 	tagName: string;

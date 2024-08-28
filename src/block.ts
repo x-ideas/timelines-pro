@@ -12,7 +12,7 @@ import {
 	drawVisTimeline,
 	type IGroupedTimelineEvent,
 } from './draw/draw-vis-timeline';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import { EventTagsManage } from './event-tags-manage';
 
 interface IRunOpt {
@@ -128,7 +128,7 @@ export class TimelineProcessor {
 		el.appendChild(timeline);
 
 		// 插入文件链接
-		const { autoInsetFileLinks = true } = filterParam;
+		const { autoInsetFileLinks = false } = filterParam;
 
 		if (currentFile && autoInsetFileLinks) {
 			insertFileLinkIfNeed(currentFile, opt.app.vault, events || []);

@@ -1,4 +1,5 @@
 import { getTimelineEventMomentTime } from '../timeline-event';
+import { describe, it, expect } from 'vitest';
 
 describe('timeline-event', () => {
 	describe('getTimelineEventMomentTime', () => {

@@ -1,4 +1,5 @@
 import { hasTimeRangeIntersection, parseTimelineDateElements } from '../time';
+import { describe, it, expect } from 'vitest';
 
 describe('time', () => {
 	describe('parseTimelineDateElements', () => {

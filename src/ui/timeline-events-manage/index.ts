@@ -6,9 +6,9 @@ import { ItemView } from 'obsidian';
 import Component from './timeline-events-manage.svelte';
 
 import { RenameModal } from '../rename-modal';
-import { includes } from 'lodash';
+import { includes } from 'lodash-es';
 
-import { EventTagsManage } from 'src/event-tags-manage';
+import { EventTagsManage } from '../../event-tags-manage';
 
 export const TIMELINE_PANEL = 'xxx-timeline-panel-view';
 

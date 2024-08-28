@@ -1,6 +1,6 @@
-import type { ITimelineEventItemParsed } from 'src/type';
+import type { ITimelineEventItemParsed } from '../../type';
 import type { ITimelineFilterParams } from './filter-timeline-event';
-import { StringSelectExp } from 'src/expressions/select-exp';
+import { StringSelectExp } from '../../expressions/select-exp';
 /**
  * 过滤字符串属性
  * @param pattern 模式

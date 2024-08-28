@@ -5,7 +5,7 @@ import {
 	type TimelineDate,
 } from './time';
 import moment from 'moment';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import type { BaseValue } from '../data-value/base-value';
 import { parserDataValue } from '../data-value/data-value-parser';
 import {

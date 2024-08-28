@@ -7,7 +7,7 @@ import type {
 	TFile,
 } from 'obsidian';
 import { EditorSuggest } from 'obsidian';
-import { EventTagsManage } from 'src/event-tags-manage';
+import { EventTagsManage } from '../event-tags-manage';
 
 class SuggestInfo {
 	tagName: string;

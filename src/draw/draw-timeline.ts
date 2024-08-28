@@ -1,4 +1,4 @@
-import { groupBy } from 'lodash';
+import { groupBy } from 'lodash-es';
 import type { TimelineOptions } from 'vis-timeline/esnext';
 import {
 	type ITimelineEventItemParsed,

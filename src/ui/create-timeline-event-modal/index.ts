@@ -1,6 +1,6 @@
 import type { App } from 'obsidian';
 import { Modal } from 'obsidian';
-import type { ITimelineEventItemSource } from 'src/type';
+import type { ITimelineEventItemSource } from '../../type';
 import Component from './create-timeline-event-modal.svelte';
 
 type OnOkFunc = (info: ITimelineEventItemSource) => void;
