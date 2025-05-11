@@ -7,7 +7,7 @@ import type {
 	TFile,
 } from 'obsidian';
 import { EditorSuggest } from 'obsidian';
-import { EventTagsManage } from 'src/event-tags-manage';
+import { EventTagsManage } from '../event-tags-manage';
 
 class SuggestInfo {
 	tagName: string;
@@ -32,7 +32,7 @@ export class TagSuggestions extends EditorSuggest<SuggestInfo> {
 	onTrigger(
 		cursor: EditorPosition,
 		editor: Editor,
-		file: TFile
+		_file: TFile,
 	): EditorSuggestTriggerInfo | null {
 		// _data-event-tags="x"_>
 		// 在x处触发
@@ -135,7 +135,7 @@ export class TagSuggestions extends EditorSuggest<SuggestInfo> {
 		el.setText(value.tagName);
 	}
 
-	selectSuggestion(value: SuggestInfo, evt: MouseEvent | KeyboardEvent) {
+	selectSuggestion(value: SuggestInfo, _evt: MouseEvent | KeyboardEvent) {
 		// 去掉tag前面的#
 		const insertStr = value.tagName.startsWith('#')
 			? value.tagName.substring(1)
@@ -144,7 +144,7 @@ export class TagSuggestions extends EditorSuggest<SuggestInfo> {
 		value.context.editor.replaceRange(
 			linkResult,
 			value.context.start,
-			value.context.end
+			value.context.end,
 		);
 	}
 }

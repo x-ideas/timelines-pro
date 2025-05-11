@@ -8,7 +8,7 @@ export type TimelineDate = string;
 /** 时间范围 */
 export type TimelineDateRange = [
 	TimelineDate | undefined,
-	TimelineDate | undefined
+	TimelineDate | undefined,
 ];
 
 /**
@@ -22,7 +22,7 @@ export type TimelineDateRange = [
  */
 export function parseTimelineDate(
 	str?: TimelineDate,
-	splitFlag = '/'
+	splitFlag = '/',
 ): number | undefined {
 	str = str?.trim();
 	if (!str) {
@@ -64,7 +64,7 @@ export function parseTimelineDate(
  * month 从1开始
  */
 export function parseTimelineDateElements(
-	str?: TimelineDate
+	str?: TimelineDate,
 ): { year: string; month: string; day: string; hour: string } | undefined {
 	str = str?.trim();
 	if (!str) {
@@ -80,7 +80,7 @@ export function parseTimelineDateElements(
 	if (isNil(yearStr) || isNil(monthStr) || isNil(dayStr)) {
 		console.error(
 			'[parseTimelineDateElements] time year, month, day maybe undefined',
-			str
+			str,
 		);
 		return undefined;
 	}
@@ -98,7 +98,7 @@ export function parseTimelineDateElements(
  */
 export function hasTimeRangeIntersection(
 	timeRange1: TimelineDateRange,
-	timeRange2: TimelineDateRange
+	timeRange2: TimelineDateRange,
 ): boolean {
 	const numTimeRange1: [number | undefined, number | undefined] = [
 		parseTimelineDate(timeRange1[0]),
@@ -116,20 +116,20 @@ export function hasTimeRangeIntersection(
 type TimelineDateRangeNumber = [number | undefined, number | undefined];
 function hasTimeRangeIntersectionImpl(
 	timeRange1: TimelineDateRangeNumber,
-	timeRange2: TimelineDateRangeNumber
+	timeRange2: TimelineDateRangeNumber,
 ): boolean {
 	// 左区间为开的情况
 	if (isNil(timeRange1[0])) {
 		return hasTimeRangeIntersectionImpl_forLeftOpen(
 			timeRange1 as [undefined, number | undefined],
-			timeRange2
+			timeRange2,
 		);
 	}
 
 	if (isNil(timeRange2[0])) {
 		return hasTimeRangeIntersectionImpl_forLeftOpen(
 			timeRange2 as [undefined, number | undefined],
-			timeRange1
+			timeRange1,
 		);
 	}
 
@@ -137,19 +137,19 @@ function hasTimeRangeIntersectionImpl(
 	if (isNil(timeRange1[1])) {
 		return hasTimeRangeIntersectionImpl_forRightOpen(
 			timeRange1 as [number, undefined],
-			timeRange2
+			timeRange2,
 		);
 	}
 	if (isNil(timeRange2[1])) {
 		return hasTimeRangeIntersectionImpl_forRightOpen(
 			timeRange2 as [number, undefined],
-			timeRange1
+			timeRange1,
 		);
 	}
 
 	return hasTimeRangeIntersectionImpl_forClose(
 		timeRange1 as [number, number],
-		timeRange2 as [number, number]
+		timeRange2 as [number, number],
 	);
 }
 
@@ -158,7 +158,7 @@ function hasTimeRangeIntersectionImpl(
  */
 function hasTimeRangeIntersectionImpl_forLeftOpen(
 	range1: [undefined, number | undefined],
-	range2: [number | undefined, number | undefined]
+	range2: [number | undefined, number | undefined],
 ): boolean {
 	// 两个左开
 	if (isNil(range2[0])) {
@@ -184,7 +184,7 @@ function hasTimeRangeIntersectionImpl_forLeftOpen(
  */
 function hasTimeRangeIntersectionImpl_forRightOpen(
 	range1: [number, undefined],
-	range2: [number | undefined, number | undefined]
+	range2: [number | undefined, number | undefined],
 ): boolean {
 	// 两个右开
 	if (isNil(range2[1])) {
@@ -205,7 +205,7 @@ function hasTimeRangeIntersectionImpl_forRightOpen(
  */
 function hasTimeRangeIntersectionImpl_forClose(
 	range1: [number, number],
-	range2: [number, number]
+	range2: [number, number],
 ): boolean {
 	//
 	const min = range1[0] <= range2[0] ? range1 : range2;

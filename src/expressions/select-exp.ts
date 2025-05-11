@@ -3,7 +3,7 @@ import { minimatch } from 'minimatch';
 import * as parser from '@babel/parser';
 
 type IStringSelectExpOpt = {
-	//
+	placeholder?: string;
 };
 
 /**
@@ -42,7 +42,7 @@ export class StringSelectExp {
 			const firstExpression = this._parseResult.program.body.findIndex(
 				(item) => {
 					return item.type === 'ExpressionStatement';
-				}
+				},
 			);
 
 			// 找到Directive
@@ -50,7 +50,7 @@ export class StringSelectExp {
 			const firstDirective = this._parseResult.program.directives.findIndex(
 				(item) => {
 					return item.type === 'Directive';
-				}
+				},
 			);
 
 			if (firstExpression !== -1) {
@@ -59,7 +59,7 @@ export class StringSelectExp {
 						this._parseResult.program.body[
 							firstExpression
 						] as _babel_types.ExpressionStatement
-					).expression
+					).expression,
 				);
 			} else if (firstDirective !== -1) {
 				// 特殊情况，只有一个tag的情况，并且还被''包裹
@@ -68,11 +68,12 @@ export class StringSelectExp {
 						this._parseResult.program.directives[
 							firstDirective
 						] as _babel_types.Directive
-					).value.value
+					).value.value,
 				);
 			} else {
 				throw new Error('表达式解析失败: 未找到表达式');
 			}
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			throw new Error(`表达式解析失败: ${error?.message}`);
 		}
@@ -93,7 +94,7 @@ function transform(ast: _babel_types.Expression): Expression {
 			return new LogicalExpression(
 				ast.operator,
 				transform(ast.left),
-				transform(ast.right)
+				transform(ast.right),
 			);
 
 		// !a
@@ -110,7 +111,7 @@ function transform(ast: _babel_types.Expression): Expression {
 			return new BinaryExpression(
 				ast.operator,
 				transform(ast.left as _babel_types.Expression),
-				transform(ast.right)
+				transform(ast.right),
 			);
 
 		case 'NumericLiteral':
@@ -144,7 +145,7 @@ class LogicalExpression extends Expression {
 	constructor(
 		operator: _babel_types.LogicalExpression['operator'],
 		left: Expression,
-		right: Expression
+		right: Expression,
 	) {
 		super('');
 		this.operator = operator;
@@ -175,7 +176,7 @@ class UnaryExpression extends Expression {
 
 	constructor(
 		operator: _babel_types.UnaryExpression['operator'],
-		expression: Expression
+		expression: Expression,
 	) {
 		super('');
 		this.operator = operator;
@@ -225,7 +226,7 @@ class BinaryExpression extends Expression {
 	constructor(
 		operator: _babel_types.BinaryExpression['operator'],
 		left: Expression,
-		right: Expression
+		right: Expression,
 	) {
 		super('');
 		this.operator = operator;

@@ -1,6 +1,6 @@
 import type { App, TFile } from 'obsidian';
 import { getAllTags } from 'obsidian';
-import { StringSelectExp } from 'src/expressions/select-exp';
+import { StringSelectExp } from '../../expressions/select-exp';
 import { parseTag } from './parse-parent-children-tag';
 
 /**

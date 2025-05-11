@@ -1,5 +1,4 @@
-import { isNil } from 'lodash';
-import type { ITimelineEventItemParsed } from 'src/type';
+import { isNil } from 'lodash-es';
 
 // export function filterNumberProperty(
 // 	events: ITimelineEventItemParsed[],
@@ -12,8 +11,8 @@ import type { ITimelineEventItemParsed } from 'src/type';
 // 	return events;
 // }
 
-export function isNumberMatch(numCondition: string, val?: string) {
-	const filter = new NumberFilter(numCondition);
+export function isNumberMatch(numCondition: string, _val?: string) {
+	const _filter = new NumberFilter(numCondition);
 }
 
 /**
@@ -33,5 +32,6 @@ class NumberFilter {
 		if (isNil(val)) {
 			return false;
 		}
+		return true;
 	}
 }

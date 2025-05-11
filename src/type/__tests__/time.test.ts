@@ -1,4 +1,5 @@
 import { hasTimeRangeIntersection, parseTimelineDateElements } from '../time';
+import { describe, it, expect } from 'vitest';
 
 describe('time', () => {
 	describe('parseTimelineDateElements', () => {
@@ -19,8 +20,8 @@ describe('time', () => {
 				hasTimeRangeIntersection(
 					['1646/10', '1662/3'],
 					// 开区间
-					['1645/07/27', undefined]
-				)
+					['1645/07/27', undefined],
+				),
 			).toBe(true);
 		});
 	});

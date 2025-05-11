@@ -32,11 +32,11 @@ export class TimeDurationValue extends BaseValue {
 			// 相加
 			return new TimeDurationValue(
 				mindd.value + aMin.value,
-				TimeDurationUnit.Minute
+				TimeDurationUnit.Minute,
 			);
 		} else {
 			throw new Error(
-				`不同类型的值不能相加: ${this.toString()}, ${aValue.toString()}`
+				`不同类型的值不能相加: ${this.toString()}, ${aValue.toString()}`,
 			);
 		}
 	}
@@ -56,14 +56,14 @@ export class TimeDurationValue extends BaseValue {
 
 		return new TimeDurationValue(
 			(this.value * factor) / minToSecondFactor,
-			TimeDurationUnit.Minute
+			TimeDurationUnit.Minute,
 		);
 	}
 
 	/**
 	 * 获取转换到second的因子
 	 */
-	getFactor(fromUnit: TimeDurationUnit, toUnit = TimeDurationUnit.Second) {
+	getFactor(fromUnit: TimeDurationUnit, _toUnit = TimeDurationUnit.Second) {
 		switch (fromUnit) {
 			case TimeDurationUnit.Second:
 				return 1;

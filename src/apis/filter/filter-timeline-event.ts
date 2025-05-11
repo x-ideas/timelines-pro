@@ -59,7 +59,7 @@ export interface ITimelineFilterParams {
  */
 export function filterTimelineEvents(
 	events: ITimelineEventItemParsed[],
-	params?: ITimelineFilterParams
+	params?: ITimelineFilterParams,
 ): ITimelineEventItemParsed[] {
 	// const result = [...events];
 	if (!params) {
@@ -88,7 +88,7 @@ export function filterTimelineEvents(
  */
 function filterByEventTag(
 	events: ITimelineEventItemParsed[],
-	params?: ITimelineFilterParams
+	params?: ITimelineFilterParams,
 ): ITimelineEventItemParsed[] {
 	if (!params || !params.eventTags) {
 		return events;
@@ -130,7 +130,7 @@ function filterByEventTag(
  */
 function filterByTime(
 	events: ITimelineEventItemParsed[],
-	params?: ITimelineFilterParams
+	params?: ITimelineFilterParams,
 ): ITimelineEventItemParsed[] {
 	if (!params) {
 		return events;

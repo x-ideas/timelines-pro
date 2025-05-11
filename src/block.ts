@@ -1,4 +1,3 @@
-//import Gallery from './svelte/Gallery.svelte'
 import type { TimelinesSettings } from './types';
 import { RENDER_TIMELINE } from './constants';
 import type { TFile, MarkdownView, App } from 'obsidian';
@@ -12,7 +11,7 @@ import {
 	drawVisTimeline,
 	type IGroupedTimelineEvent,
 } from './draw/draw-vis-timeline';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import { EventTagsManage } from './event-tags-manage';
 
 interface IRunOpt {
@@ -46,7 +45,7 @@ export class TimelineProcessor {
 		app: App,
 		// fileCache: MetadataCache,
 		// appVault: Vault,
-		currentFile: TFile | null
+		currentFile: TFile | null,
 	) {
 		const editor = sourceView.editor;
 		if (editor) {
@@ -61,7 +60,7 @@ export class TimelineProcessor {
 				rendered.setText(new Date().toString());
 
 				div.appendChild(
-					document.createComment(`TIMELINE BEGIN source='${match[1]}'`)
+					document.createComment(`TIMELINE BEGIN source='${match[1]}'`),
 				);
 				await this.runUnion({
 					source: source,
@@ -87,16 +86,16 @@ export class TimelineProcessor {
 	 */
 	async runOneVerticle(
 		filterParam: ITimelineMarkdownParams,
-		opt: Omit<IRunOpt, 'source'>
+		opt: Omit<IRunOpt, 'source'>,
 	) {
 		const {
 			el,
-			settings,
-			vaultFiles,
-			app,
-			// fileCache,
-			// appVault,
-			visTimeline,
+			// settings,
+			// vaultFiles,
+			// app,
+			// // fileCache,
+			// // appVault,
+			// visTimeline,
 			currentFile,
 		} = opt;
 
@@ -104,11 +103,12 @@ export class TimelineProcessor {
 		console.time(label);
 
 		// 搜索
-		const events = await EventTagsManage.getInstance().searchTimelineEvents(
-			filterParam
-		);
+		const events =
+			await EventTagsManage.getInstance().searchTimelineEvents(filterParam);
 
 		console.timeEnd(label);
+
+		console.log('[ob timelines]: 搜索结果', events);
 
 		// 绘制
 		// Keep only the files that have the time info
@@ -128,7 +128,7 @@ export class TimelineProcessor {
 		el.appendChild(timeline);
 
 		// 插入文件链接
-		const { autoInsetFileLinks = true } = filterParam;
+		const { autoInsetFileLinks = false } = filterParam;
 
 		if (currentFile && autoInsetFileLinks) {
 			insertFileLinkIfNeed(currentFile, opt.app.vault, events || []);
@@ -144,16 +144,16 @@ export class TimelineProcessor {
 	 */
 	async runManyHorizontal(
 		filterParams: ITimelineMarkdownParams[],
-		opt: Omit<IRunOpt, 'source'>
+		opt: Omit<IRunOpt, 'source'>,
 	) {
 		const {
 			el,
-			settings,
-			vaultFiles,
+			// settings,
+			// vaultFiles,
 			// fileCache,
 			// appVault,
-			app,
-			visTimeline,
+			// app,
+			// visTimeline,
 			currentFile,
 		} = opt;
 
@@ -163,9 +163,8 @@ export class TimelineProcessor {
 			const label = '[ob timelines]: timeline标签搜索阶段';
 			console.time(label);
 
-			const res = await EventTagsManage.getInstance().searchTimelineEvents(
-				filterParam
-			);
+			const res =
+				await EventTagsManage.getInstance().searchTimelineEvents(filterParam);
 			console.timeEnd(label);
 
 			groupedEvents.push({
@@ -183,9 +182,11 @@ export class TimelineProcessor {
 					'groupName',
 					'dateStart',
 					'dateEnd',
-				])
+				]),
 			);
 		}
+
+		console.log('[ob timelines]: 搜索结果', groupedEvents);
 
 		drawVisTimeline({
 			events: groupedEvents,
@@ -194,14 +195,14 @@ export class TimelineProcessor {
 		});
 
 		// 插入文件链接
-		const { autoInsetFileLinks = true } = extraOptions;
+		const { autoInsetFileLinks = false } = extraOptions;
 
 		if (currentFile && autoInsetFileLinks) {
 			const allEvents = groupedEvents.reduce<ITimelineEventItemParsed[]>(
 				(prev, cur) => {
 					return prev.concat(cur.events);
 				},
-				[]
+				[],
 			);
 			insertFileLinkIfNeed(currentFile, opt.app.vault, allEvents);
 		} else {

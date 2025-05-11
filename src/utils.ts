@@ -54,7 +54,7 @@ export function parseMarkdownCode(source: string): ITimelineMarkdownParams {
  * @returns
  */
 export function parseMarkdownCodeSource(
-	source: string
+	source: string,
 ): ITimelineMarkdownParams[] {
 	// 按照空白行分割
 	const sourceList = source
