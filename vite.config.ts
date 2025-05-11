@@ -9,8 +9,16 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: 'src/main.ts',
-			fileName: 'main',
-			formats: ['es'],
+			// fileName: 'main',
+			formats: ['cjs'],
+			cssFileName: 'styles',
+			// 输出文件为main.js
+			fileName: (format, entry) => {
+				if (format === 'cjs') {
+					return 'main.js';
+				}
+				return `${entry}.${format}.js`;
+			},
 		},
 		rollupOptions: {
 			output: {

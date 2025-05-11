@@ -11,8 +11,8 @@ import { isNil } from 'lodash-es';
 // 	return events;
 // }
 
-export function isNumberMatch(numCondition: string, val?: string) {
-	const filter = new NumberFilter(numCondition);
+export function isNumberMatch(numCondition: string, _val?: string) {
+	const _filter = new NumberFilter(numCondition);
 }
 
 /**

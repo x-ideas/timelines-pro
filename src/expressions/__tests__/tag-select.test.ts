@@ -46,7 +46,7 @@ describe('tag select测试', () => {
 		expect(condition6.test('南明史;书籍;读书笔记')).toBe(true);
 
 		const condition7 = new StringSelectExp(
-			'书籍 && (其他 || (读书笔记 && 南明史))'
+			'书籍 && (其他 || (读书笔记 && 南明史))',
 		);
 		expect(condition7.test('其他;书籍')).toBe(true);
 		expect(condition7.test('南明史;书籍')).toBe(false);

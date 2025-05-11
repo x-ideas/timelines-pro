@@ -5,7 +5,6 @@ import {
 	getTimelineEventImagePath,
 	getTimelineEventSourcePath,
 	getTimelineEventId,
-	type ITimelineEventItemSource,
 	getTimelineSortOrder,
 	getTimelineEventDateDescription,
 } from '../type/timeline-event';
@@ -50,7 +49,7 @@ export function drawTimeline(opt: IDrawTimelineOptions) {
 			cls: 'timeline-event-list',
 			attr: { style: 'display: block' },
 		});
-		noteHeader.addEventListener('click', (event) => {
+		noteHeader.addEventListener('click', (_event) => {
 			if (eventContainer.style.getPropertyValue('display') === 'none') {
 				eventContainer.style.setProperty('display', 'block');
 				return;

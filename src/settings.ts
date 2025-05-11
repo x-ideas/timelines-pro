@@ -19,7 +19,7 @@ export class TimelinesSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('Default timeline tag')
 			.setDesc(
-				'Tag to specify which notes to include in created timelines e.g. timeline for #timeline tag'
+				'Tag to specify which notes to include in created timelines e.g. timeline for #timeline tag',
 			)
 			.addText((text) =>
 				text
@@ -27,7 +27,7 @@ export class TimelinesSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.timelineTag = value;
 						await this.plugin.saveSettings();
-					})
+					}),
 			);
 
 		new Setting(containerEl)

@@ -1,18 +1,19 @@
 import type { App } from 'obsidian';
 import { Modal } from 'obsidian';
 import Component from './rename.svelte';
+import { mount, unmount } from 'svelte';
 
 export class RenameModal extends Modal {
 	tagName: string;
 	onSubmit: (result: string) => void;
-	component: Component;
+	component: ReturnType<typeof Component> | undefined;
 
 	constructor(app: App, tagName: string, onSubmit: (result: string) => void) {
 		super(app);
 		this.tagName = tagName;
 		this.onSubmit = onSubmit;
 
-		this.component = new Component({
+		this.component = mount(Component, {
 			target: this.contentEl,
 			props: {
 				tagName: '',
@@ -40,10 +41,13 @@ export class RenameModal extends Modal {
 	}
 
 	onOpen() {
-		this.component.$set({ tagName: this.tagName });
+		this.component?.updateProps({ tagName: this.tagName });
 	}
 
-	onClose() {
-		this.component.$destroy();
+	close(): void {
+		if (this.component) {
+			unmount(this.component);
+		}
+		super.close();
 	}
 }

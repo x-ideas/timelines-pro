@@ -1,4 +1,4 @@
-import type { App, DataAdapter, TFile, Vault } from 'obsidian';
+import type { App, DataAdapter, TFile } from 'obsidian';
 import {
 	parseTimelineDate,
 	parseTimelineDateElements,
@@ -6,12 +6,6 @@ import {
 } from './time';
 import moment from 'moment';
 import { isNil } from 'lodash-es';
-import type { BaseValue } from '../data-value/base-value';
-import { parserDataValue } from '../data-value/data-value-parser';
-import {
-	TimeDurationUnit,
-	TimeDurationValue,
-} from '../data-value/time-duration-value';
 
 /**
  * timeline event模型（存放在dataset中）
@@ -69,12 +63,12 @@ export interface ITimelineEventItemSource {
 	/**
 	 * 该事件的值，如5km, 40min
 	 */
-	value?: string;
+	// value?: string;
 
 	/**
 	 * 事件花费的时长(输入), 如50min, 4h
 	 */
-	timeCost: string;
+	// timeCost: string;
 
 	/**
 	 * 是否是里程碑
@@ -96,7 +90,7 @@ export interface ITimelineEventItemSource {
  *
  */
 export interface ITimelineEventItemParsed
-	extends Omit<ITimelineEventItemSource, 'value' | 'milestone' | 'timeCost'> {
+	extends Omit<ITimelineEventItemSource, 'milestone'> {
 	/** 图片的地址 */
 	imgRealPath?: string;
 	/** 内部html */
@@ -108,12 +102,12 @@ export interface ITimelineEventItemParsed
 	/**
 	 * 事件的值(输出，如距离)
 	 */
-	value?: BaseValue;
+	// value?: BaseValue;
 
 	/**
 	 * 事件花费的时长(输入)
 	 */
-	timeCost: TimeDurationValue;
+	// timeCost: TimeDurationValue;
 
 	/**
 	 * 里程碑描述
@@ -130,7 +124,7 @@ export interface ITimelineEventItemParsed
  * 获取timeline的id
  */
 export function getTimelineEventId(
-	dataset?: Pick<ITimelineEventItemSource, 'date' | 'dateStart' | 'dateEnd'>
+	dataset?: Pick<ITimelineEventItemSource, 'date' | 'dateStart' | 'dateEnd'>,
 ) {
 	if (dataset) {
 		if (dataset['date']) {
@@ -140,7 +134,7 @@ export function getTimelineEventId(
 		if (dataset['dateStart'] && dataset['dateEnd']) {
 			// 范围
 			return `${getTimelineEventTime(
-				dataset['dateStart']
+				dataset['dateStart'],
 			)}-${getTimelineEventTime(dataset['dateEnd'])}`;
 		}
 
@@ -167,7 +161,7 @@ export function getTimelineEventTime(str?: TimelineDate): number {
  * 将时间字符串转换为moment对象，一般用于开放接口，供外界使用
  */
 export function getTimelineEventMomentTime(
-	str?: TimelineDate
+	str?: TimelineDate,
 ): moment.Moment | undefined {
 	const info = parseTimelineDateElements(str);
 
@@ -206,7 +200,7 @@ export function getTimelineEventMomentTime(
  * 取dateDescription字段，如果没有dateDescription字段，则返回getTimelineEventId()的值
  */
 export function getTimelineEventDateDescription(
-	dataset?: ITimelineEventItemParsed
+	dataset?: ITimelineEventItemParsed,
 ) {
 	return dataset?.['dateDescription'] || getTimelineEventId(dataset);
 }
@@ -246,7 +240,7 @@ export function getTimelineEventEndTime(dataset?: ITimelineEventItemParsed) {
  * 暴露给外界使用
  */
 export function getTimelineEventEndTimeJudged(
-	dataset?: ITimelineEventItemParsed
+	dataset?: ITimelineEventItemParsed,
 ) {
 	return getTimelineEventEndTime(dataset) || getTimelineEventStartTime(dataset);
 }
@@ -255,7 +249,7 @@ export function getTimelineEventEndTimeJudged(
  * 从dataset中获取排序字段（做了一些解析工作）
  */
 export function getTimelineSortOrder(
-	dataset?: Pick<ITimelineEventItemSource, 'date' | 'dateStart'>
+	dataset?: Pick<ITimelineEventItemSource, 'date' | 'dateStart'>,
 ) {
 	if (dataset) {
 		return (
@@ -299,7 +293,7 @@ export interface FileTagInfos {
  */
 export async function getTimelineEventsAndTagsInFile(
 	files: TFile[],
-	app: App
+	app: App,
 ): Promise<Map<TFile, FileTagInfos>> {
 	const domparser = new DOMParser();
 	const res = new Map<TFile, FileTagInfos>();
@@ -307,7 +301,7 @@ export async function getTimelineEventsAndTagsInFile(
 	for (const file of files) {
 		const doc = domparser.parseFromString(
 			await app.vault.read(file),
-			'text/html'
+			'text/html',
 		);
 		// timeline div
 		const timelineData = doc.getElementsByClassName('ob-timelines');
@@ -315,8 +309,8 @@ export async function getTimelineEventsAndTagsInFile(
 		const timelines: ITimelineEventItemParsed[] = [];
 		// NOTE: 额外dataset处理一些参数
 		const notePath = file.path;
-		const path = notePath;
-		for (const event of timelineData as any) {
+		const _path = notePath;
+		for (const event of timelineData) {
 			if (!(event instanceof HTMLElement)) {
 				continue;
 			}
@@ -351,8 +345,8 @@ export async function getTimelineEventsAndTagsInFile(
 				// 一些属性的额外处理
 				//  解析成数字
 				name: event.dataset['name'] || 'unknown',
-				value: parseValue(event.dataset['value']),
-				timeCost: parseTimeDurationValue(event.dataset['timeCost']),
+				// value: parseValue(event.dataset['value']),
+				// timeCost: parseTimeDurationValue(event.dataset['timeCost']),
 				milestone: event.dataset['milestone'],
 			};
 
@@ -366,17 +360,4 @@ export async function getTimelineEventsAndTagsInFile(
 	}
 
 	return res;
-}
-
-function parseValue(value?: string): BaseValue {
-	return parserDataValue(value);
-}
-
-function parseTimeDurationValue(value?: string): TimeDurationValue {
-	const ss = parserDataValue(value);
-	if (ss instanceof TimeDurationValue) {
-		return ss;
-	}
-
-	return new TimeDurationValue(0, TimeDurationUnit.Minute);
 }

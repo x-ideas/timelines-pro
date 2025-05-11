@@ -22,7 +22,7 @@ export function filterStrProperty(pattern: string, val?: string) {
  */
 export function filterEventsByName(
 	events: ITimelineEventItemParsed[],
-	params?: ITimelineFilterParams
+	params?: ITimelineFilterParams,
 ): ITimelineEventItemParsed[] {
 	const pattern = params?.name;
 	if (pattern) {

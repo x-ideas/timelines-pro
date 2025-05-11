@@ -39,7 +39,7 @@ const context = await esbuild.context({
           // console.log('result.outputFiles[0].path', result);
 
           const cssFiles = Object.keys(outputs).filter((file) =>
-            file.endsWith('.css')
+            file.endsWith('.css'),
           );
 
           for (const file of cssFiles) {

@@ -24,8 +24,8 @@ const Keys = [
 	'data-date-description',
 	'data-title',
 	'data-name',
-	'data-value',
-	'data-time-cost',
+	// 'data-value',
+	// 'data-time-cost',
 	'data-milestone',
 ];
 
@@ -36,7 +36,7 @@ export class TimelineSuggestion extends EditorSuggest<SuggestInfo> {
 	onTrigger(
 		cursor: EditorPosition,
 		editor: Editor,
-		file: TFile | null
+		_file: TFile | null,
 	): EditorSuggestTriggerInfo | null {
 		const line = editor.getLine(cursor.line);
 
@@ -75,7 +75,7 @@ export class TimelineSuggestion extends EditorSuggest<SuggestInfo> {
 				line: cursor.line,
 				ch: 0,
 			},
-			cursor
+			cursor,
 		);
 
 		const query = charBeforeCursor.match(/['"]\s((?:\w+-?)+)$/);
@@ -96,7 +96,7 @@ export class TimelineSuggestion extends EditorSuggest<SuggestInfo> {
 	}
 
 	getSuggestions(
-		context: EditorSuggestContext
+		context: EditorSuggestContext,
 	): SuggestInfo[] | Promise<SuggestInfo[]> {
 		const line = context.editor.getLine(context.start.line);
 
@@ -131,13 +131,13 @@ export class TimelineSuggestion extends EditorSuggest<SuggestInfo> {
 		el.setText(value.tagName);
 	}
 
-	selectSuggestion(value: SuggestInfo, evt: MouseEvent | KeyboardEvent): void {
+	selectSuggestion(value: SuggestInfo, _evt: MouseEvent | KeyboardEvent): void {
 		// tag=''
 		// 增加=''
 		value.context.editor.replaceRange(
 			value.tagName + "=''",
 			value.context.start,
-			value.context.end
+			value.context.end,
 		);
 		value.context.editor.setCursor({
 			line: value.context.end.line,

@@ -1,4 +1,4 @@
-import { isNil, omit } from 'lodash-es';
+import { isNil } from 'lodash-es';
 import type { DataGroup, DataItem, TimelineOptions } from 'vis-timeline/esnext';
 import { Timeline } from 'vis-timeline/esnext';
 import * as vis from 'vis-data';
@@ -83,7 +83,7 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 
 			const opt: DataItem = {
 				content: `${event.dateDescription || ''}<br><a href=${JSON.stringify(
-					getTimelineEventSourcePath(event)
+					getTimelineEventSourcePath(event),
 				)} class="internal-link">${event.title || ''}</a>`,
 				title: noteCard.outerHTML,
 				start: `${start.year}-${start.month}-${start.day}`,
@@ -127,7 +127,7 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 		showTooltips: false,
 		// 删除一些不需要的字段
 		...options,
-		template: function (item: DataItem, element: HTMLElement, data: any) {
+		template: function (item: DataItem, _element: HTMLElement) {
 			const eventContainer = document.createElement('div');
 			eventContainer.innerHTML = item.content || '';
 			// eventContainer.setText(item.content);
@@ -157,7 +157,7 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 			container,
 			items,
 			new vis.DataSet(groupInfos),
-			timelineOpt
+			timelineOpt,
 		);
 	} else {
 		timeline = new Timeline(container, items, timelineOpt);
@@ -168,7 +168,7 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 		const id = getTimelineEventId(milestone) || Math.random().toString(16);
 
 		const endDate = getTimelineEventMomentTime(
-			getTimelineEventEndTimeJudged(milestone)
+			getTimelineEventEndTimeJudged(milestone),
 		);
 		if (!endDate) {
 			console.warn('[timeline]: milestone end date is undefined', milestone);
@@ -180,7 +180,7 @@ export function drawVisTimeline(opt: IDrawVisTimelineOptions) {
 		// @ts-ignore
 		timeline.setCustomTimeMarker(
 			`${milestone.dateDescription || ''}:${milestone.milestone || ''}`,
-			id
+			id,
 		);
 	}
 }

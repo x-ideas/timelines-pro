@@ -3,7 +3,8 @@ import type { TimelineOptions } from 'vis-timeline';
 /** timeline绘制参数 */
 export type TimelineEventDrawParams = TimelineOptions & {
 	/**
-	 * 是否自动插入文件链接,默认true
+	 * 是否自动插入文件链接
+	 * @default false
 	 */
 	autoInsetFileLinks?: boolean;
 

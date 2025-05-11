@@ -27,7 +27,7 @@ export class DistanceValue extends BaseValue {
 			return new DistanceValue((mindd.value + aMin.value) / factor, this.unit);
 		} else {
 			throw new Error(
-				`不同类型的值不能相加: ${this.toString()}, ${aValue.toString()}`
+				`不同类型的值不能相加: ${this.toString()}, ${aValue.toString()}`,
 			);
 		}
 	}
@@ -50,7 +50,7 @@ export class DistanceValue extends BaseValue {
 	/**
 	 * 基本单位，看作是米
 	 */
-	getFactor(fromUnit: DistanceUnit, toUnit = DistanceUnit.Meter) {
+	getFactor(fromUnit: DistanceUnit, _toUnit = DistanceUnit.Meter) {
 		switch (fromUnit) {
 			case DistanceUnit.Meter:
 				return 1;

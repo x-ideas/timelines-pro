@@ -2,8 +2,9 @@ import type { Plugin } from 'obsidian';
 import { Notice, type TFile, type WorkspaceLeaf } from 'obsidian';
 import { Menu } from 'obsidian';
 import { ItemView } from 'obsidian';
+import { mount, unmount } from 'svelte';
 
-import Component from './timeline-events-manage.svelte';
+import TimelineEventsManage from './timeline-events-manage.svelte';
 
 import { RenameModal } from '../rename-modal';
 import { includes } from 'lodash-es';
@@ -32,12 +33,12 @@ function getSearchTagRegExp2(tag: string) {
  */
 function getSearchNameRegExp(name: string) {
 	// 转义名称中的\字符
-	const splitName = name.split('\\');
+	const _splitName = name.split('\\');
 	// return `/data-name\\W*=\\W*${splitName.join('\\/')}/`;
 	return name;
 }
 
-function getSearchNameRegExpGlobal(name: string) {
+function _getSearchNameRegExpGlobal(name: string) {
 	// 转义名称中的\字符
 	// const splitName = name.split('\\');
 	// return new RegExp(`data-name\\W*=\\W*${splitName.join('\\/')}`, 'g');
@@ -45,9 +46,7 @@ function getSearchNameRegExpGlobal(name: string) {
 }
 
 export class TimelineEventsPanel extends ItemView {
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	component: Component;
+	component: ReturnType<typeof TimelineEventsManage> | undefined;
 
 	changeEventRef?: ReturnType<typeof this.app.metadataCache.on>;
 	deleteEventRef?: ReturnType<typeof this.app.metadataCache.on>;
@@ -62,9 +61,9 @@ export class TimelineEventsPanel extends ItemView {
 
 		this.changeEventRef = this.app.metadataCache.on(
 			'changed',
-			(file, fileContent, cache) => {
+			(file, _fileContent, _cache) => {
 				this.onFileUpdated(file);
-			}
+			},
 		);
 
 		this.deleteEventRef = this.app.metadataCache.on('deleted', (file) => {
@@ -121,7 +120,7 @@ export class TimelineEventsPanel extends ItemView {
 		this.app.workspace.trigger(
 			'timeline-event-tag-wrapper:contextmenu',
 			menu,
-			eventTag
+			eventTag,
 		);
 		setTimeout(() => {
 			menu.showAtMouseEvent(uiEvent);
@@ -167,7 +166,7 @@ export class TimelineEventsPanel extends ItemView {
 
 		const tagArray = Array.from(eventTagSet);
 
-		this.component.$set({
+		this.component?.updateProps({
 			initLoading: this.initLoading,
 			tags: tagArray.sort(),
 			tagCountMap,
@@ -205,10 +204,10 @@ export class TimelineEventsPanel extends ItemView {
 			const newFileContent = fileContent.replace(
 				reg,
 				// newTag,
-				(match, p1, p2, offset, origin, groups) => {
+				(_match, p1, p2, _offset, _origin, _groups) => {
 					// console.log('rename tags:', match, 'p1', p1, 'p2', p2);
 					return `data-event-tags=${p1 ? p1 : ''}${newTag}${p2 ? p2 : ''}`;
-				}
+				},
 			);
 
 			this.app.vault.modify(file, newFileContent);
@@ -253,7 +252,7 @@ export class TimelineEventsPanel extends ItemView {
 
 	/** 生命周期 */
 	async onOpen() {
-		this.component = new Component({
+		this.component = mount(TimelineEventsManage, {
 			target: this.contentEl,
 			props: {
 				tags: [],
@@ -278,7 +277,9 @@ export class TimelineEventsPanel extends ItemView {
 
 	/** 生命周期 */
 	async onClose() {
-		this.component.$destroy();
+		if (this.component) {
+			unmount(this.component);
+		}
 
 		if (this.changeEventRef) {
 			this.app.metadataCache.offref(this.changeEventRef);

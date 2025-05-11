@@ -26,20 +26,20 @@ export class ValueUnitSuggesiton extends EditorSuggest<SuggestInfo> {
 	onTrigger(
 		cursor: EditorPosition,
 		editor: Editor,
-		file: TFile | null
+		_file: TFile | null,
 	): EditorSuggestTriggerInfo | null {
-		const line = editor.getLine(cursor.line);
+		const _line = editor.getLine(cursor.line);
 
 		const strBeforeCursor = editor.getRange(
 			{
 				line: cursor.line,
 				ch: 0,
 			},
-			cursor
+			cursor,
 		);
 
 		const match = strBeforeCursor.match(
-			/\s((?:data-value)|(?:data-time-cost))=['"]([^>=\s]*?)['"]?$/
+			/\s((?:data-value)|(?:data-time-cost))=['"]([^>=\s]*?)['"]?$/,
 		);
 
 		if (!match || match.index === undefined) {
@@ -67,7 +67,7 @@ export class ValueUnitSuggesiton extends EditorSuggest<SuggestInfo> {
 	}
 
 	getSuggestions(
-		context: EditorSuggestContext
+		context: EditorSuggestContext,
 	): SuggestInfo[] | Promise<SuggestInfo[]> {
 		return [
 			...Object.values(DistanceUnit),
@@ -81,12 +81,12 @@ export class ValueUnitSuggesiton extends EditorSuggest<SuggestInfo> {
 		el.setText(value.tagName);
 	}
 
-	selectSuggestion(value: SuggestInfo, evt: MouseEvent | KeyboardEvent) {
+	selectSuggestion(value: SuggestInfo, _evt: MouseEvent | KeyboardEvent) {
 		const linkResult = `${value.tagName}`;
 		value.context.editor.replaceRange(
 			linkResult,
 			value.context.start,
-			value.context.end
+			value.context.end,
 		);
 
 		value.context.editor.setCursor({

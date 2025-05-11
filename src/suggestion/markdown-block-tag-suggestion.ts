@@ -33,7 +33,7 @@ export class MarkdownBlockTagSuggestion extends EditorSuggest<SuggestInfo> {
 	onTrigger(
 		cursor: EditorPosition,
 		editor: Editor,
-		file: TFile
+		_file: TFile,
 	): EditorSuggestTriggerInfo | null {
 		// 是否位于markdown block
 		const line = editor.getLine(cursor.line);
@@ -110,7 +110,7 @@ export class MarkdownBlockTagSuggestion extends EditorSuggest<SuggestInfo> {
 		el.setText(value.tagName);
 	}
 
-	selectSuggestion(value: SuggestInfo, evt: MouseEvent | KeyboardEvent) {
+	selectSuggestion(value: SuggestInfo, _evt: MouseEvent | KeyboardEvent) {
 		// 去掉tag前面的#
 		const insertStr = value.tagName.startsWith('#')
 			? value.tagName.substring(1)
@@ -119,7 +119,7 @@ export class MarkdownBlockTagSuggestion extends EditorSuggest<SuggestInfo> {
 		value.context.editor.replaceRange(
 			linkResult,
 			value.context.start,
-			value.context.end
+			value.context.end,
 		);
 	}
 }

@@ -49,7 +49,7 @@ export class EventTagsManage extends Events {
 	async refresh() {
 		if (!this.app) {
 			console.error(
-				'[refresh] 尚未初始化，请先调用EventTagsManage.getInstance().init(app)'
+				'[refresh] 尚未初始化，请先调用EventTagsManage.getInstance().init(app)',
 			);
 			return;
 		}
@@ -58,7 +58,7 @@ export class EventTagsManage extends Events {
 
 		const timelineEvents = await getTimelineEventsAndTagsInFile(
 			files,
-			this.app
+			this.app,
 		);
 
 		this.tagsMap = timelineEvents;
@@ -72,7 +72,7 @@ export class EventTagsManage extends Events {
 	async searchTimelineEvents(params: ITimelineSearchParams) {
 		if (!this.app) {
 			console.error(
-				'[searchTimelineEvents] 尚未初始化，请先调用EventTagsManage.getInstance().init(app)'
+				'[searchTimelineEvents] 尚未初始化，请先调用EventTagsManage.getInstance().init(app)',
 			);
 			return;
 		}
@@ -101,7 +101,7 @@ export class EventTagsManage extends Events {
 				'start',
 				params.dateStart,
 				'end',
-				params.dateEnd
+				params.dateEnd,
 			);
 			return [];
 		}
@@ -115,7 +115,7 @@ export class EventTagsManage extends Events {
 					dateStart: params.dateStart,
 					dateEnd: params.dateEnd,
 					name: params.name,
-				})
+				}),
 			);
 		}
 
@@ -130,19 +130,49 @@ export class EventTagsManage extends Events {
 	}
 
 	/**
+	 * 获取event tags数组（平铺+去重）
+	 */
+	getEventTagsArray() {
+		const tagsMap = this.getEventTags();
+
+		const eventTagSet = new Set<string>();
+		// const nameSet = new Set<string>();
+		for (const timeline of tagsMap.values()) {
+			for (const event of timeline.eventTags) {
+				event.parsedEventTags?.forEach((tag) => {
+					eventTagSet.add(tag);
+
+					// 计数
+					// const count = tagCountMap.get(tag) || 0;
+					// tagCountMap.set(tag, count + 1);
+				});
+
+				if (event.name) {
+					// nameSet.add(event.name);
+					// 计数
+					// const count = nameCountMap.get(event.name) || 0;
+					// nameCountMap.set(event.name, count + 1);
+				}
+			}
+		}
+
+		return Array.from(eventTagSet);
+	}
+
+	/**
 	 * 更新文件中的event tags信息
 	 */
 	async updateFileEventTags(aFile: TFile) {
 		if (!this.app) {
 			console.error(
-				'[updateFileEventTags] 尚未初始化，请先调用EventTagsManage.getInstance().init(app)'
+				'[updateFileEventTags] 尚未初始化，请先调用EventTagsManage.getInstance().init(app)',
 			);
 			return;
 		}
 
 		const timelineEvents = await getTimelineEventsAndTagsInFile(
 			[aFile],
-			this.app
+			this.app,
 		);
 
 		for (const [file, info] of timelineEvents) {

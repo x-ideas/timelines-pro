@@ -13,11 +13,9 @@ import 'virtual:uno.css';
 import type { ITimelineMarkdownParams } from './utils';
 import * as TimelineEventApi from './type/timeline-event';
 import { CreateTimelineEventModal } from './ui/create-timeline-event-modal';
-import { insertFileLinkIfNeed } from './insert-link/insert-file-link';
 import { EventTagsManage } from './event-tags-manage';
 import { TagSuggestions } from './suggestion/tag-suggestion';
 import { TimelineSuggestion } from './suggestion/timeline-suggestion';
-import { ValueUnitSuggesiton } from './suggestion/value-unit-suggestion';
 import { drawVisTimeline } from './draw/draw-vis-timeline';
 import { MarkdownBlockTagSuggestion } from './suggestion/markdown-block-tag-suggestion';
 
@@ -36,7 +34,7 @@ export default class TimelinesPlugin extends Plugin {
 	timelineSuggestion: TimelineSuggestion;
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
-	valueUnitSuggestion: ValueUnitSuggesiton;
+	// valueUnitSuggestion: ValueUnitSuggesiton;
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	markdownBlockTagSuggestion: MarkdownBlockTagSuggestion;
@@ -48,7 +46,7 @@ export default class TimelinesPlugin extends Plugin {
 
 		this.tagSuggestion = new TagSuggestions(this.app);
 		this.timelineSuggestion = new TimelineSuggestion(this.app);
-		this.valueUnitSuggestion = new ValueUnitSuggesiton(this.app);
+		// this.valueUnitSuggestion = new ValueUnitSuggesiton(this.app);
 		this.markdownBlockTagSuggestion = new MarkdownBlockTagSuggestion(this.app);
 
 		setTimeout(() => {
@@ -63,7 +61,7 @@ export default class TimelinesPlugin extends Plugin {
 			async (source, el, ctx) => {
 				const currentFile = this.app.metadataCache.getFirstLinkpathDest(
 					ctx.sourcePath,
-					''
+					'',
 				);
 
 				const proc = new TimelineProcessor();
@@ -78,7 +76,7 @@ export default class TimelinesPlugin extends Plugin {
 					visTimeline: false,
 					currentFile: currentFile,
 				});
-			}
+			},
 		);
 
 		this.addCommand({
@@ -96,7 +94,7 @@ export default class TimelinesPlugin extends Plugin {
 						this.app,
 						// this.app.metadataCache,
 						// this.app.vault,
-						view.file
+						view.file,
 					);
 				}
 			},
@@ -116,7 +114,7 @@ export default class TimelinesPlugin extends Plugin {
 
 		this.registerEditorSuggest(this.tagSuggestion);
 		this.registerEditorSuggest(this.timelineSuggestion);
-		this.registerEditorSuggest(this.valueUnitSuggestion);
+		// this.registerEditorSuggest(this.valueUnitSuggestion);
 		this.registerEditorSuggest(this.markdownBlockTagSuggestion);
 
 		this.addRibbonIcon('tags', 'Timeline', () => {
@@ -139,7 +137,7 @@ export default class TimelinesPlugin extends Plugin {
 		});
 
 		this.app.workspace.revealLeaf(
-			this.app.workspace.getLeavesOfType(TIMELINE_PANEL)[0]
+			this.app.workspace.getLeavesOfType(TIMELINE_PANEL)[0],
 		);
 	}
 
@@ -157,9 +155,9 @@ export default class TimelinesPlugin extends Plugin {
 	 * 搜索timeline event
 	 */
 	private searchTimelineEvents = (
-		filter?: ITimelineMarkdownParams
+		filter?: ITimelineMarkdownParams,
 	): Promise<TimelineEventApi.ITimelineEventItemParsed[]> => {
-		const vaultFiles = this.app.vault.getMarkdownFiles();
+		const _vaultFiles = this.app.vault.getMarkdownFiles();
 
 		const label = '[ob timelines]: 搜索';
 		console.time(label);
@@ -179,7 +177,7 @@ export default class TimelinesPlugin extends Plugin {
 	};
 
 	private showCreateModal = (
-		onOk: (info: TimelineEventApi.ITimelineEventItemSource) => void
+		onOk: (info: TimelineEventApi.ITimelineEventItemSource) => void,
 	) => {
 		new CreateTimelineEventModal(this.app, (info) => {
 			// 修改文件
@@ -194,7 +192,6 @@ export default class TimelinesPlugin extends Plugin {
 		...TimelineEventApi,
 		searchTimelineEvents: this.searchTimelineEvents,
 		showCreateModal: this.showCreateModal,
-		insertFileLinkIfNeed: insertFileLinkIfNeed,
 		drawVisTimeline: drawVisTimeline,
 	};
 }
